@@ -1,0 +1,431 @@
+16:11:04.678030 IP 147.46.215.152.ssh > 147.46.127.125.2929: Flags [P.], seq 1849140064:1849140272, ack 805739528, win 260, length 208
+16:11:04.755383 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:04.755390 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:04.755497 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:04.755502 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:04.755503 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:04.755584 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:04.755589 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:04.801882 IP 147.46.216.119.57515 > 239.255.255.250.1900: UDP, length 137
+16:11:04.837461 IP osi8.snu.ac.kr.netbios-ns > 147.46.15.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:04.854582 IP 147.46.219.85.mdns > 224.0.0.251.mdns: 0 PTR (QM)? _googlecast._tcp.local. (40)
+16:11:04.854648 IP6 fe80::2c30:9229:5e8f:3ab9.mdns > ff02::fb.mdns: 0 PTR (QM)? _googlecast._tcp.local. (40)
+16:11:04.854739 IP 147.46.219.85.mdns > 224.0.0.251.mdns: 0 PTR (QM)? _googlecast._tcp.local. (40)
+16:11:04.854814 IP6 fe80::2c30:9229:5e8f:3ab9.mdns > ff02::fb.mdns: 0 PTR (QM)? _googlecast._tcp.local. (40)
+16:11:04.855059 IP6 fe80::f507:5646:68a8:8552.mdns > ff02::fb.mdns: 0*- [0q] 0/0/0 (12)
+16:11:04.855059 IP 147.46.216.143.mdns > 224.0.0.251.mdns: 0*- [0q] 0/0/0 (12)
+16:11:04.855157 IP 147.46.216.143.mdns > 224.0.0.251.mdns: 0*- [0q] 0/0/0 (12)
+16:11:04.855223 IP vega2.snu.ac.kr.mdns > 224.0.0.251.mdns: 0*- [0q] 0/0/0 (12)
+16:11:04.855316 IP6 fe80::f507:5646:68a8:8552.mdns > ff02::fb.mdns: 0*- [0q] 0/0/0 (12)
+16:11:04.855397 IP vega2.snu.ac.kr.mdns > 224.0.0.251.mdns: 0*- [0q] 0/0/0 (12)
+16:11:04.872331 ARP, Request who-has 147.46.15.153 tell 147.46.15.1, length 46
+16:11:04.875159 IP6 fe80::b063:5350:e03a:c5f4 > ff02::1:ffd5:da34: ICMP6, neighbor solicitation, who has fe80::e5ec:233c:61d5:da34, length 32
+16:11:04.887017 IP 147.46.215.204.60229 > 239.255.255.250.1900: UDP, length 97
+16:11:04.892181 IP 147.46.127.125.2929 > 147.46.215.152.ssh: Flags [.], ack 208, win 256, length 0
+16:11:04.948798 IP6 fe80::fc63:e09a:e1bb:4bff > ff02::1:ffd5:da34: ICMP6, neighbor solicitation, who has fe80::e5ec:233c:61d5:da34, length 32
+16:11:05.005034 ARP, Request who-has 147.46.215.179 tell 147.46.215.1, length 46
+16:11:05.015528 IP6 fe80::c61:acc5:88eb:7a85 > ff02::1:ffd5:da34: ICMP6, neighbor solicitation, who has fe80::e5ec:233c:61d5:da34, length 32
+16:11:05.021716 IP6 fe80::b143:ef2e:3226:6ebb > ff02::1:ff48:81d5: ICMP6, neighbor solicitation, who has fe80::215:99ff:fe48:81d5, length 32
+16:11:05.031460 ARP, Request who-has 147.46.216.112 tell 147.46.216.201, length 46
+16:11:05.099827 IP 147.46.215.181.52219 > 255.255.255.255.10505: UDP, length 94
+16:11:05.138160 IP6 fe80::da1:4015:3a05:1b6b.dhcpv6-client > ff02::1:2.dhcpv6-server: dhcp6 solicit
+16:11:05.183129 IP6 fe80::d5b2:a452:f23b:26ba.dhcpv6-client > ff02::1:2.dhcpv6-server: dhcp6 solicit
+16:11:05.262303 IP6 fe80::6dc8:4d46:4561:a9d9 > ff02::1:ffe6:eb6f: ICMP6, neighbor solicitation, who has fe80::eca4:cf5b:c2e6:eb6f, length 32
+16:11:05.262312 IP6 fe80::6dc8:4d46:4561:a9d9 > ff02::1:ff13:24c6: ICMP6, neighbor solicitation, who has fe80::185:aceb:d013:24c6, length 32
+16:11:05.262324 IP6 fe80::6dc8:4d46:4561:a9d9 > ff02::1:ff6b:ddf8: ICMP6, neighbor solicitation, who has fe80::4524:36c9:b86b:ddf8, length 32
+16:11:05.262365 IP6 fe80::6dc8:4d46:4561:a9d9 > ff02::1:ff6e:a678: ICMP6, neighbor solicitation, who has fe80::5950:8108:4b6e:a678, length 32
+16:11:05.262447 IP6 fe80::6dc8:4d46:4561:a9d9 > ff02::1:ffbb:4bff: ICMP6, neighbor solicitation, who has fe80::fc63:e09a:e1bb:4bff, length 32
+16:11:05.262623 IP6 fe80::4524:36c9:b86b:ddf8 > ff02::1:ff61:a9d9: ICMP6, neighbor solicitation, who has fe80::6dc8:4d46:4561:a9d9, length 32
+16:11:05.262629 IP6 fe80::185:aceb:d013:24c6 > ff02::1:ff61:a9d9: ICMP6, neighbor solicitation, who has fe80::6dc8:4d46:4561:a9d9, length 32
+16:11:05.262944 IP6 fe80::fc63:e09a:e1bb:4bff > ff02::1:ff61:a9d9: ICMP6, neighbor solicitation, who has fe80::6dc8:4d46:4561:a9d9, length 32
+16:11:05.263099 IP6 fe80::5950:8108:4b6e:a678 > ff02::1:ff61:a9d9: ICMP6, neighbor solicitation, who has fe80::6dc8:4d46:4561:a9d9, length 32
+16:11:05.264881 STP 802.1w, Rapid STP, Flags [Learn, Forward, Agreement], bridge-id 8000.5c:a4:8a:70:23:c3.8033, length 43
+16:11:05.267150 IP 147.46.15.23.49455 > 239.255.255.250.1900: UDP, length 174
+16:11:05.299037 IP 147.46.215.118.netbios-ns > 147.46.215.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:05.299325 IP6 fe80::b408:af94:6bcf:d1f7.63699 > ff02::1:3.hostmon: UDP, length 22
+16:11:05.299435 IP 147.46.215.118.63699 > 224.0.0.252.hostmon: UDP, length 22
+16:11:05.299667 IP6 fe80::b408:af94:6bcf:d1f7.50013 > ff02::1:3.hostmon: UDP, length 22
+16:11:05.299767 IP 147.46.215.118.50013 > 224.0.0.252.hostmon: UDP, length 22
+16:11:05.302956 ARP, Request who-has 147.46.219.212 tell 147.46.219.1, length 46
+16:11:05.346457 ARP, Request who-has 147.46.216.207 tell 147.46.216.1, length 46
+16:11:05.423331 IP 147.46.216.213.63074 > 224.0.0.253.3544: UDP, length 40
+16:11:05.504913 IP6 fe80::5ea4:8aff:fe70:23c3.dhcpv6-client > ff02::1:2.dhcpv6-server: dhcp6 inf-req
+16:11:05.506032 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:05.506068 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:05.506131 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:05.506184 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:05.506190 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:05.506202 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:05.506276 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:05.508947 IP6 fe80::8926:4db3:4045:b5db > ff02::1:ffd5:da34: ICMP6, neighbor solicitation, who has fe80::e5ec:233c:61d5:da34, length 32
+16:11:05.587534 IP osi8.snu.ac.kr.netbios-ns > 147.46.15.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:05.615403 IP 147.46.216.112.56773 > 239.255.255.250.1900: UDP, length 137
+16:11:05.665555 IP 147.46.215.152.39630 > ercc.snu.ac.kr.domain: 54832+ PTR? 125.127.46.147.in-addr.arpa. (45)
+16:11:05.666143 IP ercc.snu.ac.kr.domain > 147.46.215.152.39630: 54832 NXDomain* 0/1/0 (104)
+16:11:05.666200 IP 147.46.215.152.35351 > ercc.snu.ac.kr.domain: 36359+ PTR? 152.215.46.147.in-addr.arpa. (45)
+16:11:05.667038 IP ercc.snu.ac.kr.domain > 147.46.215.152.35351: 36359 NXDomain* 0/1/0 (104)
+16:11:05.667095 IP 147.46.215.152.52932 > ercc.snu.ac.kr.domain: 36431+ PTR? 255.219.46.147.in-addr.arpa. (45)
+16:11:05.667813 IP ercc.snu.ac.kr.domain > 147.46.215.152.52932: 36431 NXDomain* 0/1/0 (104)
+16:11:05.667859 IP 147.46.215.152.48518 > ercc.snu.ac.kr.domain: 10799+ PTR? 85.219.46.147.in-addr.arpa. (44)
+16:11:05.668517 IP ercc.snu.ac.kr.domain > 147.46.215.152.48518: 10799 NXDomain* 0/1/0 (103)
+16:11:05.668574 IP 147.46.215.152.49420 > ercc.snu.ac.kr.domain: 49698+ PTR? 250.255.255.239.in-addr.arpa. (46)
+16:11:05.669180 IP ercc.snu.ac.kr.domain > 147.46.215.152.49420: 49698 NXDomain 0/1/0 (103)
+16:11:05.669226 IP 147.46.215.152.36524 > ercc.snu.ac.kr.domain: 35562+ PTR? 119.216.46.147.in-addr.arpa. (45)
+16:11:05.669943 IP ercc.snu.ac.kr.domain > 147.46.215.152.36524: 35562 NXDomain* 0/1/0 (104)
+16:11:05.669993 IP 147.46.215.152.52941 > ercc.snu.ac.kr.domain: 31343+ PTR? 255.15.46.147.in-addr.arpa. (44)
+16:11:05.670684 IP ercc.snu.ac.kr.domain > 147.46.215.152.52941: 31343 NXDomain* 0/1/0 (103)
+16:11:05.670730 IP 147.46.215.152.52498 > ercc.snu.ac.kr.domain: 54833+ PTR? 226.15.46.147.in-addr.arpa. (44)
+16:11:05.671417 IP ercc.snu.ac.kr.domain > 147.46.215.152.52498: 54833* 1/0/0 PTR osi8.snu.ac.kr. (72)
+16:11:05.671473 IP 147.46.215.152.56347 > ercc.snu.ac.kr.domain: 45687+ PTR? 251.0.0.224.in-addr.arpa. (42)
+16:11:05.672044 IP ercc.snu.ac.kr.domain > 147.46.215.152.56347: 45687 NXDomain 0/1/0 (99)
+16:11:05.672103 IP 147.46.215.152.46895 > ercc.snu.ac.kr.domain: 7774+ PTR? b.f.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.f.f.ip6.arpa. (90)
+16:11:05.674341 IP ercc.snu.ac.kr.domain > 147.46.215.152.46895: 7774 NXDomain 0/1/0 (160)
+16:11:05.674390 IP 147.46.215.152.34694 > ercc.snu.ac.kr.domain: 24291+ PTR? 9.b.a.3.f.8.e.5.9.2.2.9.0.3.c.2.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:05.675089 IP ercc.snu.ac.kr.domain > 147.46.215.152.34694: 24291 NXDomain 0/1/0 (125)
+16:11:05.675146 IP 147.46.215.152.40899 > ercc.snu.ac.kr.domain: 6297+ PTR? 2.5.5.8.8.a.8.6.6.4.6.5.7.0.5.f.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:05.675942 IP ercc.snu.ac.kr.domain > 147.46.215.152.40899: 6297 NXDomain 0/1/0 (125)
+16:11:05.675993 IP 147.46.215.152.53300 > ercc.snu.ac.kr.domain: 39997+ PTR? 143.216.46.147.in-addr.arpa. (45)
+16:11:05.676690 IP ercc.snu.ac.kr.domain > 147.46.215.152.53300: 39997 NXDomain* 0/1/0 (104)
+16:11:05.676742 IP 147.46.215.152.59535 > ercc.snu.ac.kr.domain: 5299+ PTR? 57.216.46.147.in-addr.arpa. (44)
+16:11:05.677524 IP ercc.snu.ac.kr.domain > 147.46.215.152.59535: 5299* 1/0/0 PTR vega2.snu.ac.kr. (73)
+16:11:05.677580 IP 147.46.215.152.51643 > ercc.snu.ac.kr.domain: 24727+ PTR? 153.15.46.147.in-addr.arpa. (44)
+16:11:05.678348 IP ercc.snu.ac.kr.domain > 147.46.215.152.51643: 24727 NXDomain* 0/1/0 (103)
+16:11:05.678394 IP 147.46.215.152.40420 > ercc.snu.ac.kr.domain: 38079+ PTR? 1.15.46.147.in-addr.arpa. (42)
+16:11:05.679103 IP ercc.snu.ac.kr.domain > 147.46.215.152.40420: 38079 NXDomain* 0/1/0 (101)
+16:11:05.679153 IP 147.46.215.152.36959 > ercc.snu.ac.kr.domain: 45116+ PTR? 4.3.a.d.5.d.f.f.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.f.f.ip6.arpa. (90)
+16:11:05.719133 IP6 fe80::b408:af94:6bcf:d1f7.50013 > ff02::1:3.hostmon: UDP, length 22
+16:11:05.719136 IP6 fe80::b408:af94:6bcf:d1f7.63699 > ff02::1:3.hostmon: UDP, length 22
+16:11:05.719185 IP 147.46.215.118.63699 > 224.0.0.252.hostmon: UDP, length 22
+16:11:05.719237 IP 147.46.215.118.50013 > 224.0.0.252.hostmon: UDP, length 22
+16:11:05.731067 ARP, Request who-has 147.46.219.109 tell 147.46.219.1, length 46
+16:11:05.838858 IP 147.46.15.181.64673 > 147.46.15.255.1947: UDP, length 40
+16:11:05.955487 IP ercc.snu.ac.kr.domain > 147.46.215.152.36959: 45116 NXDomain 0/1/0 (160)
+16:11:05.955540 IP 147.46.215.152.49263 > ercc.snu.ac.kr.domain: 33874+ PTR? 4.f.5.c.a.3.0.e.0.5.3.5.3.6.0.b.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:05.956293 IP ercc.snu.ac.kr.domain > 147.46.215.152.49263: 33874 NXDomain 0/1/0 (125)
+16:11:05.956342 IP 147.46.215.152.37929 > ercc.snu.ac.kr.domain: 53502+ PTR? 4.3.a.d.5.d.1.6.c.3.3.2.c.e.5.e.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:05.963458 ARP, Request who-has 147.46.15.67 tell 147.46.15.1, length 46
+16:11:06.022466 IP6 fe80::b143:ef2e:3226:6ebb > ff02::1:ff48:81d5: ICMP6, neighbor solicitation, who has fe80::215:99ff:fe48:81d5, length 32
+16:11:06.047197 IP 147.46.215.118.netbios-ns > 147.46.215.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:06.118808 ARP, Request who-has 147.46.215.199 tell 147.46.215.1, length 46
+16:11:06.137341 IP6 fe80::da1:4015:3a05:1b6b.dhcpv6-client > ff02::1:2.dhcpv6-server: dhcp6 solicit
+16:11:06.156278 IP6 fe80::fc63:e09a:e1bb:4bff.58962 > ff02::c.1900: UDP, length 146
+16:11:06.201499 IP 147.46.215.189.62708 > 255.255.255.255.10505: UDP, length 86
+16:11:06.268213 IP 147.46.15.23.49455 > 239.255.255.250.1900: UDP, length 174
+16:11:06.281597 IP ercc.snu.ac.kr.domain > 147.46.215.152.37929: 53502 NXDomain 0/1/0 (160)
+16:11:06.281829 IP 147.46.215.152.38594 > ercc.snu.ac.kr.domain: 8600+ PTR? 204.215.46.147.in-addr.arpa. (45)
+16:11:06.282464 IP ercc.snu.ac.kr.domain > 147.46.215.152.38594: 8600 NXDomain* 0/1/0 (104)
+16:11:06.282692 IP 147.46.215.152.46891 > ercc.snu.ac.kr.domain: 59924+ PTR? f.f.b.4.b.b.1.e.a.9.0.e.3.6.c.f.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:06.284205 IP ercc.snu.ac.kr.domain > 147.46.215.152.46891: 59924 NXDomain 0/1/0 (125)
+16:11:06.284420 IP 147.46.215.152.50778 > ercc.snu.ac.kr.domain: 39232+ PTR? 179.215.46.147.in-addr.arpa. (45)
+16:11:06.285333 IP ercc.snu.ac.kr.domain > 147.46.215.152.50778: 39232 NXDomain* 0/1/0 (104)
+16:11:06.285533 IP 147.46.215.152.44182 > ercc.snu.ac.kr.domain: 61203+ PTR? 1.215.46.147.in-addr.arpa. (43)
+16:11:06.286148 IP ercc.snu.ac.kr.domain > 147.46.215.152.44182: 61203 NXDomain* 0/1/0 (102)
+16:11:06.286364 IP 147.46.215.152.59684 > ercc.snu.ac.kr.domain: 49115+ PTR? 5.8.a.7.b.e.8.8.5.c.c.a.1.6.c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:06.289888 IP ercc.snu.ac.kr.domain > 147.46.215.152.59684: 49115 NXDomain 0/1/0 (125)
+16:11:06.290104 IP 147.46.215.152.41898 > ercc.snu.ac.kr.domain: 40096+ PTR? 5.d.1.8.8.4.f.f.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.f.f.ip6.arpa. (90)
+16:11:06.290694 IP ercc.snu.ac.kr.domain > 147.46.215.152.41898: 40096 NXDomain 0/1/0 (160)
+16:11:06.290901 IP 147.46.215.152.47161 > ercc.snu.ac.kr.domain: 21686+ PTR? b.b.e.6.6.2.2.3.e.2.f.e.3.4.1.b.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:06.291694 IP ercc.snu.ac.kr.domain > 147.46.215.152.47161: 21686 NXDomain 0/1/0 (125)
+16:11:06.291900 IP 147.46.215.152.37151 > ercc.snu.ac.kr.domain: 11928+ PTR? 5.d.1.8.8.4.e.f.f.f.9.9.5.1.2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:06.292549 IP ercc.snu.ac.kr.domain > 147.46.215.152.37151: 11928 NXDomain 0/1/0 (125)
+16:11:06.292760 IP 147.46.215.152.33067 > ercc.snu.ac.kr.domain: 28713+ PTR? 112.216.46.147.in-addr.arpa. (45)
+16:11:06.293454 IP ercc.snu.ac.kr.domain > 147.46.215.152.33067: 28713 NXDomain* 0/1/0 (104)
+16:11:06.293647 IP 147.46.215.152.57294 > ercc.snu.ac.kr.domain: 46014+ PTR? 201.216.46.147.in-addr.arpa. (45)
+16:11:06.294430 IP ercc.snu.ac.kr.domain > 147.46.215.152.57294: 46014 NXDomain* 0/1/0 (104)
+16:11:06.294636 IP 147.46.215.152.44461 > ercc.snu.ac.kr.domain: 9611+ PTR? 255.255.255.255.in-addr.arpa. (46)
+16:11:06.295297 ARP, Request who-has 147.46.215.40 tell 147.46.215.1, length 46
+16:11:06.295508 IP ercc.snu.ac.kr.domain > 147.46.215.152.44461: 9611 0/1/0 (81)
+16:11:06.295705 IP 147.46.215.152.49655 > ercc.snu.ac.kr.domain: 62403+ PTR? 181.215.46.147.in-addr.arpa. (45)
+16:11:06.296257 IP ercc.snu.ac.kr.domain > 147.46.215.152.49655: 62403 NXDomain* 0/1/0 (104)
+16:11:06.296474 IP 147.46.215.152.35034 > ercc.snu.ac.kr.domain: 47818+ PTR? 2.0.0.0.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.f.f.ip6.arpa. (90)
+16:11:06.297128 IP ercc.snu.ac.kr.domain > 147.46.215.152.35034: 47818 NXDomain 0/1/0 (160)
+16:11:06.297383 IP 147.46.215.152.58621 > ercc.snu.ac.kr.domain: 9702+ PTR? b.6.b.1.5.0.a.3.5.1.0.4.1.a.d.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:06.298252 IP ercc.snu.ac.kr.domain > 147.46.215.152.58621: 9702 NXDomain 0/1/0 (125)
+16:11:06.298449 IP 147.46.215.152.34702 > ercc.snu.ac.kr.domain: 22426+ PTR? a.b.6.2.b.3.2.f.2.5.4.a.2.b.5.d.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:06.299190 IP ercc.snu.ac.kr.domain > 147.46.215.152.34702: 22426 NXDomain 0/1/0 (125)
+16:11:06.299379 IP 147.46.215.152.55406 > ercc.snu.ac.kr.domain: 30593+ PTR? f.6.b.e.6.e.f.f.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.f.f.ip6.arpa. (90)
+16:11:06.353572 ARP, Request who-has 147.46.216.244 (Broadcast) tell 147.46.216.244, length 46
+16:11:06.354552 ARP, Reply 147.46.216.244 is-at ba:c5:fd:f2:70:5d (oui Unknown), length 46
+16:11:06.403482 IP 147.46.219.85.27036 > 147.46.219.255.27036: UDP, length 41
+16:11:06.425616 ARP, Request who-has 147.46.15.48 tell 147.46.15.1, length 46
+16:11:06.470981 IP 147.46.15.96.889 > 147.46.15.255.889: UDP, length 1420
+16:11:06.487610 ARP, Request who-has 147.46.215.193 tell 147.46.215.1, length 46
+16:11:06.492387 IP ercc.snu.ac.kr.domain > 147.46.215.152.55406: 30593 NXDomain 0/1/0 (160)
+16:11:06.492464 ARP, Request who-has 255.255.216.1 (60:f5:61:e9:8f:ad (oui Unknown)) tell 143.173.255.255, length 46
+16:11:06.492476 IP 147.46.215.152.58880 > ercc.snu.ac.kr.domain: 46383+ PTR? 9.d.9.a.1.6.5.4.6.4.d.4.8.c.d.6.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:06.493116 IP ercc.snu.ac.kr.domain > 147.46.215.152.58880: 46383 NXDomain 0/1/0 (125)
+16:11:06.493194 IP 147.46.215.152.59608 > ercc.snu.ac.kr.domain: 55114+ PTR? f.6.b.e.6.e.2.c.b.5.f.c.4.a.c.e.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:06.495205 IP ercc.snu.ac.kr.domain > 147.46.215.152.59608: 55114 NXDomain 0/1/0 (125)
+16:11:06.495289 IP 147.46.215.152.49364 > ercc.snu.ac.kr.domain: 13059+ PTR? 6.c.4.2.3.1.f.f.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.f.f.ip6.arpa. (90)
+16:11:06.496219 ARP, Request who-has 255.255.216.1 (30:28:57:ed:8f:ad (oui Unknown)) tell 143.173.255.255, length 46
+16:11:06.613074 IP6 fe80::e5ec:233c:61d5:da34 > ff02::16: HBH ICMP6, multicast listener report v2, 1 group record(s), length 28
+16:11:06.617795 IP6 fe80::e5ec:233c:61d5:da34.62680 > ff02::1:3.hostmon: UDP, length 33
+16:11:06.617870 IP 147.46.216.112.62680 > 224.0.0.252.hostmon: UDP, length 33
+16:11:06.618372 IP6 fe80::e5ec:233c:61d5:da34 > ff02::16: HBH ICMP6, multicast listener report v2, 1 group record(s), length 28
+16:11:06.664423 ARP, Request who-has 255.255.216.1 (b0:e2:69:e8:8f:ad (oui Unknown)) tell 143.173.255.255, length 46
+16:11:06.677573 IP6 fe80::e5ec:233c:61d5:da34.51157 > ff02::c.3702: UDP, length 1095
+16:11:06.677663 IP 147.46.216.112.51156 > 239.255.255.250.3702: UDP, length 1082
+16:11:06.693303 IP ercc.snu.ac.kr.domain > 147.46.215.152.49364: 13059 NXDomain 0/1/0 (160)
+16:11:06.693356 IP 147.46.215.152.37155 > ercc.snu.ac.kr.domain: 21431+ PTR? 6.c.4.2.3.1.0.d.b.e.c.a.5.8.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:06.694860 ARP, Request who-has 147.46.216.127 tell 147.46.216.1, length 46
+16:11:06.695960 IP ercc.snu.ac.kr.domain > 147.46.215.152.37155: 21431 NXDomain 0/1/0 (125)
+16:11:06.696010 IP 147.46.215.152.38703 > ercc.snu.ac.kr.domain: 60178+ PTR? 8.f.d.d.b.6.f.f.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.f.f.ip6.arpa. (90)
+16:11:06.700067 IP 147.46.216.183.64512 > 239.255.255.250.1900: UDP, length 133
+16:11:06.703068 ARP, Request who-has 255.255.216.1 (d0:18:8d:fb:8f:ad (oui Unknown)) tell 143.173.255.255, length 46
+16:11:06.732398 IP6 fe80::bc3b:37f3:5662:21a3 > ff02::1:ffd5:da34: ICMP6, neighbor solicitation, who has fe80::e5ec:233c:61d5:da34, length 32
+16:11:06.739570 IP6 fe80::e5ec:233c:61d5:da34.51157 > ff02::c.3702: UDP, length 1095
+16:11:06.739864 IP 147.46.216.112.51156 > 239.255.255.250.3702: UDP, length 1082
+16:11:06.739957 IP 147.46.216.112.51156 > 239.255.255.250.3702: UDP, length 1082
+16:11:06.797211 IP 147.46.215.118.netbios-ns > 147.46.215.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:06.816482 IP 147.46.216.112.51156 > 239.255.255.250.3702: UDP, length 1082
+16:11:06.862252 IP 147.46.216.112.51156 > 239.255.255.250.3702: UDP, length 1082
+16:11:06.873566 IP6 fe80::e5ec:233c:61d5:da34.51157 > ff02::c.3702: UDP, length 1095
+16:11:06.891027 IP ercc.snu.ac.kr.domain > 147.46.215.152.38703: 60178 NXDomain 0/1/0 (160)
+16:11:06.891078 IP 147.46.215.152.45625 > ercc.snu.ac.kr.domain: 57258+ PTR? 8.f.d.d.b.6.8.b.9.c.6.3.4.2.5.4.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:06.892783 IP6 fe80::e5ec:233c:61d5:da34.51157 > ff02::c.3702: UDP, length 1095
+16:11:06.895067 IP ercc.snu.ac.kr.domain > 147.46.215.152.45625: 57258 NXDomain 0/1/0 (125)
+16:11:06.895119 IP 147.46.215.152.59782 > ercc.snu.ac.kr.domain: 36809+ PTR? 8.7.6.a.e.6.f.f.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.f.f.ip6.arpa. (90)
+16:11:06.927231 IP 147.46.15.206.50807 > 255.255.255.255.3956: UDP, length 8
+16:11:06.970924 IP 147.46.216.112.51156 > 239.255.255.250.3702: UDP, length 1082
+16:11:06.988332 IP 147.46.219.229.17500 > 147.46.219.255.17500: UDP, length 220
+16:11:07.027782 IP6 fe80::e5ec:233c:61d5:da34.62680 > ff02::1:3.hostmon: UDP, length 33
+16:11:07.027838 IP 147.46.216.112.62680 > 224.0.0.252.hostmon: UDP, length 33
+16:11:07.043868 IP ercc.snu.ac.kr.domain > 147.46.215.152.59782: 36809 NXDomain 0/1/0 (160)
+16:11:07.043920 IP 147.46.215.152.49660 > ercc.snu.ac.kr.domain: 23343+ PTR? 8.7.6.a.e.6.b.4.8.0.1.8.0.5.9.5.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:07.045993 IP 147.46.216.112.57133 > 224.0.0.253.3544: UDP, length 40
+16:11:07.047599 IP ercc.snu.ac.kr.domain > 147.46.215.152.49660: 23343 NXDomain 0/1/0 (125)
+16:11:07.047649 IP 147.46.215.152.36400 > ercc.snu.ac.kr.domain: 17392+ PTR? f.f.b.4.b.b.f.f.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.f.f.ip6.arpa. (90)
+16:11:07.052928 ARP, Request who-has riact.snu.ac.kr tell 147.46.15.7, length 46
+16:11:07.066595 IP6 fe80::fda4:4b47:3b17:e9e7.63306 > ff02::1:3.hostmon: UDP, length 22
+16:11:07.066815 IP osi8.snu.ac.kr.54432 > 224.0.0.252.hostmon: UDP, length 22
+16:11:07.106745 IP 147.46.216.112.51156 > 239.255.255.250.3702: UDP, length 1082
+16:11:07.108863 IP 147.46.215.181.52220 > 255.255.255.255.10505: UDP, length 94
+16:11:07.112583 IP6 fe80::e5ec:233c:61d5:da34 > ff02::16: HBH ICMP6, multicast listener report v2, 1 group record(s), length 28
+16:11:07.141892 IP6 fe80::e5ec:233c:61d5:da34.51157 > ff02::c.3702: UDP, length 1095
+16:11:07.166456 IP6 fe80::fda4:4b47:3b17:e9e7.63306 > ff02::1:3.hostmon: UDP, length 22
+16:11:07.166458 IP osi8.snu.ac.kr.54432 > 224.0.0.252.hostmon: UDP, length 22
+16:11:07.192842 IP ercc.snu.ac.kr.domain > 147.46.215.152.36400: 17392 NXDomain 0/1/0 (160)
+16:11:07.192897 IP 147.46.215.152.53634 > ercc.snu.ac.kr.domain: 6082+ PTR? 9.d.9.a.1.6.f.f.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.f.f.ip6.arpa. (90)
+16:11:07.264867 STP 802.1w, Rapid STP, Flags [Learn, Forward, Agreement], bridge-id 8000.5c:a4:8a:70:23:c3.8033, length 43
+16:11:07.268860 IP 147.46.15.23.49455 > 239.255.255.250.1900: UDP, length 174
+16:11:07.279336 IP 147.46.216.112.51156 > 239.255.255.250.3702: UDP, length 1082
+16:11:07.279996 IP 147.46.216.3.54122 > 239.255.255.250.1900: UDP, length 174
+16:11:07.288172 IP 147.46.219.164.mdns > 224.0.0.251.mdns: 0 [7q] AAAA (QM)? TDII.local. AAAA (QM)? nas-snuvl.local. SRV (QM)? NAS-SNUVL._smb._tcp.local. A (QM)? nas-snuvl.local. SRV (QM)? TDII._afpovertcp._tcp.local. SRV (QM)? TDII._smb._tcp.local. A (QM)? TDII.local. (116)
+16:11:07.288506 IP 147.46.216.143.mdns > 224.0.0.251.mdns: 0*- [0q] 0/0/0 (12)
+16:11:07.288506 IP 147.46.216.91.mdns > 224.0.0.251.mdns: 0*- [0q] 4/0/0 (Cache flush) A 147.46.216.91, (Cache flush) AAAA fe80::211:32ff:fe5d:bd83, (Cache flush) SRV TDII.local.:548 0 0, (Cache flush) SRV TDII.local.:445 0 0 (138)
+16:11:07.288626 IP nas-vl.snu.ac.kr.mdns > 224.0.0.251.mdns: 0*- [0q] 3/0/0 (Cache flush) A 147.46.216.171, (Cache flush) AAAA fe80::211:32ff:fe50:bba1, (Cache flush) SRV nas-snuvl.local.:445 0 0 (111)
+16:11:07.288627 IP vega2.snu.ac.kr.mdns > 224.0.0.251.mdns: 0*- [0q] 0/0/0 (12)
+16:11:07.290241 IP6 fe80::b143:ef2e:3226:6ebb > ff02::1:ff48:81d5: ICMP6, neighbor solicitation, who has fe80::215:99ff:fe48:81d5, length 32
+16:11:07.306746 ARP, Request who-has 10.20.0.2 tell 10.20.0.14, length 46
+16:11:07.322866 IP6 fe80::e5ec:233c:61d5:da34.51157 > ff02::c.3702: UDP, length 1095
+16:11:07.352234 IP ercc.snu.ac.kr.domain > 147.46.215.152.53634: 6082 NXDomain 0/1/0 (160)
+16:11:07.352314 IP 147.46.215.152.59697 > ercc.snu.ac.kr.domain: 19285+ PTR? 23.15.46.147.in-addr.arpa. (43)
+16:11:07.352850 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:07.353033 IP ercc.snu.ac.kr.domain > 147.46.215.152.59697: 19285 NXDomain* 0/1/0 (102)
+16:11:07.353034 IP6 fe80::2c30:9229:5e8f:3ab9.58069 > ff02::1:3.hostmon: UDP, length 22
+16:11:07.353082 IP 147.46.215.152.58523 > ercc.snu.ac.kr.domain: 40904+ PTR? 255.215.46.147.in-addr.arpa. (45)
+16:11:07.353149 IP 147.46.219.85.58069 > 224.0.0.252.hostmon: UDP, length 22
+16:11:07.353663 ARP, Request who-has 147.46.216.244 (Broadcast) tell 147.46.216.244, length 46
+16:11:07.353732 IP ercc.snu.ac.kr.domain > 147.46.215.152.58523: 40904 NXDomain* 0/1/0 (104)
+16:11:07.353778 IP 147.46.215.152.35923 > ercc.snu.ac.kr.domain: 41804+ PTR? 118.215.46.147.in-addr.arpa. (45)
+16:11:07.354451 IP ercc.snu.ac.kr.domain > 147.46.215.152.35923: 41804 NXDomain* 0/1/0 (104)
+16:11:07.354502 IP 147.46.215.152.49588 > ercc.snu.ac.kr.domain: 17241+ PTR? 3.0.0.0.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.f.f.ip6.arpa. (90)
+16:11:07.354626 ARP, Reply 147.46.216.244 is-at ba:c5:fd:f2:70:5d (oui Unknown), length 46
+16:11:07.355204 IP ercc.snu.ac.kr.domain > 147.46.215.152.49588: 17241 NXDomain 0/1/0 (160)
+16:11:07.355254 IP 147.46.215.152.41960 > ercc.snu.ac.kr.domain: 37725+ PTR? 7.f.1.d.f.c.b.6.4.9.f.a.8.0.4.b.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:07.357751 IP ercc.snu.ac.kr.domain > 147.46.215.152.41960: 37725 NXDomain 0/1/0 (125)
+16:11:07.357801 IP 147.46.215.152.54512 > ercc.snu.ac.kr.domain: 28539+ PTR? 252.0.0.224.in-addr.arpa. (42)
+16:11:07.358053 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:07.358236 IP6 fe80::2c30:9229:5e8f:3ab9.53809 > ff02::1:3.hostmon: UDP, length 22
+16:11:07.358292 IP 147.46.219.85.53809 > 224.0.0.252.hostmon: UDP, length 22
+16:11:07.358428 IP ercc.snu.ac.kr.domain > 147.46.215.152.54512: 28539 NXDomain 0/1/0 (99)
+16:11:07.358480 IP 147.46.215.152.59563 > ercc.snu.ac.kr.domain: 25552+ PTR? 212.219.46.147.in-addr.arpa. (45)
+16:11:07.359132 IP ercc.snu.ac.kr.domain > 147.46.215.152.59563: 25552 NXDomain* 0/1/0 (104)
+16:11:07.359178 IP 147.46.215.152.39597 > ercc.snu.ac.kr.domain: 10064+ PTR? 1.219.46.147.in-addr.arpa. (43)
+16:11:07.359902 IP ercc.snu.ac.kr.domain > 147.46.215.152.39597: 10064 NXDomain* 0/1/0 (102)
+16:11:07.359951 IP 147.46.215.152.42830 > ercc.snu.ac.kr.domain: 15331+ PTR? 207.216.46.147.in-addr.arpa. (45)
+16:11:07.360593 IP ercc.snu.ac.kr.domain > 147.46.215.152.42830: 15331 NXDomain* 0/1/0 (104)
+16:11:07.360639 IP 147.46.215.152.44633 > ercc.snu.ac.kr.domain: 7982+ PTR? 1.216.46.147.in-addr.arpa. (43)
+16:11:07.361769 IP ercc.snu.ac.kr.domain > 147.46.215.152.44633: 7982 NXDomain* 0/1/0 (102)
+16:11:07.361817 IP 147.46.215.152.39962 > ercc.snu.ac.kr.domain: 26505+ PTR? 253.0.0.224.in-addr.arpa. (42)
+16:11:07.362491 IP ercc.snu.ac.kr.domain > 147.46.215.152.39962: 26505 NXDomain 0/1/0 (99)
+16:11:07.362538 IP 147.46.215.152.32991 > ercc.snu.ac.kr.domain: 54076+ PTR? 213.216.46.147.in-addr.arpa. (45)
+16:11:07.363268 IP ercc.snu.ac.kr.domain > 147.46.215.152.32991: 54076 NXDomain* 0/1/0 (104)
+16:11:07.363317 IP 147.46.215.152.59230 > ercc.snu.ac.kr.domain: 16212+ PTR? 3.c.3.2.0.7.e.f.f.f.a.8.4.a.e.5.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:07.365715 IP ercc.snu.ac.kr.domain > 147.46.215.152.59230: 16212 NXDomain 0/1/0 (125)
+16:11:07.365772 IP 147.46.215.152.43516 > ercc.snu.ac.kr.domain: 41916+ PTR? b.d.5.b.5.4.0.4.3.b.d.4.6.2.9.8.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:07.366737 IP osi8.snu.ac.kr.netbios-ns > 147.46.15.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:07.368205 IP ercc.snu.ac.kr.domain > 147.46.215.152.43516: 41916 NXDomain 0/1/0 (125)
+16:11:07.368259 IP 147.46.215.152.49553 > ercc.snu.ac.kr.domain: 62229+ PTR? 1.80.46.147.in-addr.arpa. (42)
+16:11:07.368485 IP6 fe80::b056:e43d:1e8c:f3f0.dhcpv6-client > ff02::1:2.dhcpv6-server: dhcp6 solicit
+16:11:07.369228 IP ercc.snu.ac.kr.domain > 147.46.215.152.49553: 62229* 1/0/0 PTR ercc.snu.ac.kr. (70)
+16:11:07.369356 IP 147.46.215.152.52534 > ercc.snu.ac.kr.domain: 54098+ PTR? 109.219.46.147.in-addr.arpa. (45)
+16:11:07.369883 IP ercc.snu.ac.kr.domain > 147.46.215.152.52534: 54098 NXDomain* 0/1/0 (104)
+16:11:07.369932 IP 147.46.215.152.46287 > ercc.snu.ac.kr.domain: 26476+ PTR? 181.15.46.147.in-addr.arpa. (44)
+16:11:07.370544 IP ercc.snu.ac.kr.domain > 147.46.215.152.46287: 26476 NXDomain* 0/1/0 (103)
+16:11:07.370603 IP 147.46.215.152.54812 > ercc.snu.ac.kr.domain: 54093+ PTR? 67.15.46.147.in-addr.arpa. (43)
+16:11:07.371482 IP ercc.snu.ac.kr.domain > 147.46.215.152.54812: 54093 NXDomain* 0/1/0 (102)
+16:11:07.371535 IP 147.46.215.152.49013 > ercc.snu.ac.kr.domain: 39808+ PTR? 199.215.46.147.in-addr.arpa. (45)
+16:11:07.371664 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:07.371847 IP6 fe80::2c30:9229:5e8f:3ab9.61475 > ff02::1:3.hostmon: UDP, length 22
+16:11:07.371915 IP 147.46.219.85.61475 > 224.0.0.252.hostmon: UDP, length 22
+16:11:07.372185 IP ercc.snu.ac.kr.domain > 147.46.215.152.49013: 39808 NXDomain* 0/1/0 (104)
+16:11:07.372243 IP 147.46.215.152.50442 > ercc.snu.ac.kr.domain: 54617+ PTR? c.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.f.f.ip6.arpa. (90)
+16:11:07.373046 IP ercc.snu.ac.kr.domain > 147.46.215.152.50442: 54617 NXDomain 0/1/0 (160)
+16:11:07.373097 IP 147.46.215.152.51611 > ercc.snu.ac.kr.domain: 21390+ PTR? 189.215.46.147.in-addr.arpa. (45)
+16:11:07.373931 IP ercc.snu.ac.kr.domain > 147.46.215.152.51611: 21390 NXDomain* 0/1/0 (104)
+16:11:07.374024 IP 147.46.215.152.58258 > ercc.snu.ac.kr.domain: 17365+ PTR? 40.215.46.147.in-addr.arpa. (44)
+16:11:07.374861 IP ercc.snu.ac.kr.domain > 147.46.215.152.58258: 17365 NXDomain* 0/1/0 (103)
+16:11:07.374929 IP 147.46.215.152.43543 > ercc.snu.ac.kr.domain: 54024+ PTR? 244.216.46.147.in-addr.arpa. (45)
+16:11:07.375657 IP ercc.snu.ac.kr.domain > 147.46.215.152.43543: 54024 NXDomain* 0/1/0 (104)
+16:11:07.375714 IP 147.46.215.152.47224 > ercc.snu.ac.kr.domain: 13292+ PTR? 48.15.46.147.in-addr.arpa. (43)
+16:11:07.376352 IP ercc.snu.ac.kr.domain > 147.46.215.152.47224: 13292 NXDomain* 0/1/0 (102)
+16:11:07.376401 IP 147.46.215.152.54708 > ercc.snu.ac.kr.domain: 58219+ PTR? 96.15.46.147.in-addr.arpa. (43)
+16:11:07.377190 IP ercc.snu.ac.kr.domain > 147.46.215.152.54708: 58219 NXDomain* 0/1/0 (102)
+16:11:07.377239 IP 147.46.215.152.48561 > ercc.snu.ac.kr.domain: 35686+ PTR? 193.215.46.147.in-addr.arpa. (45)
+16:11:07.378016 IP ercc.snu.ac.kr.domain > 147.46.215.152.48561: 35686 NXDomain* 0/1/0 (104)
+16:11:07.378075 IP 147.46.215.152.50295 > ercc.snu.ac.kr.domain: 56242+ PTR? 1.216.255.255.in-addr.arpa. (44)
+16:11:07.397943 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:07.398146 IP6 fe80::2c30:9229:5e8f:3ab9.57845 > ff02::1:3.hostmon: UDP, length 22
+16:11:07.398231 IP 147.46.219.85.57845 > 224.0.0.252.hostmon: UDP, length 22
+16:11:07.407376 IP 147.46.219.164.mdns > 224.0.0.251.mdns: 0 [2q] SRV (QM)? MRL_JEHEE._afpovertcp._tcp.local. SRV (QM)? MRL_JEHEE._smb._tcp.local. (71)
+16:11:07.407776 IP 147.46.216.143.mdns > 224.0.0.251.mdns: 0*- [0q] 0/0/0 (12)
+16:11:07.407844 IP vega2.snu.ac.kr.mdns > 224.0.0.251.mdns: 0*- [0q] 0/0/0 (12)
+16:11:07.407844 IP jump.snu.ac.kr.mdns > 224.0.0.251.mdns: 0*- [0q] 2/0/6 (Cache flush) SRV MRL-JEHEE.local.:548 0 0, (Cache flush) SRV MRL-JEHEE.local.:445 0 0 (231)
+16:11:07.408028 IP6 fe80::bac7:5dff:fecb:eb92.mdns > ff02::fb.mdns: 0*- [0q] 2/0/6 (Cache flush) SRV MRL-JEHEE.local.:548 0 0, (Cache flush) SRV MRL-JEHEE.local.:445 0 0 (231)
+16:11:07.438922 IP6 fe80::e5ec:233c:61d5:da34.64972 > ff02::1:3.hostmon: UDP, length 33
+16:11:07.439002 IP 147.46.216.112.64972 > 224.0.0.252.hostmon: UDP, length 33
+16:11:07.439515 IP6 fe80::e5ec:233c:61d5:da34 > ff02::16: HBH ICMP6, multicast listener report v2, 1 group record(s), length 28
+16:11:07.440116 IP6 fe80::e5ec:233c:61d5:da34 > ff02::16: HBH ICMP6, multicast listener report v2, 1 group record(s), length 28
+16:11:07.511206 IP ercc.snu.ac.kr.domain > 147.46.215.152.50295: 56242 NXDomain 0/1/0 (112)
+16:11:07.511262 IP 147.46.215.152.49803 > ercc.snu.ac.kr.domain: 5045+ PTR? 255.255.173.143.in-addr.arpa. (46)
+16:11:07.522864 IP 147.46.219.164.mdns > 224.0.0.251.mdns: 0 [4q] AAAA (QM)? Caprica.local. SRV (QM)? Caprica._afpovertcp._tcp.local. SRV (QM)? Caprica._smb._tcp.local. A (QM)? Caprica.local. (87)
+16:11:07.523176 IP 147.46.215.135.mdns > 224.0.0.251.mdns: 0*- [0q] 4/0/3 (Cache flush) AAAA fe80::225:ff:fed1:5420, (Cache flush) A 147.46.215.135, (Cache flush) SRV Caprica.local.:445 0 0, (Cache flush) SRV Caprica.local.:548 0 0 (209)
+16:11:07.523250 IP6 fe80::225:ff:fed1:5420.mdns > ff02::fb.mdns: 0*- [0q] 4/0/3 (Cache flush) AAAA fe80::225:ff:fed1:5420, (Cache flush) A 147.46.215.135, (Cache flush) SRV Caprica.local.:445 0 0, (Cache flush) SRV Caprica.local.:548 0 0 (209)
+16:11:07.523291 IP vega2.snu.ac.kr.mdns > 224.0.0.251.mdns: 0*- [0q] 0/0/0 (12)
+16:11:07.523291 IP 147.46.216.143.mdns > 224.0.0.251.mdns: 0*- [0q] 0/0/0 (12)
+16:11:07.543433 IP hmse5.snu.ac.kr.6771 > 239.192.0.0.6771: UDP, length 115
+16:11:07.592245 IP6 fe80::e5ec:233c:61d5:da34.51157 > ff02::c.3702: UDP, length 1095
+16:11:07.594260 IP ercc.snu.ac.kr.domain > 147.46.215.152.49803: 5045 NXDomain 0/1/0 (100)
+16:11:07.594385 IP 147.46.215.152.51240 > ercc.snu.ac.kr.domain: 25934+ PTR? 6.1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.2.0.f.f.ip6.arpa. (90)
+16:11:07.595129 IP ercc.snu.ac.kr.domain > 147.46.215.152.51240: 25934 NXDomain 0/1/0 (160)
+16:11:07.602309 ARP, Reply 147.46.216.243 is-at 76:41:cb:cd:79:84 (oui Unknown), length 46
+16:11:07.602313 ARP, Request who-has 147.46.216.243 (Broadcast) tell 147.46.216.243, length 46
+16:11:07.613180 IP6 fe80::e5ec:233c:61d5:da34 > ff02::16: HBH ICMP6, multicast listener report v2, 1 group record(s), length 28
+16:11:07.665477 IP 147.46.215.152.54639 > ercc.snu.ac.kr.domain: 3038+ PTR? 127.216.46.147.in-addr.arpa. (45)
+16:11:07.666216 IP ercc.snu.ac.kr.domain > 147.46.215.152.54639: 3038 NXDomain* 0/1/0 (104)
+16:11:07.666320 IP 147.46.215.152.55498 > ercc.snu.ac.kr.domain: 35401+ PTR? 183.216.46.147.in-addr.arpa. (45)
+16:11:07.667165 IP ercc.snu.ac.kr.domain > 147.46.215.152.55498: 35401 NXDomain* 0/1/0 (104)
+16:11:07.667264 IP 147.46.215.152.54443 > ercc.snu.ac.kr.domain: 44712+ PTR? 3.a.1.2.2.6.6.5.3.f.7.3.b.3.c.b.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:07.669644 IP ercc.snu.ac.kr.domain > 147.46.215.152.54443: 44712 NXDomain 0/1/0 (125)
+16:11:07.669767 IP 147.46.215.152.58223 > ercc.snu.ac.kr.domain: 9429+ PTR? 206.15.46.147.in-addr.arpa. (44)
+16:11:07.670761 IP ercc.snu.ac.kr.domain > 147.46.215.152.58223: 9429 NXDomain* 0/1/0 (103)
+16:11:07.670851 IP 147.46.215.152.34434 > ercc.snu.ac.kr.domain: 51514+ PTR? 229.219.46.147.in-addr.arpa. (45)
+16:11:07.671615 IP ercc.snu.ac.kr.domain > 147.46.215.152.34434: 51514 NXDomain* 0/1/0 (104)
+16:11:07.671738 IP 147.46.215.152.37955 > ercc.snu.ac.kr.domain: 4506+ PTR? 24.15.46.147.in-addr.arpa. (43)
+16:11:07.672442 IP ercc.snu.ac.kr.domain > 147.46.215.152.37955: 4506* 1/0/0 PTR riact.snu.ac.kr. (72)
+16:11:07.672526 IP 147.46.215.152.35553 > ercc.snu.ac.kr.domain: 31449+ PTR? 7.15.46.147.in-addr.arpa. (42)
+16:11:07.673228 IP ercc.snu.ac.kr.domain > 147.46.215.152.35553: 31449 NXDomain* 0/1/0 (101)
+16:11:07.673339 IP 147.46.215.152.47891 > ercc.snu.ac.kr.domain: 63013+ PTR? 7.e.9.e.7.1.b.3.7.4.b.4.4.a.d.f.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:07.674251 IP ercc.snu.ac.kr.domain > 147.46.215.152.47891: 63013 NXDomain 0/1/0 (125)
+16:11:07.674374 IP 147.46.215.152.36867 > ercc.snu.ac.kr.domain: 10028+ PTR? 3.216.46.147.in-addr.arpa. (43)
+16:11:07.675252 IP ercc.snu.ac.kr.domain > 147.46.215.152.36867: 10028 NXDomain* 0/1/0 (102)
+16:11:07.675341 IP 147.46.215.152.44318 > ercc.snu.ac.kr.domain: 21074+ PTR? 164.219.46.147.in-addr.arpa. (45)
+16:11:07.676120 IP ercc.snu.ac.kr.domain > 147.46.215.152.44318: 21074 NXDomain* 0/1/0 (104)
+16:11:07.676218 IP 147.46.215.152.59348 > ercc.snu.ac.kr.domain: 10746+ PTR? 91.216.46.147.in-addr.arpa. (44)
+16:11:07.676926 IP ercc.snu.ac.kr.domain > 147.46.215.152.59348: 10746 NXDomain* 0/1/0 (103)
+16:11:07.677026 IP 147.46.215.152.46373 > ercc.snu.ac.kr.domain: 6804+ PTR? 171.216.46.147.in-addr.arpa. (45)
+16:11:07.678747 IP ercc.snu.ac.kr.domain > 147.46.215.152.46373: 6804* 2/0/0 PTR nas-vl.snu.ac.kr., PTR nas-vl.snu.kr. (100)
+16:11:07.678854 IP 147.46.215.152.45625 > ercc.snu.ac.kr.domain: 7142+ PTR? 2.0.20.10.in-addr.arpa. (40)
+16:11:07.679469 IP ercc.snu.ac.kr.domain > 147.46.215.152.45625: 7142 NXDomain 0/1/0 (90)
+16:11:07.679552 IP 147.46.215.152.56151 > ercc.snu.ac.kr.domain: 866+ PTR? 14.0.20.10.in-addr.arpa. (41)
+16:11:07.680031 IP ercc.snu.ac.kr.domain > 147.46.215.152.56151: 866 NXDomain 0/1/0 (91)
+16:11:07.680234 IP 147.46.215.152.51154 > ercc.snu.ac.kr.domain: 17469+ PTR? 0.f.3.f.c.8.e.1.d.3.4.e.6.5.0.b.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:07.681062 IP ercc.snu.ac.kr.domain > 147.46.215.152.51154: 17469 NXDomain 0/1/0 (125)
+16:11:07.681242 IP 147.46.215.152.41745 > ercc.snu.ac.kr.domain: 9078+ PTR? 169.15.46.147.in-addr.arpa. (44)
+16:11:07.682075 IP ercc.snu.ac.kr.domain > 147.46.215.152.41745: 9078* 1/0/0 PTR jump.snu.ac.kr. (72)
+16:11:07.682129 IP 147.46.215.152.56315 > ercc.snu.ac.kr.domain: 8168+ PTR? 2.9.b.e.b.c.e.f.f.f.d.5.7.c.a.b.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:07.763357 IP6 fe80::2c30:9229:5e8f:3ab9.58069 > ff02::1:3.hostmon: UDP, length 22
+16:11:07.763433 IP 147.46.219.85.58069 > 224.0.0.252.hostmon: UDP, length 22
+16:11:07.768335 IP6 fe80::2c30:9229:5e8f:3ab9.53809 > ff02::1:3.hostmon: UDP, length 22
+16:11:07.768387 IP 147.46.219.85.53809 > 224.0.0.252.hostmon: UDP, length 22
+16:11:07.773460 IP6 fe80::e5ec:233c:61d5:da34.51157 > ff02::c.3702: UDP, length 1095
+16:11:07.782369 IP6 fe80::2c30:9229:5e8f:3ab9.61475 > ff02::1:3.hostmon: UDP, length 22
+16:11:07.782422 IP 147.46.219.85.61475 > 224.0.0.252.hostmon: UDP, length 22
+16:11:07.792538 IP 147.46.15.1 > ospf-all.mcast.net: OSPFv2, Hello, length 56
+16:11:07.802008 IP 147.46.216.119.57515 > 239.255.255.250.1900: UDP, length 137
+16:11:07.808452 IP6 fe80::2c30:9229:5e8f:3ab9.57845 > ff02::1:3.hostmon: UDP, length 22
+16:11:07.808506 IP 147.46.219.85.57845 > 224.0.0.252.hostmon: UDP, length 22
+16:11:07.830010 ARP, Request who-has aiprinter.snu.ac.kr tell 147.46.15.158, length 46
+16:11:07.830182 ARP, Request who-has 147.46.216.1 tell 147.46.216.112, length 46
+16:11:07.850007 IP6 fe80::e5ec:233c:61d5:da34.64972 > ff02::1:3.hostmon: UDP, length 33
+16:11:07.850112 IP 147.46.216.112.64972 > 224.0.0.252.hostmon: UDP, length 33
+16:11:08.022101 IP6 fe80::b143:ef2e:3226:6ebb > ff02::1:ff48:81d5: ICMP6, neighbor solicitation, who has fe80::215:99ff:fe48:81d5, length 32
+16:11:08.042114 IP6 fe80::2c30:9229:5e8f:3ab9.dhcpv6-client > ff02::1:2.dhcpv6-server: dhcp6 solicit
+16:11:08.087618 ARP, Request who-has 147.46.216.207 tell 147.46.216.1, length 46
+16:11:08.102772 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:08.107747 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:08.116565 IP osi8.snu.ac.kr.netbios-ns > 147.46.15.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:08.121756 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:08.137423 IP6 fe80::da1:4015:3a05:1b6b.dhcpv6-client > ff02::1:2.dhcpv6-server: dhcp6 solicit
+16:11:08.147781 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:08.203678 IP 147.46.215.189.62709 > 255.255.255.255.10505: UDP, length 86
+16:11:08.269553 IP 147.46.15.23.49455 > 239.255.255.250.1900: UDP, length 174
+16:11:08.281092 IP 147.46.216.3.54122 > 239.255.255.250.1900: UDP, length 174
+16:11:08.306583 ARP, Request who-has 10.20.0.2 tell 10.20.0.14, length 46
+16:11:08.353801 ARP, Request who-has 147.46.216.244 (Broadcast) tell 147.46.216.244, length 46
+16:11:08.354761 ARP, Reply 147.46.216.244 is-at ba:c5:fd:f2:70:5d (oui Unknown), length 46
+16:11:08.362476 ARP, Request who-has 147.46.216.1 tell 147.46.216.3, length 46
+16:11:08.581068 ARP, Request who-has 147.46.216.1 tell prt309.snu.ac.kr, length 46
+16:11:08.602344 ARP, Request who-has 147.46.216.243 (Broadcast) tell 147.46.216.243, length 46
+16:11:08.602378 ARP, Reply 147.46.216.243 is-at 76:41:cb:cd:79:84 (oui Unknown), length 46
+16:11:08.602601 ARP, Request who-has 192.168.0.1 tell 192.168.0.111, length 46
+16:11:08.602612 ARP, Request who-has 192.168.0.1 tell 192.168.0.111, length 46
+16:11:08.615527 IP 147.46.216.112.56773 > 239.255.255.250.1900: UDP, length 137
+16:11:08.760359 IP6 fe80::209b:62e2:7adb:7b2d.dhcpv6-client > ff02::1:2.dhcpv6-server: dhcp6 solicit
+16:11:08.765946 ARP, Request who-has 147.46.216.145 tell 147.46.216.1, length 46
+16:11:08.853341 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:08.858260 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:08.866884 IP osi8.snu.ac.kr.netbios-ns > 147.46.15.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:08.872333 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:08.885357 IP ercc.snu.ac.kr.domain > 147.46.215.152.56315: 8168 NXDomain 0/1/0 (125)
+16:11:08.885623 IP 147.46.215.152.39236 > ercc.snu.ac.kr.domain: 23072+ PTR? 135.215.46.147.in-addr.arpa. (45)
+16:11:08.886221 IP ercc.snu.ac.kr.domain > 147.46.215.152.39236: 23072 NXDomain* 0/1/0 (104)
+16:11:08.886429 IP 147.46.215.152.53732 > ercc.snu.ac.kr.domain: 13351+ PTR? 0.2.4.5.1.d.e.f.f.f.0.0.5.2.2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa. (90)
+16:11:08.890183 IP ercc.snu.ac.kr.domain > 147.46.215.152.53732: 13351 NXDomain 0/1/0 (125)
+16:11:08.890400 IP 147.46.215.152.39747 > ercc.snu.ac.kr.domain: 23611+ PTR? 0.0.192.239.in-addr.arpa. (42)
+16:11:08.891211 IP ercc.snu.ac.kr.domain > 147.46.215.152.39747: 23611 NXDomain 0/1/0 (99)
+16:11:08.891367 IP 147.46.215.152.50087 > ercc.snu.ac.kr.domain: 897+ PTR? 233.215.46.147.in-addr.arpa. (45)
+16:11:08.891931 IP ercc.snu.ac.kr.domain > 147.46.215.152.50087: 897* 1/0/0 PTR hmse5.snu.ac.kr. (74)
+16:11:08.892138 IP 147.46.215.152.51696 > ercc.snu.ac.kr.domain: 20150+ PTR? 243.216.46.147.in-addr.arpa. (45)
+16:11:08.892806 IP ercc.snu.ac.kr.domain > 147.46.215.152.51696: 20150 NXDomain* 0/1/0 (104)
+16:11:08.893204 IP 147.46.215.152.48952 > ercc.snu.ac.kr.domain: 6962+ PTR? 5.0.0.224.in-addr.arpa. (40)
+16:11:08.893857 IP ercc.snu.ac.kr.domain > 147.46.215.152.48952: 6962 1/0/0 PTR ospf-all.mcast.net. (72)
+16:11:08.894049 IP 147.46.215.152.57089 > ercc.snu.ac.kr.domain: 26503+ PTR? 128.15.46.147.in-addr.arpa. (44)
+16:11:08.894638 IP ercc.snu.ac.kr.domain > 147.46.215.152.57089: 26503* 1/0/0 PTR aiprinter.snu.ac.kr. (77)
+16:11:08.894797 IP 147.46.215.152.40949 > ercc.snu.ac.kr.domain: 22685+ PTR? 158.15.46.147.in-addr.arpa. (44)
+16:11:08.895575 IP ercc.snu.ac.kr.domain > 147.46.215.152.40949: 22685 NXDomain* 0/1/0 (103)
+16:11:08.895806 IP 147.46.215.152.50440 > ercc.snu.ac.kr.domain: 8201+ PTR? 132.216.46.147.in-addr.arpa. (45)
+16:11:08.896598 IP ercc.snu.ac.kr.domain > 147.46.215.152.50440: 8201* 1/0/0 PTR prt309.snu.ac.kr. (75)
+16:11:08.896799 IP 147.46.215.152.42978 > ercc.snu.ac.kr.domain: 64773+ PTR? 1.0.168.192.in-addr.arpa. (42)
+16:11:08.897542 IP ercc.snu.ac.kr.domain > 147.46.215.152.42978: 64773 NXDomain 0/1/0 (92)
+16:11:08.897699 IP 147.46.215.152.32936 > ercc.snu.ac.kr.domain: 13200+ PTR? 111.0.168.192.in-addr.arpa. (44)
+16:11:08.897853 IP 147.46.219.85.netbios-ns > 147.46.219.255.netbios-ns: NBT UDP PACKET(137): QUERY; REQUEST; BROADCAST
+16:11:08.898400 IP ercc.snu.ac.kr.domain > 147.46.215.152.32936: 13200 NXDomain 0/1/0 (94)
+16:11:08.969879 ARP, Request who-has 147.46.15.67 tell 147.46.15.1, length 46
+16:11:09.020584 IP 147.46.216.3.17500 > 255.255.255.255.17500: UDP, length 295
+16:11:09.021837 IP6 fe80::b143:ef2e:3226:6ebb > ff02::1:ff48:81d5: ICMP6, neighbor solicitation, who has fe80::215:99ff:fe48:81d5, length 32
+16:11:09.021853 IP 147.46.216.3.17500 > 147.46.216.255.17500: UDP, length 295
+16:11:09.109945 IP 147.46.215.181.52221 > 255.255.255.255.10505: UDP, length 94
+16:11:09.157291 IP6 fe80::fc63:e09a:e1bb:4bff.58962 > ff02::c.1900: UDP, length 146
+16:11:09.227362 ARP, Request who-has 147.46.15.175 tell 147.46.15.1, length 46
+16:11:09.264873 STP 802.1w, Rapid STP, Flags [Learn, Forward, Agreement], bridge-id 8000.5c:a4:8a:70:23:c3.8033, length 43
+16:11:09.273149 ARP, Request who-has 147.46.240.71 tell 147.46.15.42, length 46
+16:11:09.281155 IP 147.46.216.3.54122 > 239.255.255.250.1900: UDP, length 174
+16:11:09.306602 ARP, Request who-has 10.20.0.2 tell 10.20.0.14, length 46
+16:11:09.350783 ARP, Request who-has 147.46.216.232 tell 147.46.216.1, length 46
+16:11:09.584333 ARP, Request who-has 147.46.215.12 tell 147.46.215.1, length 46
+16:11:09.602431 ARP, Request who-has 147.46.216.243 (Broadcast) tell 147.46.216.243, length 46
+16:11:09.602449 ARP, Reply 147.46.216.243 is-at 76:41:cb:cd:79:84 (oui Unknown), length 46
+16:11:09.629047 IP 147.46.15.139.21945 > 147.46.15.255.21945: UDP, length 3
+

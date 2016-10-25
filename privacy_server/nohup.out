@@ -1,0 +1,23 @@
+Traceback (most recent call last):
+  File "privacy.py", line 1, in <module>
+    from flask import Flask, url_for
+ImportError: No module named flask
+Traceback (most recent call last):
+  File "privacy.py", line 1, in <module>
+    from flask import Flask, url_for
+ImportError: No module named flask
+ * Running on http://147.46.215.152:2507/ (Press CTRL+C to quit)
+223.62.234.29 - - [25/Sep/2016 20:03:59] "POST /sensitiveinfo/1 HTTP/1.1" 405 -
+223.62.234.29 - - [25/Sep/2016 20:04:10] "POST /sensitiveinfo/1 HTTP/1.1" 405 -
+14.32.21.148 - - [25/Sep/2016 20:04:28] "GET /sensitiveinfo/1 HTTP/1.1" 200 -
+14.32.21.148 - - [25/Sep/2016 20:04:28] "GET /favicon.ico HTTP/1.1" 404 -
+14.32.21.148 - - [25/Sep/2016 20:04:28] "GET /favicon.ico HTTP/1.1" 404 -
+223.62.234.29 - - [25/Sep/2016 20:05:15] "POST /sensitiveinfo/1 HTTP/1.1" 405 -
+14.32.21.148 - - [25/Sep/2016 20:07:36] "GET /sensitiveinfo/1 HTTP/1.1" 200 -
+223.62.234.29 - - [25/Sep/2016 20:08:04] "POST /sensitiveinfo/1 HTTP/1.1" 405 -
+223.62.234.29 - - [25/Sep/2016 20:11:00] "POST /sensitiveinfo/1 HTTP/1.1" 405 -
+223.62.234.29 - - [25/Sep/2016 20:16:39] "POST /sensitiveinfo/1 HTTP/1.1" 405 -
+223.62.234.29 - - [25/Sep/2016 20:16:47] "POST /sensitiveinfo/1 HTTP/1.1" 405 -
+223.62.234.29 - - [25/Sep/2016 20:16:48] "POST /sensitiveinfo/1 HTTP/1.1" 405 -
+223.62.234.29 - - [25/Sep/2016 20:18:39] "POST /sensitiveinfo/1 HTTP/1.1" 405 -
+223.62.234.29 - - [25/Sep/2016 20:20:36] "GET /sensitiveinfo/1 HTTP/1.1" 200 -
