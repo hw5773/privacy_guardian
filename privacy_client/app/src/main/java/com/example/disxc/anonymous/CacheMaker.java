@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-;
 
 /**
  * Created by disxc on 2016-09-27.
@@ -29,18 +28,33 @@ public class CacheMaker {
 
     public CacheMaker(String dateString, Context context) {
         ctx = context;
-        if (!checkUpdate(dateString)) {
+
+        //if invalid datestring as connection failed..
+        Log.d("CacheMaker", dateString + "::datestring");
+        if( dateString.length() < 3){
+            Log.d("CacheMaker", "Invalid date string... update from file");
+            lastUpdate = openFromFile("ver");
+            if(fetchFromFile())
+                Toast.makeText(ctx, "기존 DB를 사용합니다.", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(ctx, "업데이트에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+        }
+        //if datestring is out-of-date
+        else if (!checkUpdate(dateString)) {
             Log.d("creation", "updating to new version");
             fetchFromServer(dateString);
-        } else {
+        }
+        // if datestring is up-to-date
+        else {
             //it have valid version file
             Log.d("creation", "up to date");
             lastUpdate = dateString;
             fetchFromFile();
+            Toast.makeText(ctx, "최신 DB입니다.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void fetchFromFile(){
+    boolean fetchFromFile(){
         try {
             String fileString = openFromFile("json");
             if(fileString.compareTo("") == 0){
@@ -48,11 +62,12 @@ public class CacheMaker {
             }
             jsonArray = new JSONArray(fileString);
             writeToFile();
-            Toast.makeText(ctx, "최신 DB입니다.", Toast.LENGTH_SHORT).show();
+            return false;
         }
         catch (JSONException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public void fetchFromServer(String str){
@@ -77,7 +92,7 @@ public class CacheMaker {
             if(inputstream != null){
                 InputStreamReader in = new InputStreamReader(inputstream);
                 BufferedReader br = new BufferedReader(in);
-                String fileString = "";
+                String fileString;
                 StringBuilder stringBuilder = new StringBuilder();
 
                 while((fileString = br.readLine()) != null){
