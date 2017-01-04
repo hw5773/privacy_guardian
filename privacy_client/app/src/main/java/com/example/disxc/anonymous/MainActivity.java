@@ -2,20 +2,28 @@ package com.example.disxc.anonymous;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -94,21 +102,13 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        /* floating action button */
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //showTextInputDialog("주소를 입력해 주세요", "http://147.46.215.152:2507/lastupdate");
-                if(cm == null)
-                    return;
-                showTextInputDialog("package name 을 입력해주세용", "testapp");
-                try {
-                    textReturn = "testapp";
-                    JSONObject jo = cm.getByAppId(textReturn);
-                    Toast.makeText(getApplicationContext(), jo.toString(), Toast.LENGTH_SHORT).show();
-                }
-                catch(JSONException e){
-
-                }
+                Intent i = new Intent(getApplicationContext(), Mainpage.class);
+                startActivity(i);
 
             }
         });

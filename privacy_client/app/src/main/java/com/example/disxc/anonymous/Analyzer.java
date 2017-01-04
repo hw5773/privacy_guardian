@@ -28,6 +28,10 @@ public class Analyzer {
         String ret = "";
         try {
             payloadObject = new JSONObject(payload);
+            if(cache.getByAppId(appname) == null){
+                Log.d("analyze", "Cannot find by appid:" + appname);
+                return;
+            }
             hooker = cache.getByAppId(appname).getJSONArray("HookTarget");
             Log.d("analyze", "target: " + payloadObject.toString());
             for(int i = 0; i < hooker.length(); i++){

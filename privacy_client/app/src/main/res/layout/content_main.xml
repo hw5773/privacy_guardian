@@ -22,7 +22,7 @@
         android:scrollbars = "vertical"/>
 
     <Button
-        android:text="업데이트"
+        android:text="@string/update"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/button"
