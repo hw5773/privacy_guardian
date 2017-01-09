@@ -1,4 +1,4 @@
-package com.example.disxc.anonymous;
+package com.example.disxc.anonymous.Activity;
 
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -19,7 +19,15 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
-public class Mainpage extends AppCompatActivity {
+import com.example.disxc.anonymous.R;
+
+import layout.Analyze;
+import layout.Firstpage;
+import layout.Settings;
+
+public class MainActivity extends AppCompatActivity
+        implements Firstpage.onFirstpageInteractionListener, Analyze.OnAnalyzeInteractionListener,
+    Settings.OnSettingsInteractionListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -39,7 +47,7 @@ public class Mainpage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mainpage);
+        setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -89,39 +97,17 @@ public class Mainpage extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
+    //firstpage와 interaction 하는 리스너?
+    public void onFirstpageInteraction(){
 
-        public PlaceholderFragment() {
-        }
+    }
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
+    public void onAnalyzeInteraction(){
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_mainpage, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
+    }
+
+    public void onSettingsInteraction(){
+
     }
 
     /**
@@ -138,7 +124,15 @@ public class Mainpage extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            //return PlaceholderFragment.newInstance(position + 1);
+            switch(position){
+                case 0:
+                    return Firstpage.newInstance("1", "2");
+                case 1:
+                    return Analyze.newInstance();
+                default:
+                    return Settings.newInstance();
+            }
         }
 
         @Override
@@ -151,11 +145,11 @@ public class Mainpage extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    return "첫 페이지";
                 case 1:
-                    return "SECTION 2";
+                    return "분석";
                 case 2:
-                    return "SECTION 3";
+                    return "설정";
             }
             return null;
         }

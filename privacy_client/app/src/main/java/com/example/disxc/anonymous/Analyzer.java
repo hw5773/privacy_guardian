@@ -29,14 +29,14 @@ public class Analyzer {
         try {
             payloadObject = new JSONObject(payload);
             if(cache.getByAppId(appname) == null){
-                Log.d("analyze", "Cannot find by appid:" + appname);
+                Log.d("Analyze", "Cannot find by appid:" + appname);
                 return;
             }
             hooker = cache.getByAppId(appname).getJSONArray("HookTarget");
-            Log.d("analyze", "target: " + payloadObject.toString());
+            Log.d("Analyze", "target: " + payloadObject.toString());
             for(int i = 0; i < hooker.length(); i++){
                 JSONObject jo = hooker.getJSONObject(i);
-                Log.d("analyze", "analyze:" + jo.getString("Keyword"));
+                Log.d("Analyze", "Analyze:" + jo.getString("Keyword"));
                 try {
                     String value = payloadObject.getString(jo.getString("Keyword"));
                     String type = jo.getString("Type");
@@ -44,7 +44,7 @@ public class Analyzer {
                     log(appname, "123", "127.0.0.1", type, value);
                 }
                 catch(JSONException e){
-                    Log.d("analyze", "object parse failed:" + jo.toString());
+                    Log.d("Analyze", "object parse failed:" + jo.toString());
                     continue;
                 }
             }

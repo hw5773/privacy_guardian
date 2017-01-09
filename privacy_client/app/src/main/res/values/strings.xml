@@ -4,7 +4,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="update">업데이트해봅시당</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_firstpage">Privacy Guardian 첫 페이지입니다.</string>
     <string name="hello_analyzer">I\'ll guide you to analyzing…</string>
     <string name="title_activity_mainpage">mainpage</string>
     <string name="section_format">Hello World from section: %1$d</string>

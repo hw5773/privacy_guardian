@@ -13,12 +13,12 @@ import com.example.disxc.anonymous.R;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link firstpage.OnFragmentInteractionListener} interface
+ * {@link onFirstpageInteractionListener} interface
  * to handle interaction events.
- * Use the {@link firstpage#newInstance} factory method to
+ * Use the {@link Firstpage#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class firstpage extends Fragment {
+public class Firstpage extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -28,9 +28,9 @@ public class firstpage extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+    private onFirstpageInteractionListener mListener;
 
-    public firstpage() {
+    public Firstpage() {
         // Required empty public constructor
     }
 
@@ -40,15 +40,16 @@ public class firstpage extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment firstpage.
+     * @return A new instance of fragment Firstpage.
      */
     // TODO: Rename and change types and number of parameters
-    public static firstpage newInstance(String param1, String param2) {
-        firstpage fragment = new firstpage();
+    public static Firstpage newInstance(String param1, String param2) {
+        Firstpage fragment = new Firstpage();
+        /*
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+        fragment.setArguments(args);*/
         return fragment;
     }
 
@@ -71,18 +72,18 @@ public class firstpage extends Fragment {
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onFirstpageInteraction();
         }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof onFirstpageInteractionListener) {
+            mListener = (onFirstpageInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement onFirstpageInteractionListener");
         }
     }
 
@@ -102,8 +103,7 @@ public class firstpage extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    public interface onFirstpageInteractionListener {
+        void onFirstpageInteraction();
     }
 }
