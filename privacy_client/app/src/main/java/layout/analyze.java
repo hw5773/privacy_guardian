@@ -3,12 +3,21 @@ package layout;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
+import com.example.disxc.anonymous.Activity.OldActivity;
+import com.example.disxc.anonymous.Analyzer;
+import com.example.disxc.anonymous.CacheMaker;
+import com.example.disxc.anonymous.HttpConnect;
 import com.example.disxc.anonymous.R;
+
+import java.util.concurrent.ExecutionException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,14 +28,10 @@ import com.example.disxc.anonymous.R;
  * create an instance of this fragment.
  */
 public class Analyze extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    //Analyze Argements
+    CacheMaker cm = null;
+    Analyzer analyzer = null;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnAnalyzeInteractionListener mListener;
 
@@ -34,30 +39,17 @@ public class Analyze extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment Analyze.
-     */
+
     // TODO: Rename and change types and number of parameters
     public static Analyze newInstance() {
         Analyze fragment = new Analyze();
-        /*
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);*/
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
     }
 
     @Override
@@ -65,6 +57,48 @@ public class Analyze extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_analyze, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        /* button perform update */
+        Button button = (Button) view.findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    String ret = createHTTPConnection("http://147.46.215.152:2507/lastupdate");
+                    cm = new CacheMaker(ret, getContext());
+                    //cm = new CacheMaker(((TextView) findViewById(R.id.mainText)).getText().toString(), OldActivity.this);
+                } catch(Exception e){
+                    Log.d("button", "something Wrong...");
+                }
+            }
+        });
+
+        /* button check if it has updated */
+        Button button2 = (Button) view.findViewById(R.id.button2);
+        button2.setOnClickListener(new View.OnClickListener() { // this button performs DB update!
+            @Override
+            public void onClick(View v) {
+                if(cm == null)
+                    return;
+                cm.printCacheData();
+            }
+        });
+
+        /* button Analyze */
+        Button button3 = (Button) view.findViewById(R.id.button3);
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v){
+                if(cm != null){
+                    analyzer = new Analyzer(cm, getContext());
+                    analyzer.sample(0);
+                }
+            }
+        });
+        //super.onViewCreated(view, savedInstanceState);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -103,5 +137,23 @@ public class Analyze extends Fragment {
      */
     public interface OnAnalyzeInteractionListener {
         void onAnalyzeInteraction();
+    }
+
+    private String createHTTPConnection(String urlString){
+        HttpConnect h = new HttpConnect();
+        String ret = "";
+        try {
+            ret = h.execute(urlString).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return ret;
+        /*
+        TextView tv = (TextView) findViewById(R.id.mainText);
+        tv.setText(ret);
+        tv.setMovementMethod(new ScrollingMovementMethod());
+        */
     }
 }

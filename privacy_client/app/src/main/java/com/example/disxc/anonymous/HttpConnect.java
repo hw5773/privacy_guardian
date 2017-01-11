@@ -19,9 +19,9 @@ import java.net.URL;
  */
 
 public class HttpConnect extends AsyncTask<String, Object, String> {
-    Context ctx;
-    public HttpConnect(Context context) {
-        ctx = context;
+    //Context ctx;
+    public HttpConnect() {
+        //ctx = context;
     }
 
     @Override

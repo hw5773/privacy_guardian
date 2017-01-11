@@ -67,7 +67,7 @@ public class OldActivity extends AppCompatActivity {
     }
 
     private String createHTTPConnection(String urlString){
-        HttpConnect h = new HttpConnect(getApplicationContext());
+        HttpConnect h = new HttpConnect();
         String ret = "";
         try {
             ret = h.execute(urlString).get();

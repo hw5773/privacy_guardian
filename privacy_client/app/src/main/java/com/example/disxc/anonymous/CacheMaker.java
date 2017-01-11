@@ -1,6 +1,5 @@
 package com.example.disxc.anonymous;
 
-import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -23,7 +22,7 @@ public class CacheMaker {
     //create DB update and table creation method.
     JSONArray jsonArray;
     String lastUpdate;
-    String fetchURL = "http://147.46.215.152:2507/sensitiveinfo";
+    final String fetchURL = "http://147.46.215.152:2507/sensitiveinfo";
     Context ctx;
 
     public CacheMaker(String dateString, Context context) {
@@ -61,7 +60,7 @@ public class CacheMaker {
                 Log.d("fetchFromFile", "file not found");
             }
             jsonArray = new JSONArray(fileString);
-            writeToFile();
+            saveCacheData();
             return false;
         }
         catch (JSONException e) {
@@ -71,12 +70,12 @@ public class CacheMaker {
     }
 
     public void fetchFromServer(String str){
-        HttpConnect hcon = new HttpConnect(ctx);
+        HttpConnect hcon = new HttpConnect();
         try {
             JSONObject jo = new JSONObject(hcon.execute(fetchURL).get());
             jsonArray = new JSONArray(jo.getString("List"));
             lastUpdate = str;
-            writeToFile();
+            saveCacheData();
             Toast.makeText(ctx, "최신 DB로 업데이트 했습니다.", Toast.LENGTH_SHORT).show();
             Log.d("fetchFromServer", "Successful");
         }
@@ -138,18 +137,18 @@ public class CacheMaker {
         Log.d("printCacheData", "last update : " + lastUpdate);
     }
 
-    public void writeToFile(){
+    private void saveCacheData(){
         // write jsonArray and lastUpdate to file ("json", "ver")
         OutputStream outputStream;
         try {
             outputStream = ctx.openFileOutput("json", ctx.MODE_PRIVATE);
             outputStream.write(jsonArray.toString().getBytes());
-            Log.d("writeToFile", "writed:" + jsonArray.toString());
+            Log.d("saveCacheData", "writed:" + jsonArray.toString());
             outputStream.close();
             outputStream = ctx.openFileOutput("ver", ctx.MODE_PRIVATE);
             outputStream.write(lastUpdate.getBytes());
             outputStream.close();
-            Log.d("writeToFile", "writed:" + lastUpdate);
+            Log.d("saveCacheData", "writed:" + lastUpdate);
         }
         catch(Exception e){
             e.printStackTrace();

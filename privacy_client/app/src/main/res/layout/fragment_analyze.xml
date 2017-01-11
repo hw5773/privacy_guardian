@@ -4,10 +4,51 @@
     android:layout_height="match_parent"
     tools:context="layout.Analyze">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/hello_analyzer"
+            android:id="@+id/analyze_textview1"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <Button
+            android:text="@string/analyze_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/button"
+            tools:text="update" />
+
+        <Button
+            android:text="@string/analyze_analyze"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="17dp"
+            android:layout_marginStart="17dp"
+            android:id="@+id/button3"
+            tools:text="analyze" />
+
+        <Button
+            android:text="@string/analyze_checkUpdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="17dp"
+            android:layout_marginStart="17dp"
+            android:id="@+id/button2"
+            tools:text="check update"
+            android:elevation="0dp" />
+    </LinearLayout>
+
+
+    <ListView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_analyzer" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="65dp"
+        android:id="@+id/listview1" />
 
 </FrameLayout>

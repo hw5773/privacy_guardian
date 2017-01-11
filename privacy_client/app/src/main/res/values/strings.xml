@@ -3,7 +3,9 @@
     <string name="action_settings">Settings</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="update">업데이트해봅시당</string>
+    <string name="analyze_update">업데이트해봅시당</string>
+    <string name="analyze_checkUpdate">업데이트확인</string>
+    <string name="analyze_analyze">분석하기</string>
     <string name="hello_firstpage">Privacy Guardian 첫 페이지입니다.</string>
     <string name="hello_analyzer">I\'ll guide you to analyzing…</string>
     <string name="title_activity_mainpage">mainpage</string>
