@@ -9,14 +9,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Toast;
 
-import com.example.disxc.anonymous.Activity.OldActivity;
 import com.example.disxc.anonymous.Analyzer;
 import com.example.disxc.anonymous.CacheMaker;
-import com.example.disxc.anonymous.HttpConnect;
 import com.example.disxc.anonymous.R;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -28,10 +31,12 @@ import java.util.concurrent.ExecutionException;
  * create an instance of this fragment.
  */
 public class Analyze extends Fragment {
-    //Analyze Argements
+    //Analyze Arguments
     CacheMaker cm = null;
     Analyzer analyzer = null;
-
+    ListView listView = null;
+    ArrayList<String> LIST_MENU = new ArrayList<String>();
+    ArrayAdapter arrayAdapter = null;
 
     private OnAnalyzeInteractionListener mListener;
 
@@ -67,9 +72,15 @@ public class Analyze extends Fragment {
             @Override
             public void onClick(View v) {
                 try {
-                    String ret = createHTTPConnection("http://147.46.215.152:2507/lastupdate");
-                    cm = new CacheMaker(ret, getContext());
-                    //cm = new CacheMaker(((TextView) findViewById(R.id.mainText)).getText().toString(), OldActivity.this);
+                    cm = new CacheMaker(getContext());
+                    analyzer = new Analyzer(cm, getContext());
+                    analyzer.setOnLogGenerated(new Analyzer.onLogGeneratedListener(){
+                        @Override
+                        public void onLogGenerated(String log) {
+                            LIST_MENU.add(LIST_MENU.size() + "." + log);
+                            arrayAdapter.notifyDataSetChanged();
+                        }
+                    });
                 } catch(Exception e){
                     Log.d("button", "something Wrong...");
                 }
@@ -81,9 +92,8 @@ public class Analyze extends Fragment {
         button2.setOnClickListener(new View.OnClickListener() { // this button performs DB update!
             @Override
             public void onClick(View v) {
-                if(cm == null)
-                    return;
-                cm.printCacheData();
+                if(analyzer != null)
+                    analyzer.sample(0);
             }
         });
 
@@ -92,12 +102,14 @@ public class Analyze extends Fragment {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
-                if(cm != null){
-                    analyzer = new Analyzer(cm, getContext());
-                    analyzer.sample(0);
-                }
+                if(analyzer != null)
+                    analyzer.sample(1);
             }
         });
+
+        arrayAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, LIST_MENU);
+        listView = (ListView) view.findViewById(R.id.listview1);
+        listView.setAdapter(arrayAdapter);
         //super.onViewCreated(view, savedInstanceState);
     }
 
@@ -106,6 +118,7 @@ public class Analyze extends Fragment {
         if (mListener != null) {
             mListener.onAnalyzeInteraction();
         }
+        //getActivity().runOnUiThread();
     }
 
     @Override
@@ -115,7 +128,7 @@ public class Analyze extends Fragment {
             mListener = (OnAnalyzeInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement onFirstpageInteractionListener");
+                    + " must implement AnalyzeInteractionListener");
         }
     }
 
@@ -139,21 +152,4 @@ public class Analyze extends Fragment {
         void onAnalyzeInteraction();
     }
 
-    private String createHTTPConnection(String urlString){
-        HttpConnect h = new HttpConnect();
-        String ret = "";
-        try {
-            ret = h.execute(urlString).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        return ret;
-        /*
-        TextView tv = (TextView) findViewById(R.id.mainText);
-        tv.setText(ret);
-        tv.setMovementMethod(new ScrollingMovementMethod());
-        */
-    }
 }

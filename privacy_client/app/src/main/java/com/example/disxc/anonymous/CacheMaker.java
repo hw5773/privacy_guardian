@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.concurrent.ExecutionException;
+
+import layout.Analyze;
 
 /**
  * Created by disxc on 2016-09-27.
@@ -22,13 +25,15 @@ public class CacheMaker {
     //create DB update and table creation method.
     JSONArray jsonArray;
     String lastUpdate;
+    final String dateURL = "http://147.46.215.152:2507/lastupdate";
     final String fetchURL = "http://147.46.215.152:2507/sensitiveinfo";
     Context ctx;
 
-    public CacheMaker(String dateString, Context context) {
+    public CacheMaker(Context context) {
         ctx = context;
+        String dateString = createHTTPConnection(dateURL);
 
-        //if invalid datestring as connection failed..
+        //if invalid dateString as connection failed..
         Log.d("CacheMaker", dateString + "::datestring");
         if( dateString.length() < 3){
             Log.d("CacheMaker", "Invalid date string... update from file");
@@ -38,12 +43,12 @@ public class CacheMaker {
             else
                 Toast.makeText(ctx, "업데이트에 실패하였습니다.", Toast.LENGTH_SHORT).show();
         }
-        //if datestring is out-of-date
+        //if dateString is out-of-date
         else if (!checkUpdate(dateString)) {
             Log.d("creation", "updating to new version");
             fetchFromServer(dateString);
         }
-        // if datestring is up-to-date
+        // if dateString is up-to-date
         else {
             //it have valid version file
             Log.d("creation", "up to date");
@@ -69,12 +74,11 @@ public class CacheMaker {
         return false;
     }
 
-    public void fetchFromServer(String str){
-        HttpConnect hcon = new HttpConnect();
+    public void fetchFromServer(String dateString){
         try {
-            JSONObject jo = new JSONObject(hcon.execute(fetchURL).get());
+            JSONObject jo = new JSONObject(createHTTPConnection(fetchURL));
             jsonArray = new JSONArray(jo.getString("List"));
-            lastUpdate = str;
+            lastUpdate = dateString;
             saveCacheData();
             Toast.makeText(ctx, "최신 DB로 업데이트 했습니다.", Toast.LENGTH_SHORT).show();
             Log.d("fetchFromServer", "Successful");
@@ -153,5 +157,18 @@ public class CacheMaker {
         catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    private String createHTTPConnection(String urlString){
+        HttpConnect h = new HttpConnect();
+        String ret = "";
+        try {
+            ret = h.execute(urlString).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return ret;
     }
 }
