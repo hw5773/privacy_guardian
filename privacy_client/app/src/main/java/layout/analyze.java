@@ -1,8 +1,11 @@
 package layout;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -12,15 +15,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.disxc.anonymous.Analyzer;
 import com.example.disxc.anonymous.CacheMaker;
+import com.example.disxc.anonymous.DatabaseHelper;
 import com.example.disxc.anonymous.R;
+import com.example.disxc.anonymous.DatabaseHelper.LogEntry;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,13 +32,15 @@ import java.util.concurrent.ExecutionException;
  * Use the {@link Analyze#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Analyze extends Fragment {
+public class Analyze extends Fragment
+        implements Analyzer.onLogGeneratedListener, Button.OnClickListener {
     //Analyze Arguments
     CacheMaker cm = null;
     Analyzer analyzer = null;
     ListView listView = null;
     ArrayList<String> LIST_MENU = new ArrayList<String>();
     ArrayAdapter arrayAdapter = null;
+    DatabaseHelper mDatabase;
 
     private OnAnalyzeInteractionListener mListener;
 
@@ -44,8 +48,6 @@ public class Analyze extends Fragment {
         // Required empty public constructor
     }
 
-
-    // TODO: Rename and change types and number of parameters
     public static Analyze newInstance() {
         Analyze fragment = new Analyze();
         return fragment;
@@ -54,7 +56,7 @@ public class Analyze extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mDatabase = new DatabaseHelper(getContext());
     }
 
     @Override
@@ -68,48 +70,32 @@ public class Analyze extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         /* button perform update */
         Button button = (Button) view.findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    cm = new CacheMaker(getContext());
-                    analyzer = new Analyzer(cm, getContext());
-                    analyzer.setOnLogGenerated(new Analyzer.onLogGeneratedListener(){
-                        @Override
-                        public void onLogGenerated(String log) {
-                            LIST_MENU.add(LIST_MENU.size() + "." + log);
-                            arrayAdapter.notifyDataSetChanged();
-                        }
-                    });
-                } catch(Exception e){
-                    Log.d("button", "something Wrong...");
-                }
-            }
-        });
+        button.setOnClickListener(this);
 
-        /* button check if it has updated */
+        /* sample1 */
         Button button2 = (Button) view.findViewById(R.id.button2);
-        button2.setOnClickListener(new View.OnClickListener() { // this button performs DB update!
+        button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(analyzer != null)
-                    analyzer.sample(0);
+                if (analyzer != null)
+                    analyzer.runSamplePayload(0);
             }
         });
 
-        /* button Analyze */
+        /* sample2 */
         Button button3 = (Button) view.findViewById(R.id.button3);
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                if(analyzer != null)
-                    analyzer.sample(1);
+            public void onClick(View v) {
+                if (analyzer != null)
+                    analyzer.runSamplePayload(1);
             }
         });
 
         arrayAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, LIST_MENU);
         listView = (ListView) view.findViewById(R.id.listview1);
         listView.setAdapter(arrayAdapter);
+        onLogGenerated("LOG");
         //super.onViewCreated(view, savedInstanceState);
     }
 
@@ -118,7 +104,6 @@ public class Analyze extends Fragment {
         if (mListener != null) {
             mListener.onAnalyzeInteraction();
         }
-        //getActivity().runOnUiThread();
     }
 
     @Override
@@ -136,6 +121,62 @@ public class Analyze extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onLogGenerated(String log) {
+        SQLiteDatabase db = mDatabase.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                LogEntry._ID,
+                LogEntry.COLUMN_DATETIME,
+                LogEntry.COLUMN_PACKAGE_NAME,
+                LogEntry.COLUMN_DATA_TYPE
+        };
+
+        // Filter results WHERE "title" = 'My Title'
+        String selection = LogEntry.COLUMN_PACKAGE_NAME + " = ?";
+        String[] selectionArgs = {"*"};
+
+        // How you want the results sorted in the resulting Cursor
+        String sortOrder =
+                LogEntry.COLUMN_DATETIME + " DESC";
+
+        Cursor c = db.query(
+                LogEntry.TABLE_NAME,                     // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+        if(c.moveToFirst()){
+            do{
+                String str = "";
+                str += c.getString(0);
+                str += ":" + c.getString(1);
+                str += ":" + c.getString(2);
+                LIST_MENU.add(str);
+            }while(c.moveToNext());
+        }
+        arrayAdapter.notifyDataSetChanged();
+    }
+
+    //button when update button pressed
+    @Override
+    public void onClick(View v) {
+        try {
+            cm = new CacheMaker(getContext());
+            analyzer = new Analyzer(cm, getContext());
+            analyzer.setOnLogGenerated(this);
+
+        } catch(Exception e){
+            e.printStackTrace();
+            Log.d("button", "something Wrong...");
+        }
     }
 
     /**
