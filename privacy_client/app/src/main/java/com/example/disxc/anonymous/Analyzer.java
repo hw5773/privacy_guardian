@@ -20,9 +20,9 @@ import layout.Analyze;
  */
 
 public class Analyzer {
-    CacheMaker cache;
-    Context ctx;
-    DatabaseHelper mDatabase;
+    private CacheMaker cache;
+    private Context ctx;
+    private DatabaseHelper mDatabase;
     private onLogGeneratedListener mListener;
 
     public Analyzer(CacheMaker cm, Context context){
@@ -63,18 +63,20 @@ public class Analyzer {
             Log.d("Analyze", "target: " + payloadObject.toString());
             for(int i = 0; i < hookedTarget.length(); i++){
                 JSONObject jo = hookedTarget.getJSONObject(i);
-                Log.d("Analyze", jo.getString("Keyword"));
+                String keyword = jo.getString("Keyword");
+                String type = jo.getString("Type");
                 String s = "";
+
+                Log.d("Analyze", "target : " + keyword);
                 try {
-                    String value = payloadObject.getString(jo.getString("Keyword"));
-                    String type = jo.getString("Type");
+                    String value = payloadObject.getString(keyword);
                     s += type + ": " + value + "\n";
                     log(appName, "127.0.0.1", type, value);
                     mListener.onLogGenerated(s);
                     ret += s;
                 }
                 catch(JSONException e){
-                    Log.d("Analyze", "object parse failed:" + jo.toString());
+                    Log.d("Analyze", "No such keyword:" + keyword);
                     continue;
                 }
             }
@@ -89,10 +91,10 @@ public class Analyzer {
 
     public void runSamplePayload(int i){
         final String sampleAppName = "org.locationprivacy.locationprivacy";
-        final String samplePayload0 = "POST /location HTTP/1.1\\r\\nContent-Type: application/json\\r\\nUser-Agent: Dalvik/2.1.0 (Linux; U; Android 5.1.1; Android SDK built for x86_64 Build/LMY48X)\\r\\nHost: 147.46.215.152:7979\\r\\nConnection: Keep-Alive\\r\\nAccept-Encoding: gzip\\r\\nContent-Length: 62\\r\\n\\r\\n[{\"message\":\"client\",\"latitude\":\"37.42\",\"longitude\":\"122.08\"}]\n";
-        final String samplePayload1 = "POST /location HTTP/1.1\\r\\nContent-Type: application/json\\r\\nUser-Agent: Dalvik/2.1.0 (Linux; U; Android 5.1.1; Android SDK built for x86_64 Build/LMY48X)\\r\\nHost: 147.46.215.152:7979\\r\\nConnection: Keep-Alive\\r\\nAccept-Encoding: gzip\\r\\nContent-Length: 30\\r\\n\\r\\n[{\"test1\":\"38\",\"test2\":\"120\"}]";
+        final String samplePayload1 = ctx.getResources().getString(R.string.sample_payload1);
+        final String samplePayload2 = ctx.getResources().getString(R.string.sample_payload2);
         if(i == 0){
-            analyze(sampleAppName, samplePayload0);
+            analyze(sampleAppName, samplePayload2);
         }
         else{
             analyze(sampleAppName, samplePayload1);

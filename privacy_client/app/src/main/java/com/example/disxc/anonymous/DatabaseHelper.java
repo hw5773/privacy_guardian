@@ -42,6 +42,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    public void clearDB(){
+        onUpgrade(getWritableDatabase(), DATABASE_VERSION, DATABASE_VERSION);
+    }
+
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_ENTRIES);
     }

@@ -6,6 +6,7 @@
     <string name="analyze_update">업데이트</string>
     <string name="analyze_sample01">샘플1</string>
     <string name="analyze_sample02">샘플2</string>
+    <string name="analyze_clearDB">DB 초기화</string>
     <string name="hello_firstpage">Privacy Guardian 첫 페이지입니다.</string>
     <string name="hello_analyzer">I\'ll guide you to analyzing…</string>
     <string name="title_activity_mainpage">mainpage</string>
