@@ -1,4 +1,4 @@
-package layout;
+package com.example.disxc.anonymous.Fragment;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -8,7 +8,7 @@ import android.os.Bundle;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.format.DateFormat;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,10 +23,8 @@ import com.example.disxc.anonymous.DatabaseHelper;
 import com.example.disxc.anonymous.R;
 import com.example.disxc.anonymous.DatabaseHelper.LogEntry;
 
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -102,6 +100,20 @@ public class Analyze extends Fragment
             public void onClick(View v) {
                 mDatabase.clearDB();
                 onLogGenerated("NULL");
+            }
+        });
+
+        Button buttonStartAnalyze = (Button) view.findViewById(R.id.start_analyze);
+        buttonStartAnalyze.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AnalyzeSelectDate newFragment = new AnalyzeSelectDate();
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.replace(R.id.container, newFragment);
+                transaction.addToBackStack(null);
+
+                //trasaction commit
+                transaction.commit();
             }
         });
 

@@ -15,8 +15,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.concurrent.ExecutionException;
 
-import layout.Analyze;
-
 /**
  * Created by disxc on 2016-09-27.
  */

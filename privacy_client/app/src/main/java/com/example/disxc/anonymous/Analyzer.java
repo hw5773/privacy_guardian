@@ -13,8 +13,6 @@ import org.json.JSONObject;
 import java.util.Calendar;
 import com.example.disxc.anonymous.DatabaseHelper.LogEntry;
 
-import layout.Analyze;
-
 /**
  * Created by disxc on 2016-10-13.
  */
@@ -107,7 +105,7 @@ public class Analyzer {
         SQLiteDatabase db = mDatabase.getWritableDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(LogEntry.COLUMN_DATETIME, c.getTime().toString());
+        values.put(LogEntry.COLUMN_DATETIME, c.getTime().getTime());
         values.put(LogEntry.COLUMN_PACKAGE_NAME, packageName);
         values.put(LogEntry.COLUMN_HOST_ADDRESS, ip);
         values.put(LogEntry.COLUMN_DATA_TYPE, type);

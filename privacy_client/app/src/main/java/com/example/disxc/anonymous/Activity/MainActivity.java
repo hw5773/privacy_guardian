@@ -11,19 +11,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-
-import android.widget.TextView;
 
 import com.example.disxc.anonymous.R;
 
-import layout.Analyze;
-import layout.Firstpage;
-import layout.Settings;
+import com.example.disxc.anonymous.Fragment.Analyze;
+import com.example.disxc.anonymous.Fragment.Firstpage;
+import com.example.disxc.anonymous.Fragment.Settings;
 
 public class MainActivity extends AppCompatActivity
         implements Firstpage.onFirstpageInteractionListener, Analyze.OnAnalyzeInteractionListener,
