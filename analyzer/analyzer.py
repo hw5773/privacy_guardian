@@ -36,8 +36,8 @@ def parse_left(left, cname):
 
 def parse_right(var, right, cname, r2c, i2c):
     s1 = set([])
-    print ("  added val: ", var)
-    s1.add(var)
+    #print ("  added val: ", var)
+    #s1.add(var)
     ret = {}
     ret["i2c"] = dict(i2c)    # instance to class
 
@@ -49,6 +49,8 @@ def parse_right(var, right, cname, r2c, i2c):
         elif "(" in right:
             val = right[num:num+right[num:].index("(")].strip()
             ret ["i2c"][var] = val
+        print ("  added val: %s" % var)
+        s1.add(var)
         print ("  added val: %s" % val)
         s1.add(val)
         
@@ -63,6 +65,8 @@ def parse_right(var, right, cname, r2c, i2c):
                 val = val.replace(obj, i2c[obj])
             elif obj in r2c.keys():
                 val = val.replace(obj, r2c[obj])
+        print ("  added val: %s" % var)
+        s1.add(var)
         print ("  added val: %s" % val)
         s1.add(val)
 
@@ -78,6 +82,8 @@ def parse_right(var, right, cname, r2c, i2c):
                 idx2 = -1
             if idx2 > 0:
                 val = cname + "." + val[idx1+1:idx2] #TODO: Need to cover the lists
+                print ("  added val: %s" % var)
+                s1.add(var)
                 print ("  added val: %s" % val)
                 s1.add(val)
 
@@ -96,34 +102,102 @@ def parse_right(var, right, cname, r2c, i2c):
         print ("i2c keys: ", i2c.keys())
 
         if "(" in right and ")" in right:
+            args = ""
             idx1 = right.index("(")
-            idx2 = right.index(")")
-            tmp = '%s' % right
-            right = right[0:idx1]
+            val = right[0:idx1]
+            stack = [1]
+            i = 1
+            while len(stack) > 0:
+                if right[idx1 + i] == "(":
+                    stack.append(1)
+                elif right[idx1 + i] == ")":
+                    stack.pop()
+                args = args + right[idx1 + i]
+                i = i + 1
 
-            if idx2 - idx1 > 1:
-                arg = cname + "." + tmp[idx1+1: idx2] # TODO: Need to process arg in detail
-                print ("  added arg: %s" % arg)
-                s1.add(arg)
+            args = args[1:-1]
+            ret = parse_args(args, cname, r2c, i2c)
+
+            print ("  added var: ", var)
+            s1.add(var)
+            print ("  added val: ", val)
+            s1.add(val)
+
+            for e in ret:
+                print ("  added arg: ", e)
+                s1.add(e)
 
         print ("revised right: %s" % right)
 
         val = right
 
         if "String.valueOf" not in right:
+            print ("  added var: %s" % var)
+            s1.add(var)
             print ("  added val: %s" % val)
             s1.add(val)
     else:
-        if represent_int(right):
-            val = right
-        elif isinstance(right, str):
-            val = cname + "." + right
+        if not ((right == "true") or (right == "false")):
+            if represent_int(right):
+                val = right
+            elif isinstance(right, str):
+                val = cname + "." + right
         
-        s1.add(val)
+            print ("  added val: ", var)
+            s1.add(var)
+            print ("  added val: ", val)
+            s1.add(val)
 
     add_rel(s1)
     return ret
 
+# parsing the arguments in the righthand
+def parse_args(arg, cname, r2c, i2c):
+    ret = [] # arguments only have values. No need to revise r2c or i2c, since there is no declaration
+    arg_lst = arg.split(",")
+
+    for e in arg_lst:
+        if "." in e:
+            idx = e.index(".")
+            obj = cname + "." + e[0:idx]
+            e = e.replace(e[0:idx], obj)
+            if obj in i2c.keys():
+                e = e.replace(obj, i2c[obj])
+            elif obj in r2c.keys():
+                e = e.replace(obj, r2c[obj])
+        else:
+            e = cname + "." + e
+
+        if ("(" in e) and (")" in e):
+            args = ""
+            idx1 = e.index("(")
+            val = e[0:idx1]
+            stack = [1]
+            i = 1
+
+            while len(stack) > 0:
+                if e[idx1+i] == "(":
+                    stack.append(1)
+                elif e[idx1+i] == ")":
+                    stack.pop()
+                args = args + e[idx1+i]
+                i = i + 1
+            args = args[1:-1]
+            lst = parse_args(args, cname, r2c, i2c)
+
+            ret.append(val)
+
+            for a in lst:
+                ret.append(a)
+        else:
+            val = e
+
+        ret.append(val)
+    return ret
+
+
+
+# parsing the complete line
 def parse_line(line, cname, fname, r2c, i2c):
     line = line.strip()
     lst = line.split(" ")
@@ -169,11 +243,12 @@ def parse_line(line, cname, fname, r2c, i2c):
             elif len(lst) == 1:
                 val = cname + "." + val
 
-        s1 = set([])
-        print ("  add rel_set: %s, %s" % (cname + "." + fname, val))
-        s1.add(cname + "." + fname)
-        s1.add(val)
-        add_rel(s1)
+            if val.split(".")[-1].strip() != "null":
+                s1 = set([])
+                print ("  add rel_set: %s, %s" % (cname + "." + fname, val))
+                s1.add(cname + "." + fname)
+                s1.add(val)
+                add_rel(s1)
 
     elif len(lst) >= 2:
         if lst[-2] not in primitives:
