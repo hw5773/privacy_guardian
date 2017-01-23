@@ -36,11 +36,11 @@ public class Analyzer {
         HttpResponse httpResponse = new HttpResponse(payload);
         String responseBody = httpResponse.responseBody;
         if(responseBody.length() == 0){
-            Log.d("Analyze", "Response is null...");
+            Log.d("AnalyzeFragment", "Response is null...");
             return;
         }
         if(httpResponse.contentType.compareTo("application/json") != 0){
-            Log.d("Analyze", "dropping non-json payload");
+            Log.d("AnalyzeFragment", "dropping non-json payload");
             return;
         }
 
@@ -49,7 +49,7 @@ public class Analyzer {
             JSONObject target = cache.getByAppId(appName);
             if(target == null){
                 Toast.makeText(ctx, "분석할 수 없는 앱: " + appName, Toast.LENGTH_SHORT);
-                Log.d("Analyze", "Couldn't find app:" + appName);
+                Log.d("AnalyzeFragment", "Couldn't find app:" + appName);
                 return;
             }
 
@@ -58,14 +58,14 @@ public class Analyzer {
                 throw new RuntimeException("not implemented Exception");
             }
             hookedTarget = target.getJSONArray("HookTarget");
-            Log.d("Analyze", "target: " + payloadObject.toString());
+            Log.d("AnalyzeFragment", "target: " + payloadObject.toString());
             for(int i = 0; i < hookedTarget.length(); i++){
                 JSONObject jo = hookedTarget.getJSONObject(i);
                 String keyword = jo.getString("Keyword");
                 String type = jo.getString("Type");
                 String s = "";
 
-                Log.d("Analyze", "target : " + keyword);
+                Log.d("AnalyzeFragment", "target : " + keyword);
                 try {
                     String value = payloadObject.getString(keyword);
                     s += type + ": " + value + "\n";
@@ -74,7 +74,7 @@ public class Analyzer {
                     ret += s;
                 }
                 catch(JSONException e){
-                    Log.d("Analyze", "No such keyword:" + keyword);
+                    Log.d("AnalyzeFragment", "No such keyword:" + keyword);
                     continue;
                 }
             }

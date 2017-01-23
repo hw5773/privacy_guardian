@@ -9,33 +9,28 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.disxc.anonymous.R;
-import com.google.android.gms.plus.PlusOneButton;
 
 /**
- * A fragment with a Google +1 button.
+ * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link OnSettingsInteractionListener} interface
+ * {@link onFirstpageInteractionListener} interface
  * to handle interaction events.
- * Use the {@link Settings#newInstance} factory method to
+ * Use the {@link FirstpageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Settings extends Fragment {
+public class FirstpageFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    // The request code must be 0 or greater.
-    private static final int PLUS_ONE_REQUEST_CODE = 0;
-    // The URL to +1.  Must be a valid URL.
-    private final String PLUS_ONE_URL = "http://developer.android.com";
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private PlusOneButton mPlusOneButton;
 
-    private OnSettingsInteractionListener mListener;
+    private onFirstpageInteractionListener mListener;
 
-    public Settings() {
+    public FirstpageFragment() {
         // Required empty public constructor
     }
 
@@ -43,11 +38,13 @@ public class Settings extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment Settings.
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment FirstpageFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static Settings newInstance() {
-        Settings fragment = new Settings();
+    public static FirstpageFragment newInstance(String param1, String param2) {
+        FirstpageFragment fragment = new FirstpageFragment();
         /*
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -69,37 +66,24 @@ public class Settings extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_settings, container, false);
-
-        //Find the +1 button
-        mPlusOneButton = (PlusOneButton) view.findViewById(R.id.plus_one_button);
-
-        return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Refresh the state of the +1 button each time the activity receives focus.
-        mPlusOneButton.initialize(PLUS_ONE_URL, PLUS_ONE_REQUEST_CODE);
+        return inflater.inflate(R.layout.fragment_firstpage, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onSettingsInteraction();
+            mListener.onFirstpageInteraction();
         }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnSettingsInteractionListener) {
-            mListener = (OnSettingsInteractionListener) context;
+        if (context instanceof onFirstpageInteractionListener) {
+            mListener = (onFirstpageInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnSettingsInteractionListener");
+                    + " must implement onFirstpageInteractionListener");
         }
     }
 
@@ -119,8 +103,7 @@ public class Settings extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnSettingsInteractionListener {
-        void onSettingsInteraction();
+    public interface onFirstpageInteractionListener {
+        void onFirstpageInteraction();
     }
-
 }

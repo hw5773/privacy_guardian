@@ -8,7 +8,6 @@ import android.os.Bundle;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,10 +31,10 @@ import java.util.Date;
  * Activities that contain this fragment must implement the
  * {@link OnAnalyzeInteractionListener} interface
  * to handle interaction events.
- * Use the {@link Analyze#newInstance} factory method to
+ * Use the {@link AnalyzeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Analyze extends Fragment
+public class AnalyzeFragment extends Fragment
         implements Analyzer.onLogGeneratedListener, Button.OnClickListener {
     CacheMaker cm = null;
     Analyzer analyzer = null;
@@ -46,12 +45,12 @@ public class Analyze extends Fragment
 
     private OnAnalyzeInteractionListener mListener;
 
-    public Analyze() {
+    public AnalyzeFragment() {
         // Required empty public constructor
     }
 
-    public static Analyze newInstance() {
-        Analyze fragment = new Analyze();
+    public static AnalyzeFragment newInstance() {
+        AnalyzeFragment fragment = new AnalyzeFragment();
         return fragment;
     }
 
@@ -103,19 +102,14 @@ public class Analyze extends Fragment
             }
         });
 
+        /*
         Button buttonStartAnalyze = (Button) view.findViewById(R.id.start_analyze);
         buttonStartAnalyze.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AnalyzeSelectDate newFragment = new AnalyzeSelectDate();
-                FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                transaction.replace(R.id.container, newFragment);
-                transaction.addToBackStack(null);
 
-                //trasaction commit
-                transaction.commit();
             }
-        });
+        });*/
 
         arrayAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, LIST_MENU);
         listView = (ListView) view.findViewById(R.id.listview1);

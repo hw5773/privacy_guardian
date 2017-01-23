@@ -27,6 +27,16 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name=".Activity.DataSelectActivity"
+            android:label="@string/title_activity_dataselect"
+            android:parentActivityName=".Activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.disxc.anonymous.Activity.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

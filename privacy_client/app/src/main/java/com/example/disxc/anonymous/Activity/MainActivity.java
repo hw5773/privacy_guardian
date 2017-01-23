@@ -1,5 +1,6 @@
 package com.example.disxc.anonymous.Activity;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,15 +16,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.disxc.anonymous.Fragment.AnalyzeFragment;
+import com.example.disxc.anonymous.Fragment.FirstpageFragment;
+import com.example.disxc.anonymous.Fragment.SettingsFragment;
 import com.example.disxc.anonymous.R;
 
-import com.example.disxc.anonymous.Fragment.Analyze;
-import com.example.disxc.anonymous.Fragment.Firstpage;
-import com.example.disxc.anonymous.Fragment.Settings;
-
 public class MainActivity extends AppCompatActivity
-        implements Firstpage.onFirstpageInteractionListener, Analyze.OnAnalyzeInteractionListener,
-    Settings.OnSettingsInteractionListener{
+        implements FirstpageFragment.onFirstpageInteractionListener, AnalyzeFragment.OnAnalyzeInteractionListener,
+    SettingsFragment.OnSettingsInteractionListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -93,6 +93,12 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    //분석 필터 액티비티 시작
+    public void startAnalyze(View view){
+        Intent intent = new Intent(this, DataSelectActivity.class);
+        startActivity(intent);
+    }
+
     //firstpage와 interaction 하는 리스너?
     public void onFirstpageInteraction(){
 
@@ -123,11 +129,11 @@ public class MainActivity extends AppCompatActivity
             //return PlaceholderFragment.newInstance(position + 1);
             switch(position){
                 case 0:
-                    return Firstpage.newInstance("1", "2");
+                    return FirstpageFragment.newInstance("1", "2");
                 case 1:
-                    return Analyze.newInstance();
+                    return AnalyzeFragment.newInstance();
                 default:
-                    return Settings.newInstance();
+                    return SettingsFragment.newInstance();
             }
         }
 
