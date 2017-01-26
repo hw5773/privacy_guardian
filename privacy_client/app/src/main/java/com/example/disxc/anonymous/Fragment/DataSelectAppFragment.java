@@ -10,9 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.disxc.anonymous.Activity.DataSelectActivity;
 import com.example.disxc.anonymous.R;
-import com.example.disxc.anonymous.Fragment.dummy.DummyContent;
-import com.example.disxc.anonymous.Fragment.dummy.DummyContent.DummyItem;
+import com.example.disxc.anonymous.Fragment.dummy.DataSelectAppContent;
+import com.example.disxc.anonymous.Fragment.dummy.DataSelectAppContent.AppsItem;
 
 /**
  * A fragment representing a list of Items.
@@ -36,7 +37,6 @@ public class DataSelectAppFragment extends Fragment {
     }
 
     // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
     public static DataSelectAppFragment newInstance(int columnCount) {
         DataSelectAppFragment fragment = new DataSelectAppFragment();
         Bundle args = new Bundle();
@@ -48,7 +48,7 @@ public class DataSelectAppFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        DataSelectAppContent.init(DataSelectActivity.appsList);
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
@@ -57,18 +57,17 @@ public class DataSelectAppFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item_list, container, false);
-
+        View view = inflater.inflate(R.layout.fragment_data_select_app, container, false);
+        Context context = view.getContext();
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.ds_applist);
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+        if (recyclerView != null) {
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(DataSelectAppContent.ITEMS, mListener));
         }
         return view;
     }
@@ -103,6 +102,6 @@ public class DataSelectAppFragment extends Fragment {
      */
     public interface OnAppSelectionChangedListener {
         // TODO: Update argument type and name
-        void onAppSelectionChanged(DummyItem item);
+        void onAppSelectionChanged(AppsItem item);
     }
 }

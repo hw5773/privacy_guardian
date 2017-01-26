@@ -11,34 +11,44 @@ import java.util.Map;
  * <p>
  * TODO: Replace all uses of this class before publishing your app.
  */
-public class DummyContent {
+public class DataSelectAppContent {
 
     /**
      * An array of sample (dummy) items.
      */
-    public static final List<DummyItem> ITEMS = new ArrayList<DummyItem>();
+    public static final List<AppsItem> ITEMS = new ArrayList<AppsItem>();
 
     /**
      * A map of sample (dummy) items, by ID.
      */
-    public static final Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
+    public static final Map<String, AppsItem> ITEM_MAP = new HashMap<String, AppsItem>();
 
     private static final int COUNT = 25;
+    private static boolean initiated = false;
 
-    static {
+    /*static {
         // Add some sample items.
         for (int i = 1; i <= COUNT; i++) {
             addItem(createDummyItem(i));
         }
+    }*/
+
+    public static void init(String[] appsList){
+        if(initiated)
+            return;
+        for(int i = 0; i < appsList.length; i++){
+            addItem(createDummyItem(i, appsList[i]));
+        }
+        initiated = true;
     }
 
-    private static void addItem(DummyItem item) {
+    private static void addItem(AppsItem item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);
     }
 
-    private static DummyItem createDummyItem(int position) {
-        return new DummyItem(String.valueOf(position), "Item " + position, makeDetails(position));
+    private static AppsItem createDummyItem(int position, String name) {
+        return new AppsItem(String.valueOf(position), "", name, makeDetails(position));
     }
 
     private static String makeDetails(int position) {
@@ -53,13 +63,15 @@ public class DummyContent {
     /**
      * A dummy item representing a piece of content.
      */
-    public static class DummyItem {
+    public static class AppsItem {
         public final String id;
+        public final String image;
         public final String content;
         public final String details;
 
-        public DummyItem(String id, String content, String details) {
+        public AppsItem(String id, String image, String content, String details) {
             this.id = id;
+            this.image = image;
             this.content = content;
             this.details = details;
         }

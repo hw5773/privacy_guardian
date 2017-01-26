@@ -3,7 +3,6 @@ package com.example.disxc.anonymous.Fragment;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 
 import android.support.annotation.Nullable;
@@ -25,11 +24,12 @@ import com.example.disxc.anonymous.DatabaseHelper.LogEntry;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link OnAnalyzeInteractionListener} interface
+ * {@link OnAnalyzePressedListener} interface
  * to handle interaction events.
  * Use the {@link AnalyzeFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -43,7 +43,7 @@ public class AnalyzeFragment extends Fragment
     ArrayAdapter arrayAdapter = null;
     DatabaseHelper mDatabase;
 
-    private OnAnalyzeInteractionListener mListener;
+    private OnAnalyzePressedListener mListener;
 
     public AnalyzeFragment() {
         // Required empty public constructor
@@ -102,14 +102,13 @@ public class AnalyzeFragment extends Fragment
             }
         });
 
-        /*
         Button buttonStartAnalyze = (Button) view.findViewById(R.id.start_analyze);
         buttonStartAnalyze.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                onAnalyzeButtonPressed();
             }
-        });*/
+        });
 
         arrayAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, LIST_MENU);
         listView = (ListView) view.findViewById(R.id.listview1);
@@ -118,18 +117,17 @@ public class AnalyzeFragment extends Fragment
         //super.onViewCreated(view, savedInstanceState);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onAnalyzeInteraction();
+    public void onAnalyzeButtonPressed() {
+        if (mListener != null && cm != null) {
+            mListener.onAnalyzePressed(cm.getAppsList());
         }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnAnalyzeInteractionListener) {
-            mListener = (OnAnalyzeInteractionListener) context;
+        if (context instanceof OnAnalyzePressedListener) {
+            mListener = (OnAnalyzePressedListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement AnalyzeInteractionListener");
@@ -225,8 +223,8 @@ public class AnalyzeFragment extends Fragment
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnAnalyzeInteractionListener {
-        void onAnalyzeInteraction();
+    public interface OnAnalyzePressedListener {
+        void onAnalyzePressed(List<String> appsList);
     }
 
 }

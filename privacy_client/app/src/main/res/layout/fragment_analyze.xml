@@ -13,22 +13,22 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <Button
-                android:text="@string/start_analyze"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/start_analyze"
-                android:onClick="startAnalyze" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <Button
                 android:text="@string/analyze_update"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/button"
                 tools:text="update" />
+
+            <Button
+                android:text="@string/start_analyze"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/start_analyze" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <Button
                 android:text="@string/analyze_sample01"

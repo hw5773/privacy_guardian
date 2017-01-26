@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -21,11 +23,12 @@ import java.util.concurrent.ExecutionException;
 
 public class CacheMaker {
     //create DB update and table creation method.
-    JSONArray jsonArray;
-    String lastUpdate;
-    final String dateURL = "http://147.46.215.152:2507/lastupdate";
-    final String fetchURL = "http://147.46.215.152:2507/sensitiveinfo";
-    Context ctx;
+    private JSONArray jsonArray;
+    private String lastUpdate;
+    private ArrayList<String> appsList;
+    private final String dateURL = "http://147.46.215.152:2507/lastupdate";
+    private final String fetchURL = "http://147.46.215.152:2507/sensitiveinfo";
+    private Context ctx;
 
     public CacheMaker(Context context) {
         ctx = context;
@@ -53,6 +56,17 @@ public class CacheMaker {
             lastUpdate = dateString;
             fetchFromFile();
             Toast.makeText(ctx, "최신 DB입니다.", Toast.LENGTH_SHORT).show();
+        }
+
+        //create new list of apps.
+        appsList = new ArrayList<>();
+        for(int i = 0; i < jsonArray.length(); i++){
+            try {
+                appsList.add(jsonArray.getJSONObject(i).getString("AppId"));
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -168,5 +182,9 @@ public class CacheMaker {
             e.printStackTrace();
         }
         return ret;
+    }
+
+    public List<String> getAppsList(){
+        return appsList;
     }
 }

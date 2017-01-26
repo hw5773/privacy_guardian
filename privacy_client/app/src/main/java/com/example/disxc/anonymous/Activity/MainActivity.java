@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,8 +22,10 @@ import com.example.disxc.anonymous.Fragment.FirstpageFragment;
 import com.example.disxc.anonymous.Fragment.SettingsFragment;
 import com.example.disxc.anonymous.R;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity
-        implements FirstpageFragment.onFirstpageInteractionListener, AnalyzeFragment.OnAnalyzeInteractionListener,
+        implements FirstpageFragment.onFirstpageInteractionListener, AnalyzeFragment.OnAnalyzePressedListener,
     SettingsFragment.OnSettingsInteractionListener{
 
     /**
@@ -39,6 +42,8 @@ public class MainActivity extends AppCompatActivity
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+
+    public static String APPS_LIST = "AppsList";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +99,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     //분석 필터 액티비티 시작
-    public void startAnalyze(View view){
+    public void startAnalyze(List<String> appsList){
+        Log.d("startAnalyze", appsList.toArray().toString());
         Intent intent = new Intent(this, DataSelectActivity.class);
+        intent.putExtra(APPS_LIST, (appsList.toArray(new String[0])));
         startActivity(intent);
     }
 
@@ -104,8 +111,8 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public void onAnalyzeInteraction(){
-
+    public void onAnalyzePressed(List<String> appsList){
+        startAnalyze(appsList);
     }
 
     public void onSettingsInteraction(){

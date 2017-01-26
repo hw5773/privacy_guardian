@@ -2,7 +2,6 @@
     <string name="app_name">anonymous</string>
     <string name="action_settings">Settings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="analyze_update">업데이트</string>
     <string name="analyze_sample01">샘플1</string>
     <string name="analyze_sample02">샘플2</string>
@@ -17,4 +16,5 @@
     <string name="copyright_image">모든 아이콘의 저작권은 GraphicLoads에 있습니다.</string>
     <string name="ds_select_date">날짜를 선택해 주세요</string>
     <string name="ds_select_type_message">개인정보의 종류를 선택해 주세요</string>
+    <string name="ds_select_app">앱을 선택해 주세요</string>
 </resources>

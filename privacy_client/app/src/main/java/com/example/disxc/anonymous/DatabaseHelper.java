@@ -12,7 +12,7 @@ import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "AnalyzeLog.db";
 
     public static class LogEntry implements BaseColumns{
@@ -25,11 +25,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private static final String TEXT_TYPE = " TEXT";
+    private static final String INTEGER_TYPE = " INTEGER";
     private static final String COMMA_SEP = ",";
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + LogEntry.TABLE_NAME + " (" +
                     LogEntry._ID + " INTEGER PRIMARY KEY," +
-                    LogEntry.COLUMN_DATETIME + TEXT_TYPE + COMMA_SEP +
+                    LogEntry.COLUMN_DATETIME + INTEGER_TYPE + COMMA_SEP +
                     LogEntry.COLUMN_PACKAGE_NAME + TEXT_TYPE + COMMA_SEP +
                     LogEntry.COLUMN_HOST_ADDRESS + TEXT_TYPE + COMMA_SEP +
                     LogEntry.COLUMN_DATA_TYPE + TEXT_TYPE + COMMA_SEP +

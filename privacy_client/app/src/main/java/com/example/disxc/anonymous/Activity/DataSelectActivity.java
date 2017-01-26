@@ -1,7 +1,6 @@
 package com.example.disxc.anonymous.Activity;
 
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,18 +10,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-
-import android.widget.TextView;
 
 import com.example.disxc.anonymous.Fragment.DataSelectAppFragment;
 import com.example.disxc.anonymous.Fragment.DataSelectDateFragment;
 import com.example.disxc.anonymous.Fragment.DataSelectTypeFragment;
-import com.example.disxc.anonymous.Fragment.dummy.DummyContent;
+import com.example.disxc.anonymous.Fragment.dummy.DataSelectAppContent;
 import com.example.disxc.anonymous.R;
 
 import java.util.Date;
@@ -31,7 +27,8 @@ public class DataSelectActivity extends AppCompatActivity
     implements DataSelectAppFragment.OnAppSelectionChangedListener,
     DataSelectDateFragment.OnDateSelectionChangedListener,
     DataSelectTypeFragment.OnTypeSelectionChangedListener {
-
+    private static final int APP_SELECT_COLUMN = 3;
+    public static String[] appsList;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -66,6 +63,9 @@ public class DataSelectActivity extends AppCompatActivity
         TabLayout tabLayout = (TabLayout) findViewById(R.id.datatab);
         tabLayout.setupWithViewPager(mViewPager);
 
+        Intent intent = getIntent();
+        appsList = intent.getStringArrayExtra(MainActivity.APPS_LIST);
+
     }
 
     public void setFilter(View view){
@@ -97,7 +97,7 @@ public class DataSelectActivity extends AppCompatActivity
     }
 
     @Override
-    public void onAppSelectionChanged(DummyContent.DummyItem item) {
+    public void onAppSelectionChanged(DataSelectAppContent.AppsItem item) {
 
     }
 
@@ -127,11 +127,11 @@ public class DataSelectActivity extends AppCompatActivity
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position){
                 case 1:
-                    return new DataSelectAppFragment();
+                    return DataSelectAppFragment.newInstance(APP_SELECT_COLUMN);
                 case 2:
-                    return new DataSelectTypeFragment();
+                    return DataSelectTypeFragment.newInstance("", "");
                 default:
-                    return new DataSelectDateFragment();
+                    return DataSelectDateFragment.newInstance("", "");
             }
         }
 
