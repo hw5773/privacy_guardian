@@ -3,10 +3,12 @@ package com.example.disxc.anonymous.Fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CalendarView;
 
 import com.example.disxc.anonymous.R;
 
@@ -71,9 +73,10 @@ public class DataSelectDateFragment extends Fragment {
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onButtonPressed() {
+        //TODO: DO SOMETHING!!!
         if (mListener != null) {
-            mListener.onDateSelectionChanged(null,null);
+            mListener.onDateSelectionChanged(new Date(), new Date());
         }
     }
 
@@ -92,6 +95,17 @@ public class DataSelectDateFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        CalendarView calendarView = (CalendarView) view.findViewById(R.id.calendarView);
+        calendarView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                onButtonPressed();
+            }
+        });
     }
 
     /**

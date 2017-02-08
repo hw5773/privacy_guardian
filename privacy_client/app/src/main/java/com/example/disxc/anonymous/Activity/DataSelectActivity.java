@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.disxc.anonymous.Fragment.DataSelectAppFragment;
 import com.example.disxc.anonymous.Fragment.DataSelectDateFragment;
@@ -29,6 +30,11 @@ public class DataSelectActivity extends AppCompatActivity
     DataSelectTypeFragment.OnTypeSelectionChangedListener {
     private static final int APP_SELECT_COLUMN = 3;
     public static String[] appsList;
+
+    private String selectedApp = "";
+    private Date selectedDate = null;
+    private String selectedType = "";
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -70,7 +76,19 @@ public class DataSelectActivity extends AppCompatActivity
 
     public void setFilter(View view){
         //TODO: send work argument to main activity and return to main activity
-        return;
+        if(selectedApp.compareTo("") == 0){
+            Toast.makeText(getApplicationContext(), "앱을 선택해 주세요", Toast.LENGTH_SHORT);
+            return;
+        }
+        if(selectedDate == null){
+            Toast.makeText(getApplicationContext(), "날짜를 선택해 주세요", Toast.LENGTH_SHORT);
+            return;
+        }
+        if(selectedType.compareTo("") == 0){
+            Toast.makeText(getApplicationContext(), "타입을 선택해 주세요", Toast.LENGTH_SHORT);
+            return;
+        }
+        finish();
     }
 
 
@@ -98,17 +116,20 @@ public class DataSelectActivity extends AppCompatActivity
 
     @Override
     public void onAppSelectionChanged(DataSelectAppContent.AppsItem item) {
-
+        Log.d("onAppSelectionChanged", "App selected");
+        selectedApp = item.content;
     }
 
     @Override
     public void onDateSelectionChanged(Date start, Date end) {
-
+        Log.d("onDateSelectionChanged", "Date selected");
+        selectedDate = start;
     }
 
     @Override
     public void onTypeSelectionChanged(String type) {
-
+        Log.d("onTypeSelectionChanged", "Type selected");
+        selectedType = type;
     }
 
     /**

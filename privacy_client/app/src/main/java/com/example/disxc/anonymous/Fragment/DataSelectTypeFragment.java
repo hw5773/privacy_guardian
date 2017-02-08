@@ -3,10 +3,13 @@ package com.example.disxc.anonymous.Fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 
 import com.example.disxc.anonymous.R;
 
@@ -69,9 +72,15 @@ public class DataSelectTypeFragment extends Fragment {
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onContactButtonPressed() {
         if (mListener != null) {
-            mListener.onTypeSelectionChanged("null");
+            mListener.onTypeSelectionChanged("contact");
+        }
+    }
+
+    public void onLocationButtonPressed() {
+        if (mListener != null) {
+            mListener.onTypeSelectionChanged("location");
         }
     }
 
@@ -90,6 +99,26 @@ public class DataSelectTypeFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        //super.onViewCreated(view, savedInstanceState);
+        ImageView buttonContact = (ImageView) view.findViewById(R.id.image_view_type_contact);
+        buttonContact.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                onContactButtonPressed();
+            }
+        });
+
+        ImageView buttonLocation = (ImageView) view.findViewById(R.id.image_view_type_location);
+        buttonLocation.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                onLocationButtonPressed();
+            }
+        });
     }
 
     /**
