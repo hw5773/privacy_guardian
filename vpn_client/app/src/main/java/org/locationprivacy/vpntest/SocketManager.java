@@ -6,11 +6,20 @@ package org.locationprivacy.vpntest;
 
 public interface SocketManager {
     // Adding the socket in the SocketManager
-    public void addSocket(boolean isTCP, IP_Header ipHdr, TCP_Header tcpHdr);
+    void addSocket(boolean isTCP, IP_Header ipHdr, TCP_Header tcpHdr);
 
     // Forwarding the message to the SocketManager
-    public void message(String destIP, int destPort, String payload);
+    void message(String destIP, int destPort, String payload);
 
     // Deleting the socket in the SocketManager
-    public void delSocket(String destIP, int destPort);
+    void delSocket(String destIP, int destPort);
+
+    // Sending the message to the corresponding server
+    void sendMessage(String destIP, int destPost, String payload);
+
+    // Checking whether the message is in the queue
+    boolean isMessage();
+
+    // Getting the message from the queue
+    byte[] getMessage();
 }
