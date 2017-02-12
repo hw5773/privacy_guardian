@@ -8,9 +8,6 @@ public interface SocketManager {
     // Adding the socket in the SocketManager
     void addSocket(boolean isTCP, IP_Header ipHdr, TCP_Header tcpHdr);
 
-    // Forwarding the message to the SocketManager
-    void message(String destIP, int destPort, String payload);
-
     // Deleting the socket in the SocketManager
     void delSocket(String destIP, int destPort);
 
