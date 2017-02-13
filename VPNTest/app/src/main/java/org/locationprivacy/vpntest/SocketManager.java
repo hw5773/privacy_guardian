@@ -3,7 +3,9 @@ package org.locationprivacy.vpntest;
 import android.support.annotation.NonNull;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -133,11 +135,13 @@ public class SocketManager implements SocketManagerAPI {
     @Override
     public void addSocket(boolean isTCP, IP_Header ipHdr, TransmissionHeader tHdr) {
         String key = ipHdr.getDestIP() + ":" + tHdr.getDestPort();
+
         if (isTCP) // This means the message is TCP
         {
             try {
                 SocketChannel socket = SocketChannel.open();
                 socket.configureBlocking(false);
+                socket.connect(new InetSocketAddress(ipHdr.getDestIP(), tHdr.getDestPort()));
                 socket.register(selector, SelectionKey.OP_READ, null);
                 tcpHt.put(key, socket);
             }
@@ -151,6 +155,7 @@ public class SocketManager implements SocketManagerAPI {
             try {
                 DatagramChannel socket = DatagramChannel.open();
                 socket.configureBlocking(false);
+                socket.connect(new 
                 socket.register(selector, SelectionKey.OP_READ, null);
                 udpHt.put(key, socket);
             }
