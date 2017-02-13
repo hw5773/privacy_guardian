@@ -22,6 +22,7 @@ import com.example.disxc.anonymous.Fragment.DataSelectTypeFragment;
 import com.example.disxc.anonymous.Fragment.dummy.DataSelectAppContent;
 import com.example.disxc.anonymous.R;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class DataSelectActivity extends AppCompatActivity
@@ -32,7 +33,7 @@ public class DataSelectActivity extends AppCompatActivity
     public static String[] appsList;
 
     private String selectedApp = "";
-    private Date selectedDate = null;
+    private Calendar selectedDate = null;
     private String selectedType = "";
 
     /**
@@ -77,17 +78,22 @@ public class DataSelectActivity extends AppCompatActivity
     public void setFilter(View view){
         //TODO: send work argument to main activity and return to main activity
         if(selectedApp.compareTo("") == 0){
-            Toast.makeText(getApplicationContext(), "앱을 선택해 주세요", Toast.LENGTH_SHORT);
+            Toast.makeText(getApplicationContext(), "앱을 선택해 주세요", Toast.LENGTH_SHORT).show();
             return;
         }
         if(selectedDate == null){
-            Toast.makeText(getApplicationContext(), "날짜를 선택해 주세요", Toast.LENGTH_SHORT);
+            Toast.makeText(getApplicationContext(), "날짜를 선택해 주세요", Toast.LENGTH_SHORT).show();
             return;
         }
         if(selectedType.compareTo("") == 0){
-            Toast.makeText(getApplicationContext(), "타입을 선택해 주세요", Toast.LENGTH_SHORT);
+            Toast.makeText(getApplicationContext(), "타입을 선택해 주세요", Toast.LENGTH_SHORT).show();
             return;
         }
+        Intent data = new Intent();
+        data.putExtra("app", selectedApp);
+        data.putExtra("date_long", selectedDate.getTimeInMillis());
+        data.putExtra("type", selectedType);
+        setResult(RESULT_OK, data);
         finish();
     }
 
@@ -121,7 +127,7 @@ public class DataSelectActivity extends AppCompatActivity
     }
 
     @Override
-    public void onDateSelectionChanged(Date start, Date end) {
+    public void onDateSelectionChanged(Calendar start, Calendar end) {
         Log.d("onDateSelectionChanged", "Date selected");
         selectedDate = start;
     }

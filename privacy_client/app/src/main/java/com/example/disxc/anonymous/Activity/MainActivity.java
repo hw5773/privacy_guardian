@@ -22,6 +22,7 @@ import com.example.disxc.anonymous.Fragment.FirstpageFragment;
 import com.example.disxc.anonymous.Fragment.SettingsFragment;
 import com.example.disxc.anonymous.R;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity
     private ViewPager mViewPager;
 
     public static String APPS_LIST = "AppsList";
+    static final int START_ANALYZE_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +105,22 @@ public class MainActivity extends AppCompatActivity
         Log.d("startAnalyze", appsList.toArray().toString());
         Intent intent = new Intent(this, DataSelectActivity.class);
         intent.putExtra(APPS_LIST, (appsList.toArray(new String[0])));
-        startActivity(intent);
+        startActivityForResult(intent, START_ANALYZE_REQUEST_CODE);
+    }
+
+    //분석 필터 액티비티 결과 수신
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == START_ANALYZE_REQUEST_CODE){
+            if(resultCode == RESULT_OK){
+                Calendar date = Calendar.getInstance();
+                String app, type;
+                date.setTimeInMillis(data.getLongExtra("date", 0L));
+                app = data.getStringExtra("app");
+                type = data.getStringExtra("type");
+                Log.d("onActivityResult", date.toString() + "/" + app + "/" + type);
+            }
+        }
     }
 
     //firstpage와 interaction 하는 리스너?

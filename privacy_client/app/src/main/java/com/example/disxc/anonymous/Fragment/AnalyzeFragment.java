@@ -142,6 +142,7 @@ public class AnalyzeFragment extends Fragment
 
     @Override
     public void onLogGenerated(String log) {
+        //TODO: 로그 만드는 부분과 어레이 리프레시 분리하기
         SQLiteDatabase db = mDatabase.getReadableDatabase();
         //TODO: 내 언어에 맞는 시간대 출력하는 방법 찾기
 
@@ -198,6 +199,8 @@ public class AnalyzeFragment extends Fragment
         }
         arrayAdapter.notifyDataSetChanged();
     }
+
+
 
     //button when update button pressed
     @Override
