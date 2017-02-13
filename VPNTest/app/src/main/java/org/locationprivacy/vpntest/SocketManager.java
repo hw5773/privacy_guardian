@@ -131,8 +131,8 @@ public class SocketManager implements SocketManagerAPI {
     }
 
     @Override
-    public void addSocket(boolean isTCP, IP_Header ipHdr, TransmissionHeader tcpHdr) {
-        String key = ipHdr.getDestIP() + ":" + tcpHdr.getDestPort();
+    public void addSocket(boolean isTCP, IP_Header ipHdr, TransmissionHeader tHdr) {
+        String key = ipHdr.getDestIP() + ":" + tHdr.getDestPort();
         if (isTCP) // This means the message is TCP
         {
             try {
