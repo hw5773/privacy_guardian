@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -134,7 +135,7 @@ public class SocketManager implements SocketManagerAPI {
 
     @Override
     public void addSocket(boolean isTCP, IP_Header ipHdr, TransmissionHeader tHdr) {
-        String key = ipHdr.getDestIP() + ":" + tHdr.getDestPort();
+        String key = makeKey(ipHdr.getDestIP(), tHdr.getDestPort());
 
         if (isTCP) // This means the message is TCP
         {
@@ -155,7 +156,7 @@ public class SocketManager implements SocketManagerAPI {
             try {
                 DatagramChannel socket = DatagramChannel.open();
                 socket.configureBlocking(false);
-                socket.connect(new 
+                socket.connect(new InetSocketAddress(ipHdr.getDestIP(), tHdr.getDestPort()));
                 socket.register(selector, SelectionKey.OP_READ, null);
                 udpHt.put(key, socket);
             }
@@ -168,12 +169,55 @@ public class SocketManager implements SocketManagerAPI {
 
     @Override
     public void delSocket(boolean isTCP, String destIP, int destPort) {
+        String key = makeKey(destIP, destPort);
 
+        if (isTCP)
+        {
+            try {
+                tcpHt.get(key).close();
+            } catch (IOException e) {
+                System.out.println(e.getStackTrace());
+            }
+            tcpHt.remove(key);
+        }
+        else
+        {
+            try {
+                udpHt.get(key).close();
+            } catch (IOException e) {
+                System.out.println(e.getStackTrace());
+            }
+            udpHt.remove(key);
+        }
     }
 
     @Override
     public void sendMessage(boolean isTCP, String destIP, int destPort, String payload) {
+        String key = makeKey(destIP, destPort);
+        ByteBuffer msg = ByteBuffer.wrap(payload.getBytes());
 
+        if (isTCP)
+        {
+            try
+            {
+                tcpHt.get(key).write(msg);
+            }
+            catch (IOException e)
+            {
+                System.out.println(e.getStackTrace());
+            }
+        }
+        else
+        {
+            try
+            {
+                udpHt.get(key).write(msg);
+            }
+            catch (IOException e)
+            {
+                System.out.println(e.getStackTrace());
+            }
+        }
     }
 
     @Override
@@ -184,5 +228,10 @@ public class SocketManager implements SocketManagerAPI {
     @Override
     public byte[] getMessage() {
         return new byte[0];
+    }
+
+    private String makeKey(String destIP, int destPort)
+    {
+        return destIP + ":" + destPort;
     }
 }
