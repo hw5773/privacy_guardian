@@ -1,4 +1,4 @@
-package com.example.disxc.anonymous.Fragment;
+package org.socialcoding.privacyguardian.Fragment;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -15,11 +15,11 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.example.disxc.anonymous.Analyzer;
-import com.example.disxc.anonymous.CacheMaker;
-import com.example.disxc.anonymous.DatabaseHelper;
-import com.example.disxc.anonymous.R;
-import com.example.disxc.anonymous.DatabaseHelper.LogEntry;
+import org.socialcoding.privacyguardian.Analyzer;
+import org.socialcoding.privacyguardian.CacheMaker;
+import org.socialcoding.privacyguardian.DatabaseHelper;
+import org.socialcoding.privacyguardian.R;
+import org.socialcoding.privacyguardian.DatabaseHelper.LogEntry;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.example.disxc.anonymous.Activity;
+package org.socialcoding.privacyguardian.Activity;
 
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
@@ -17,10 +17,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.disxc.anonymous.Fragment.AnalyzeFragment;
-import com.example.disxc.anonymous.Fragment.FirstpageFragment;
-import com.example.disxc.anonymous.Fragment.SettingsFragment;
-import com.example.disxc.anonymous.R;
+import org.socialcoding.privacyguardian.Fragment.AnalyzeFragment;
+import org.socialcoding.privacyguardian.Fragment.FirstpageFragment;
+import org.socialcoding.privacyguardian.Fragment.SettingsFragment;
+import org.socialcoding.privacyguardian.R;
 
 import java.util.Calendar;
 import java.util.List;
@@ -108,6 +108,11 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(intent, START_ANALYZE_REQUEST_CODE);
     }
 
+    public void startVPN(){
+        Intent intent = new Intent(this, VPNTestActivity.class);
+        startActivity(intent);
+    }
+
     //분석 필터 액티비티 결과 수신
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -125,7 +130,7 @@ public class MainActivity extends AppCompatActivity
 
     //firstpage와 interaction 하는 리스너?
     public void onFirstpageInteraction(){
-
+        startVPN();
     }
 
     public void onAnalyzePressed(List<String> appsList){

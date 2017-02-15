@@ -1,7 +1,6 @@
-package com.example.disxc.anonymous.Fragment;
+package org.socialcoding.privacyguardian.Fragment;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,10 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 
-import com.example.disxc.anonymous.R;
+import org.socialcoding.privacyguardian.R;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.

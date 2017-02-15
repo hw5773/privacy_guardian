@@ -1,9 +1,7 @@
-package com.example.disxc.anonymous.Activity;
+package org.socialcoding.privacyguardian.Activity;
 
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -16,18 +14,26 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
-import com.example.disxc.anonymous.Fragment.AnalyzeFragment;
-import com.example.disxc.anonymous.Fragment.FirstpageFragment;
-import com.example.disxc.anonymous.Fragment.SettingsFragment;
-import com.example.disxc.anonymous.R;
+import org.socialcoding.privacyguardian.Fragment.DataSelectAppFragment;
+import org.socialcoding.privacyguardian.Fragment.DataSelectDateFragment;
+import org.socialcoding.privacyguardian.Fragment.DataSelectTypeFragment;
+import org.socialcoding.privacyguardian.Fragment.dummy.DataSelectAppContent;
+import org.socialcoding.privacyguardian.R;
 
 import java.util.Calendar;
-import java.util.List;
 
-public class MainActivity extends AppCompatActivity
-        implements FirstpageFragment.onFirstpageInteractionListener, AnalyzeFragment.OnAnalyzePressedListener,
-    SettingsFragment.OnSettingsInteractionListener{
+public class DataSelectActivity extends AppCompatActivity
+    implements DataSelectAppFragment.OnAppSelectionChangedListener,
+    DataSelectDateFragment.OnDateSelectionChangedListener,
+        DataSelectTypeFragment.OnTypeSelectionChangedListener {
+    private static final int APP_SELECT_COLUMN = 3;
+    public static String[] appsList;
+
+    private String selectedApp = "";
+    private Calendar selectedDate = null;
+    private String selectedType = "";
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -44,13 +50,10 @@ public class MainActivity extends AppCompatActivity
      */
     private ViewPager mViewPager;
 
-    public static String APPS_LIST = "AppsList";
-    static final int START_ANALYZE_REQUEST_CODE = 1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_dataselect);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -63,25 +66,41 @@ public class MainActivity extends AppCompatActivity
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.datatab);
         tabLayout.setupWithViewPager(mViewPager);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        Intent intent = getIntent();
+        appsList = intent.getStringArrayExtra(MainActivity.APPS_LIST);
 
+    }
+
+    public void setFilter(View view){
+        //TODO: send work argument to main activity and return to main activity
+        if(selectedApp.compareTo("") == 0){
+            Toast.makeText(getApplicationContext(), "앱을 선택해 주세요", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(selectedDate == null){
+            Toast.makeText(getApplicationContext(), "날짜를 선택해 주세요", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(selectedType.compareTo("") == 0){
+            Toast.makeText(getApplicationContext(), "타입을 선택해 주세요", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent data = new Intent();
+        data.putExtra("app", selectedApp);
+        data.putExtra("date_long", selectedDate.getTimeInMillis());
+        data.putExtra("type", selectedType);
+        setResult(RESULT_OK, data);
+        finish();
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_mainpage, menu);
+        getMenuInflater().inflate(R.menu.menu_dataselect, menu);
         return true;
     }
 
@@ -100,40 +119,22 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    //분석 필터 액티비티 시작
-    public void startAnalyze(List<String> appsList){
-        Log.d("startAnalyze", appsList.toArray().toString());
-        Intent intent = new Intent(this, DataSelectActivity.class);
-        intent.putExtra(APPS_LIST, (appsList.toArray(new String[0])));
-        startActivityForResult(intent, START_ANALYZE_REQUEST_CODE);
-    }
-
-    //분석 필터 액티비티 결과 수신
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == START_ANALYZE_REQUEST_CODE){
-            if(resultCode == RESULT_OK){
-                Calendar date = Calendar.getInstance();
-                String app, type;
-                date.setTimeInMillis(data.getLongExtra("date", 0L));
-                app = data.getStringExtra("app");
-                type = data.getStringExtra("type");
-                Log.d("onActivityResult", date.toString() + "/" + app + "/" + type);
-            }
-        }
+    public void onAppSelectionChanged(DataSelectAppContent.AppsItem item) {
+        Log.d("onAppSelectionChanged", "App selected");
+        selectedApp = item.content;
     }
 
-    //firstpage와 interaction 하는 리스너?
-    public void onFirstpageInteraction(){
-
+    @Override
+    public void onDateSelectionChanged(Calendar start, Calendar end) {
+        Log.d("onDateSelectionChanged", "Date selected");
+        selectedDate = start;
     }
 
-    public void onAnalyzePressed(List<String> appsList){
-        startAnalyze(appsList);
-    }
-
-    public void onSettingsInteraction(){
-
+    @Override
+    public void onTypeSelectionChanged(String type) {
+        Log.d("onTypeSelectionChanged", "Type selected");
+        selectedType = type;
     }
 
     /**
@@ -150,14 +151,13 @@ public class MainActivity extends AppCompatActivity
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            //return PlaceholderFragment.newInstance(position + 1);
-            switch(position){
-                case 0:
-                    return FirstpageFragment.newInstance("1", "2");
+            switch (position){
                 case 1:
-                    return AnalyzeFragment.newInstance();
+                    return DataSelectAppFragment.newInstance(APP_SELECT_COLUMN);
+                case 2:
+                    return DataSelectTypeFragment.newInstance("", "");
                 default:
-                    return SettingsFragment.newInstance();
+                    return DataSelectDateFragment.newInstance("", "");
             }
         }
 
@@ -171,11 +171,11 @@ public class MainActivity extends AppCompatActivity
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "첫 페이지";
+                    return "날짜";
                 case 1:
-                    return "분석";
+                    return "앱";
                 case 2:
-                    return "설정";
+                    return "종류";
             }
             return null;
         }
