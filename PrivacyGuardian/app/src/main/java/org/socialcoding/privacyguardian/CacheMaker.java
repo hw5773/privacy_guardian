@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,7 +36,7 @@ public class CacheMaker {
         String dateString = createHTTPConnection(dateURL);
 
         //if invalid dateString as connection failed..
-        Log.d("CacheMaker", dateString + "::datestring");
+        Log.d("CacheMaker", "datestring is :" + dateString);
         if( dateString.length() < 3){
             Log.d("CacheMaker", "Invalid date string... update from file");
             lastUpdate = openFromFile("ver");
@@ -43,6 +44,7 @@ public class CacheMaker {
                 Toast.makeText(ctx, "기존 DB를 사용합니다.", Toast.LENGTH_SHORT).show();
             else
                 Toast.makeText(ctx, "업데이트에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+            return;
         }
         //if dateString is out-of-date
         else if (!checkUpdate(dateString)) {
@@ -75,10 +77,11 @@ public class CacheMaker {
             String fileString = openFromFile("json");
             if(fileString.compareTo("") == 0){
                 Log.d("fetchFromFile", "file not found");
+                return false;
             }
             jsonArray = new JSONArray(fileString);
             saveCacheData();
-            return false;
+            return true;
         }
         catch (JSONException e) {
             e.printStackTrace();
@@ -120,8 +123,10 @@ public class CacheMaker {
                 Log.d("fetchFromFile", "File not found");
             }
         }
+        catch (FileNotFoundException e){
+            Log.d("readFromFile", "File Not Found:" + filename);
+        }
         catch (IOException e) {
-            Log.d("readFromFile", filename + " :: read failed");
             e.printStackTrace();
         }
         return "";

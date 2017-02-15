@@ -34,6 +34,7 @@ public class HttpConnect extends AsyncTask<String, Object, String> {
             urlConnection.setDoInput(true);        // 읽기모드 지정
             urlConnection.setUseCaches(false);     // 캐싱데이터를 받을지 안받을지
             urlConnection.setDefaultUseCaches(false); // 캐싱데이터 디폴트 값 설정
+            urlConnection.setConnectTimeout(5000);
             try {
                 Log.d("httpconn", "fetching");
                 InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -50,7 +51,7 @@ public class HttpConnect extends AsyncTask<String, Object, String> {
 
             } catch(IOException e) {
                 Log.d("httpconn", "something gone wrong in connection\n" + e.toString());
-
+                Log.d("httpconn", "delay time is " + urlConnection.getConnectTimeout());
             } finally {
                 urlConnection.disconnect();
             }
@@ -61,5 +62,10 @@ public class HttpConnect extends AsyncTask<String, Object, String> {
         }
 
         return ret;
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+        super.onPostExecute(s);
     }
 }
