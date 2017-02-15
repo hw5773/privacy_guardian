@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.socialcoding.privacyguardian">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name="org.socialcoding.privacyguardian.Activity.MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!--
+ ATTENTION: This was auto-generated to add Google Play services to your project for
+     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name="org.socialcoding.privacyguardian.Activity.DataSelectActivity"
+            android:label="@string/title_activity_dataselect"
+            android:parentActivityName="org.socialcoding.privacyguardian.Activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.socialcoding.privacyguardian.Activity.MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".Activity.VPNTestActivity"
+            android:label="VPNTest"
+            android:parentActivityName="org.socialcoding.privacyguardian.Activity.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.socialcoding.privacyguardian.Activity.MainActivity" />
+        </activity>
+
+
+        <service android:name=".VPN.Vpn"
+            android:permission="android.permission.BIND_VPN_SERVICE">
+            <intent-filter>
+                <action android:name="android.net.Vpn"/>
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>
