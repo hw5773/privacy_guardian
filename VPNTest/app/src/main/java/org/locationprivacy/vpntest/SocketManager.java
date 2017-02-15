@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by user on 2017-02-12.
@@ -25,107 +26,14 @@ public class SocketManager implements SocketManagerAPI {
     private Selector selector;
     private Hashtable<String, SocketChannel> tcpHt;
     private Hashtable<String, DatagramChannel> udpHt;
-    private Queue<byte[]> msgQueue;
+    private LinkedBlockingQueue<byte[]> msgQueue;
 
     public SocketManager() {
         try {
             selector = Selector.open();
             tcpHt = new Hashtable<String, SocketChannel>();
             udpHt = new Hashtable<String, DatagramChannel>();
-            msgQueue = new Queue<byte[]>() {
-                @Override
-                public boolean add(byte[] bytes) {
-                    return false;
-                }
-
-                @Override
-                public boolean offer(byte[] bytes) {
-                    return false;
-                }
-
-                @Override
-                public byte[] remove() {
-                    return new byte[0];
-                }
-
-                @Override
-                public byte[] poll() {
-                    return new byte[0];
-                }
-
-                @Override
-                public byte[] element() {
-                    return new byte[0];
-                }
-
-                @Override
-                public byte[] peek() {
-                    return new byte[0];
-                }
-
-                @Override
-                public boolean addAll(Collection<? extends byte[]> collection) {
-                    return false;
-                }
-
-                @Override
-                public void clear() {
-
-                }
-
-                @Override
-                public boolean contains(Object o) {
-                    return false;
-                }
-
-                @Override
-                public boolean containsAll(Collection<?> collection) {
-                    return false;
-                }
-
-                @Override
-                public boolean isEmpty() {
-                    return false;
-                }
-
-                @NonNull
-                @Override
-                public Iterator<byte[]> iterator() {
-                    return null;
-                }
-
-                @Override
-                public boolean remove(Object o) {
-                    return false;
-                }
-
-                @Override
-                public boolean removeAll(Collection<?> collection) {
-                    return false;
-                }
-
-                @Override
-                public boolean retainAll(Collection<?> collection) {
-                    return false;
-                }
-
-                @Override
-                public int size() {
-                    return 0;
-                }
-
-                @NonNull
-                @Override
-                public Object[] toArray() {
-                    return new Object[0];
-                }
-
-                @NonNull
-                @Override
-                public <T> T[] toArray(T[] ts) {
-                    return null;
-                }
-            };
+            msgQueue = new LinkedBlockingQueue<byte[]>();
         }
         catch (IOException e)
         {
@@ -222,12 +130,12 @@ public class SocketManager implements SocketManagerAPI {
 
     @Override
     public boolean isMessage() {
-        return false;
+        return !(msgQueue.isEmpty());
     }
 
     @Override
     public byte[] getMessage() {
-        return new byte[0];
+        return msgQueue.poll();
     }
 
     private String makeKey(String destIP, int destPort)
