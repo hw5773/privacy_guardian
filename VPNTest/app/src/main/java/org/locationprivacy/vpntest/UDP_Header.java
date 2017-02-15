@@ -9,7 +9,7 @@ import android.util.Log;
 public class UDP_Header extends TransmissionHeader {
     private byte[] header;
     private int ihl;
-    private int offset;
+    //private int offset;
     private int sPort;
     private int dPort;
     UDP_Header(byte[] packet ,int ipheaderlength){

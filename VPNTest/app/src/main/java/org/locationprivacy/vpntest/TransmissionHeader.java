@@ -6,15 +6,13 @@ package org.locationprivacy.vpntest;
 
 public class TransmissionHeader {
     private byte[] header;
-    private int offset;
+    protected int offset;
     private int sPort;
     private int dPort;
     byte[] getHeader(){
         return header;
     }
-    void setHeader(byte[] h){
-        System.arraycopy(h,0,header,0,h.length);
-    }
+
 
     int getSourcePort(){
         return sPort;
@@ -35,4 +33,5 @@ public class TransmissionHeader {
     int getOffset(){
         return offset;
     }
+
 }

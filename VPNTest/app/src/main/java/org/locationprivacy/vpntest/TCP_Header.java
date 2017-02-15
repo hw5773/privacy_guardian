@@ -8,7 +8,7 @@ import android.util.Log;
 public class TCP_Header extends TransmissionHeader{
     private byte[] header;
     private int ihl;
-    private int offset;
+    //private int offset;
     private int sPort;
     private int dPort;
     private long SequenceNumber;
@@ -31,7 +31,22 @@ public class TCP_Header extends TransmissionHeader{
         SequenceNumber = (((header[4] &0xff) << 24) | ((header[5] &0xff) << 16) | ((header[6] &0xff) << 8) | (header[7] &0xff)) & 0xffffffff;
         AckNumber = (((header[8] &0xff) << 24) | ((header[9] &0xff) << 16) | ((header[10] &0xff) << 8) | (header[11] &0xff)) & 0xffffffff;
     }
+    void setHeader(byte[] packet){
+        offset = ((int)((packet[ihl+12] & 0xf0) >> 4)) * 4;
 
+        //Log.d("asdf",packet.length+" \n offset is "+offset);
+        if(offset == 0){
+            Log.d("asdf","??");
+        }
+        header = new byte[offset];
+        for(int i = 0;i<offset;i++)
+            header[i] = packet[ihl+i];                  //make header
+
+        sPort = ((header[0] & 0xff) << 8) | (header[1] & 0xff);
+        dPort = ((header[2] & 0xff) << 8) | (header[3] & 0xff);
+        SequenceNumber = (((header[4] &0xff) << 24) | ((header[5] &0xff) << 16) | ((header[6] &0xff) << 8) | (header[7] &0xff)) & 0xffffffff;
+        AckNumber = (((header[8] &0xff) << 24) | ((header[9] &0xff) << 16) | ((header[10] &0xff) << 8) | (header[11] &0xff)) & 0xffffffff;
+    }
 
     long getSequenceNumber(){
         return SequenceNumber;
@@ -50,6 +65,7 @@ public class TCP_Header extends TransmissionHeader{
         offset = inoffset;
         header[12] = (byte)((inoffset/4)<<4);
     }
+    int getFin() { return (header[13] & 0x1);}
     int getSyn(){
         return (header[13] & 0x2) >> 1;
     }
