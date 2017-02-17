@@ -3,6 +3,7 @@ package org.socialcoding.privacyguardian.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import org.socialcoding.privacyguardian.Analyzer;
 import org.socialcoding.privacyguardian.CacheMaker;
@@ -26,16 +28,18 @@ import org.socialcoding.privacyguardian.DatabaseHelper;
 import org.socialcoding.privacyguardian.Fragment.AnalyzeFragment;
 import org.socialcoding.privacyguardian.Fragment.FirstpageFragment;
 import org.socialcoding.privacyguardian.Fragment.SettingsFragment;
+import org.socialcoding.privacyguardian.HttpConnect;
 import org.socialcoding.privacyguardian.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity
         implements FirstpageFragment.onFirstpageInteractionListener, AnalyzeFragment.OnAnalyzeInteractionListener,
-    SettingsFragment.OnSettingsInteractionListener, Analyzer.onLogGeneratedListener{
+    SettingsFragment.OnSettingsInteractionListener/*, Analyzer.onLogGeneratedListener*/{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -88,7 +92,6 @@ public class MainActivity extends AppCompatActivity
         });
 
         mDatabase = new DatabaseHelper(this);
-        onLogGenerated();
     }
 
 
@@ -154,25 +157,15 @@ public class MainActivity extends AppCompatActivity
     //button when update button pressed
     public void onUpdateButtonClicked(View v) {
         try {
-            cm = new CacheMaker(this);
-            analyzer = new Analyzer(cm, this);
-            analyzer.setOnLogGenerated(this);
-
+            Log.d("updateButton", "DOIT");
+            new CacheMakerBackgroundWorker().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         } catch(Exception e){
             e.printStackTrace();
             Log.d("button", "something Wrong...");
         }
     }
 
-    @Override
-    public void onLogGenerated() {
-        if(mSectionsPagerAdapter.getCurrentFragment() instanceof AnalyzeFragment){
-            Log.d("onLogGenerated", "find success...");
-            ((AnalyzeFragment) mSectionsPagerAdapter.getCurrentFragment()).refreshList();
-        }else {
-            Log.d("onLogGenerated", "failed...");
-        }
-    }
+
 
     public String[] getQueryList(){
         SQLiteDatabase db = mDatabase.getReadableDatabase();
@@ -234,7 +227,6 @@ public class MainActivity extends AppCompatActivity
         if(i == 0)
             return null;
         return strings;
-        //fragment.setListItems(strings);
     }
 
     @Override
@@ -261,6 +253,54 @@ public class MainActivity extends AppCompatActivity
             return getQueryList();
         }
         return null;
+    }
+
+    public class CacheMakerBackgroundWorker extends AsyncTask<Void, Void, String[]> implements Analyzer.onLogGeneratedListener{
+        private final String dateURL = "http://147.46.215.152:2507/lastupdate";
+        private final String fetchURL = "http://147.46.215.152:2507/sensitiveinfo";
+
+        @Override
+        protected void onPreExecute() {
+            Toast.makeText(getApplicationContext(), "업데이트를 시작합니다.", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected String[] doInBackground(Void... params) {
+            Log.d("cmbw", "I'm running");
+            String[] ret = {createHTTPConnection(dateURL), createHTTPConnection(fetchURL)};
+            return ret;
+        }
+
+        @Override
+        protected void onPostExecute(String... strings) {
+            Log.d("cmbw", "I'm done");
+            cm = new CacheMaker(getApplicationContext(), strings[0], strings[1]);
+            analyzer = new Analyzer(cm, getApplicationContext());
+            analyzer.setOnLogGenerated(this);
+        }
+
+        @Override
+        public void onLogGenerated() {
+            if(mSectionsPagerAdapter.getCurrentFragment() instanceof AnalyzeFragment){
+                Log.d("onLogGenerated", "find success...");
+                ((AnalyzeFragment) mSectionsPagerAdapter.getCurrentFragment()).refreshList();
+            }else {
+                Log.d("onLogGenerated", "failed...");
+            }
+        }
+
+        private String createHTTPConnection(String urlString){
+            HttpConnect h = new HttpConnect();
+            String ret = "";
+            try {
+                ret = h.execute(urlString).get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+            return ret;
+        }
     }
 
     /**

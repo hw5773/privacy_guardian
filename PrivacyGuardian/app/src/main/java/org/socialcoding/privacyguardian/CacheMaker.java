@@ -27,13 +27,12 @@ public class CacheMaker {
     private JSONArray jsonArray;
     private String lastUpdate;
     private ArrayList<String> appsList;
-    private final String dateURL = "http://147.46.215.152:2507/lastupdate";
-    private final String fetchURL = "http://147.46.215.152:2507/sensitiveinfo";
+
     private Context ctx;
 
-    public CacheMaker(Context context) {
+    public CacheMaker(Context context, String dateString, String patchData) {
         ctx = context;
-        String dateString = createHTTPConnection(dateURL);
+        //String dateString = createHTTPConnection(dateURL);
 
         //if invalid dateString as connection failed..
         Log.d("CacheMaker", "datestring is :" + dateString);
@@ -49,7 +48,7 @@ public class CacheMaker {
         //if dateString is out-of-date
         else if (!checkUpdate(dateString)) {
             Log.d("creation", "updating to new version");
-            fetchFromServer(dateString);
+            fetchFromServer(dateString, patchData);
         }
         // if dateString is up-to-date
         else {
@@ -89,9 +88,9 @@ public class CacheMaker {
         return false;
     }
 
-    public void fetchFromServer(String dateString){
+    public void fetchFromServer(String dateString, String patchData){
         try {
-            JSONObject jo = new JSONObject(createHTTPConnection(fetchURL));
+            JSONObject jo = new JSONObject(patchData);
             jsonArray = new JSONArray(jo.getString("List"));
             lastUpdate = dateString;
             saveCacheData();
@@ -174,19 +173,6 @@ public class CacheMaker {
         catch(Exception e){
             e.printStackTrace();
         }
-    }
-
-    private String createHTTPConnection(String urlString){
-        HttpConnect h = new HttpConnect();
-        String ret = "";
-        try {
-            ret = h.execute(urlString).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        return ret;
     }
 
     public List<String> getAppsList(){
