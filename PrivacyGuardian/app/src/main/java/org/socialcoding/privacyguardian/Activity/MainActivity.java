@@ -1,6 +1,8 @@
 package org.socialcoding.privacyguardian.Activity;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -16,18 +18,24 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
+import org.socialcoding.privacyguardian.Analyzer;
+import org.socialcoding.privacyguardian.CacheMaker;
+import org.socialcoding.privacyguardian.DatabaseHelper;
 import org.socialcoding.privacyguardian.Fragment.AnalyzeFragment;
 import org.socialcoding.privacyguardian.Fragment.FirstpageFragment;
 import org.socialcoding.privacyguardian.Fragment.SettingsFragment;
 import org.socialcoding.privacyguardian.R;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements FirstpageFragment.onFirstpageInteractionListener, AnalyzeFragment.OnAnalyzePressedListener,
-    SettingsFragment.OnSettingsInteractionListener{
+        implements FirstpageFragment.onFirstpageInteractionListener, AnalyzeFragment.OnAnalyzeInteractionListener,
+    SettingsFragment.OnSettingsInteractionListener, Analyzer.onLogGeneratedListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -43,6 +51,10 @@ public class MainActivity extends AppCompatActivity
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+
+    CacheMaker cm = null;
+    Analyzer analyzer = null;
+    DatabaseHelper mDatabase;
 
     public static String APPS_LIST = "AppsList";
     static final int START_ANALYZE_REQUEST_CODE = 1;
@@ -75,6 +87,8 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        mDatabase = new DatabaseHelper(this);
+        onLogGenerated();
     }
 
 
@@ -133,12 +147,120 @@ public class MainActivity extends AppCompatActivity
         startVPN();
     }
 
-    public void onAnalyzePressed(List<String> appsList){
-        startAnalyze(appsList);
-    }
-
     public void onSettingsInteraction(){
 
+    }
+
+    //button when update button pressed
+    public void onUpdateButtonClicked(View v) {
+        try {
+            cm = new CacheMaker(this);
+            analyzer = new Analyzer(cm, this);
+            analyzer.setOnLogGenerated(this);
+
+        } catch(Exception e){
+            e.printStackTrace();
+            Log.d("button", "something Wrong...");
+        }
+    }
+
+    @Override
+    public void onLogGenerated() {
+        if(mSectionsPagerAdapter.getCurrentFragment() instanceof AnalyzeFragment){
+            Log.d("onLogGenerated", "find success...");
+            ((AnalyzeFragment) mSectionsPagerAdapter.getCurrentFragment()).refreshList();
+        }else {
+            Log.d("onLogGenerated", "failed...");
+        }
+    }
+
+    public String[] getQueryList(){
+        SQLiteDatabase db = mDatabase.getReadableDatabase();
+        //TODO: 내 언어에 맞는 시간대 출력하는 방법 찾기
+
+        SimpleDateFormat inputFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+        SimpleDateFormat outputFormat = new SimpleDateFormat("mmm dd HH:mm");
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                DatabaseHelper.LogEntry._ID,
+                DatabaseHelper.LogEntry.COLUMN_DATETIME,
+                DatabaseHelper.LogEntry.COLUMN_PACKAGE_NAME,
+                DatabaseHelper.LogEntry.COLUMN_DATA_TYPE,
+                DatabaseHelper.LogEntry.COLUMN_DATA_VALUE
+        };
+
+        // Filter results WHERE "title" = 'My Title'
+        String selection = DatabaseHelper.LogEntry.COLUMN_PACKAGE_NAME + " = ?";
+        String[] selectionArgs = {"*"};
+
+        // How you want the results sorted in the resulting Cursor
+        String sortOrder =
+                DatabaseHelper.LogEntry.COLUMN_DATETIME + " DESC";
+
+        Cursor c = db.query(
+                DatabaseHelper.LogEntry.TABLE_NAME,                      // The table to query
+                projection,                               // The columns to return
+                null,                                     // The not columns for the WHERE clause
+                null,                                     // The not values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+        Log.d("getQueryList", "query got " + c.getCount());
+        String[] strings = new String[c.getCount()];
+        int i = 0;
+        if(c.moveToFirst()){
+            do{
+                Date date = null;
+                String str = "";
+                str += c.getString(0);/*
+                //TODO: 제대로 된 LOCALE 시간 알아내기
+                try{
+                    date = inputFormat.parse(c.getString(1));
+                    str += outputFormat.format(date);
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }*/
+                str += ", " + c.getString(2);
+                str += ", " + c.getString(3);
+                str += ", " + c.getString(4);
+                strings[i++] = str;
+
+            }while(c.moveToNext());
+        }
+        if(i == 0)
+            return null;
+        return strings;
+        //fragment.setListItems(strings);
+    }
+
+    @Override
+    public void onAnalyzePressed() {
+        if(cm != null && analyzer != null)
+            startAnalyze(cm.getAppsList());
+    }
+
+    @Override
+    public void onSamplePayloadPressed(int index) {
+        if(analyzer != null)
+            analyzer.runSamplePayload(index);
+    }
+
+    @Override
+    public void onClearDBPressed() {
+        if(mDatabase != null)
+            mDatabase.clearDB();
+    }
+
+    @Override
+    public String[] onListRequired() {
+        if(mDatabase != null){
+            return getQueryList();
+        }
+        return null;
     }
 
     /**
@@ -146,9 +268,20 @@ public class MainActivity extends AppCompatActivity
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
+        private Fragment mCurrentFragment;
+        public Fragment getCurrentFragment(){
+            return mCurrentFragment;
+        }
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
+        }
+
+        @Override
+        public void setPrimaryItem(ViewGroup container, int position, Object object) {
+            if(getCurrentFragment() != object){
+                mCurrentFragment = (Fragment) object;
+            }
+            super.setPrimaryItem(container, position, object);
         }
 
         @Override

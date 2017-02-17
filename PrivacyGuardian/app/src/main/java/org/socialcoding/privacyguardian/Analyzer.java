@@ -12,8 +12,6 @@ import org.json.JSONObject;
 
 import java.util.Calendar;
 
-import org.socialcoding.privacyguardian.R;
-
 /**
  * Created by disxc on 2016-10-13.
  */
@@ -71,7 +69,7 @@ public class Analyzer {
                     String value = payloadObject.getString(keyword);
                     s += type + ": " + value + "\n";
                     log(appName, "127.0.0.1", type, value);
-                    mListener.onLogGenerated(s);
+                    mListener.onLogGenerated();
                     ret += s;
                 }
                 catch(JSONException e){
@@ -130,7 +128,7 @@ public class Analyzer {
     }
 
     public interface onLogGeneratedListener{
-        void onLogGenerated(String log);
+        void onLogGenerated();
     }
 
     public void setOnLogGenerated(onLogGeneratedListener listener){
