@@ -1,0 +1,61 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/fragment_analyze"
+    tools:context="org.socialcoding.privacyguardian.Fragment.AnalyzeFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <Button
+            android:text="@string/analyze_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/update_button"
+            android:onClick="onUpdateButtonClicked"
+            tools:text="update" />
+
+        <Button
+            android:text="@string/start_analyze"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/update_button"
+            android:id="@+id/start_analyze" />
+
+        <Button
+            android:text="@string/analyze_sample01"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/start_analyze"
+            android:id="@+id/button2" />
+
+
+        <Button
+            android:text="@string/analyze_sample02"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/start_analyze"
+            android:layout_toRightOf="@+id/button2"
+            android:id="@+id/button3" />
+
+        <Button
+            android:text="@string/analyze_clearDB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/start_analyze"
+            android:layout_toRightOf="@+id/button3"
+            android:id="@+id/button4"
+            android:layout_weight="1" />
+
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/button4"
+            android:id="@+id/listview1" />
+
+    </RelativeLayout>
+
+</FrameLayout>

@@ -1,4 +1,4 @@
-package org.locationprivacy.vpntest;
+package org.socialcoding.privacyguardian.VPN;
 
 /**
  * Created by 신승수 on 2017-02-06.
@@ -6,13 +6,15 @@ package org.locationprivacy.vpntest;
 
 public class TransmissionHeader {
     private byte[] header;
-    protected int offset;
+    private int offset;
     private int sPort;
     private int dPort;
     byte[] getHeader(){
         return header;
     }
-
+    void setHeader(byte[] h){
+        System.arraycopy(h,0,header,0,h.length);
+    }
 
     int getSourcePort(){
         return sPort;
@@ -33,5 +35,4 @@ public class TransmissionHeader {
     int getOffset(){
         return offset;
     }
-
 }
