@@ -1,127 +1,192 @@
 package org.socialcoding.privacyguardian.VPN;
 
-import android.support.annotation.NonNull;
-
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Created by user on 2017-02-12.
+ * Created by Hyunwoo Lee on 2017-02-12.
  */
 
 public class SocketManager implements SocketManagerAPI {
 
-    private Selector selector;
-    private Hashtable<String, SocketChannel> tcpHt;
-    private Hashtable<String, DatagramChannel> udpHt;
-    private Queue<byte[]> msgQueue;
+    private Selector tcpSelector;
+    private Selector udpSelector;
+
+    private Hashtable<SocketChannel, TCPSocketInfo> tcpInfo;
+    private Hashtable<DatagramChannel, UDPSocketInfo> udpInfo;
+    private Hashtable<Integer, TCPSocketInfo> tcpInfoByPort;
+    private Hashtable<Integer, UDPSocketInfo> udpInfoByPort;
+
+    private Hashtable<String, SocketChannel> tcpSock;
+    private Hashtable<String, DatagramChannel> udpSock;
+
+    private LinkedBlockingQueue<byte[]> msgQueue;
+    private Thread tcpThread;
+    private Thread udpThread;
+    private int IPHeaderLength = 20;
+    private int TCPHeaderLength = 20;
+    private int UDPHeaderLength = 20;
 
     public SocketManager() {
         try {
-            selector = Selector.open();
-            tcpHt = new Hashtable<String, SocketChannel>();
-            udpHt = new Hashtable<String, DatagramChannel>();
-            msgQueue = new Queue<byte[]>() {
-                @Override
-                public boolean add(byte[] bytes) {
-                    return false;
-                }
+            tcpSelector = Selector.open();
+            udpSelector = Selector.open();
+            tcpInfo = new Hashtable<SocketChannel, TCPSocketInfo>();
+            udpInfo = new Hashtable<DatagramChannel, UDPSocketInfo>();
+            tcpSock = new Hashtable<String, SocketChannel>();
+            udpSock = new Hashtable<String, DatagramChannel>();
+            tcpInfoByPort = new Hashtable<Integer, TCPSocketInfo>();
+            udpInfoByPort = new Hashtable<Integer, UDPSocketInfo>();
+            msgQueue = new LinkedBlockingQueue<byte[]>();
+
+            tcpThread = new Thread(new Runnable() {
 
                 @Override
-                public boolean offer(byte[] bytes) {
-                    return false;
+                public void run() {
+                    for(;;) {
+                        try {
+                            int tcpChannels = tcpSelector.select();
+
+                            if (tcpChannels == 0) {
+                                Thread.sleep(100);
+                                continue;
+                            }
+
+                            if (tcpChannels > 0) {
+                                Set<SelectionKey> selectedKeys = tcpSelector.selectedKeys();
+                                Iterator<SelectionKey> iter = selectedKeys.iterator();
+
+                                while (iter.hasNext()) {
+                                    SelectionKey key = iter.next();
+                                    SocketChannel socket = (SocketChannel) key.channel();
+                                    ByteBuffer buf = ByteBuffer.allocate(256);
+                                    socket.read(buf);
+                                    makeMessage(true, buf.array(), socket.socket());
+                                }
+                            }
+                        } catch (IOException e) {
+                            System.out.println(e.getStackTrace());
+                        } catch (InterruptedException e) {
+                            System.out.println(e.getStackTrace());
+                        }
+                    }
                 }
+
+            }, "TCPPoller");
+
+            udpThread = new Thread(new Runnable() {
 
                 @Override
-                public byte[] remove() {
-                    return new byte[0];
+                public void run() {
+                    for(;;) {
+                        try {
+                            int udpChannels = udpSelector.select();
+
+                            if (udpChannels == 0) {
+                                Thread.sleep(100);
+                                continue;
+                            }
+
+                            if (udpChannels > 0) {
+                                Set<SelectionKey> selectedKeys = tcpSelector.selectedKeys();
+                                Iterator<SelectionKey> iter = selectedKeys.iterator();
+
+                                while (iter.hasNext()) {
+                                    SelectionKey key = iter.next();
+                                    SocketChannel socket = (SocketChannel) key.channel();
+                                    ByteBuffer buf = ByteBuffer.allocate(256);
+                                    socket.read(buf);
+                                    makeMessage(true, buf.array(), socket.socket());
+                                }
+                            }
+                        } catch (IOException e) {
+                            System.out.println(e.getStackTrace());
+                        } catch (InterruptedException e) {
+                            System.out.println(e.getStackTrace());
+                        }
+                    }
                 }
 
-                @Override
-                public byte[] poll() {
-                    return new byte[0];
-                }
+            }, "UDPPoller");
 
-                @Override
-                public byte[] element() {
-                    return new byte[0];
-                }
+        }
+        catch (Exception e)
+        {
+            System.out.println(e.getStackTrace());
+        }
+        tcpThread.start();
+        udpThread.start();
+    }
 
-                @Override
-                public byte[] peek() {
-                    return new byte[0];
-                }
+    @Override
+    public void addSocket(boolean isTCP, IP_Header ipHdr, TransmissionHeader tHdr) {
 
-                @Override
-                public boolean addAll(Collection<? extends byte[]> collection) {
-                    return false;
-                }
+        if (isTCP) {
+            TCP_Header tcpHdr = (TCP_Header) tHdr;
+            addTCPSocket(ipHdr, tcpHdr);
+        } else {
+            UDP_Header udpHdr = (UDP_Header) tHdr;
+            addUDPSocket(ipHdr, udpHdr);
+        }
+    }
 
-                @Override
-                public void clear() {
+    // Add the TCP Socket into the manager
+    private void addTCPSocket(IP_Header ipHdr, TCP_Header tcpHdr) {
+        try {
+            // Key is the combination of the client IP address and the client port
+            // VPN will give the SYN/ACK packet. So the destination is the client
+            String key = makeKey(ipHdr.getDestIP(), tcpHdr.getDestPort());
 
-                }
+            SocketChannel socket = SocketChannel.open();
+            socket.configureBlocking(false); // Set the socket in non-blocking mode
+            // Connect to the server
+            socket.connect(new InetSocketAddress(ipHdr.getSourceIP(), tcpHdr.getSourcePort()));
+            while (!socket.finishConnect()); // Wait until finishing TCP handshake
 
-                @Override
-                public boolean contains(Object o) {
-                    return false;
-                }
+            tcpSelector.wakeup();
+            socket.register(tcpSelector, SelectionKey.OP_READ, null);
 
-                @Override
-                public boolean containsAll(Collection<?> collection) {
-                    return false;
-                }
+            TCPSocketInfo info = new TCPSocketInfo(socket, ipHdr.getDestIP(), tcpHdr.getDestPort(), tcpHdr.getSequenceNumber(), tcpHdr.getAckNumber());
+            info.setSeqNum(1);
 
-                @Override
-                public boolean isEmpty() {
-                    return false;
-                }
+            // Input the information and the socket into the appropriate table
+            tcpInfo.put(socket, info);
+            tcpInfoByPort.put(socket.socket().getLocalPort(), info);
+            tcpSock.put(key, socket);
+        }
+        catch (IOException e)
+        {
+            System.out.println(e.getStackTrace());
+        }
+    }
 
-                @NonNull
-                @Override
-                public Iterator<byte[]> iterator() {
-                    return null;
-                }
+    // Add the UDP socket into the manager
+    private void addUDPSocket(IP_Header ipHdr, UDP_Header udpHdr) {
+        try {
+            // Key is composed of Client IP and Client Port
+            String key = makeKey(ipHdr.getDestIP(), udpHdr.getDestPort());
+            DatagramChannel socket = DatagramChannel.open();
+            socket.configureBlocking(false);
+            socket.connect(new InetSocketAddress(ipHdr.getSourceIP(), udpHdr.getSourcePort()));
+            udpSelector.wakeup();
+            socket.register(udpSelector, SelectionKey.OP_READ, null);
+            UDPSocketInfo info = new UDPSocketInfo(socket, ipHdr.getDestIP(), udpHdr.getDestPort());
 
-                @Override
-                public boolean remove(Object o) {
-                    return false;
-                }
-
-                @Override
-                public boolean removeAll(Collection<?> collection) {
-                    return false;
-                }
-
-                @Override
-                public boolean retainAll(Collection<?> collection) {
-                    return false;
-                }
-
-                @Override
-                public int size() {
-                    return 0;
-                }
-
-                @NonNull
-                @Override
-                public Object[] toArray() {
-                    return new Object[0];
-                }
-
-                @NonNull
-                @Override
-                public <T> T[] toArray(T[] ts) {
-                    return null;
-                }
-            };
+            udpInfo.put(socket, info);
+            udpInfoByPort.put(socket.socket().getLocalPort(), info);
+            udpSock.put(key, socket);
         }
         catch (IOException e)
         {
@@ -130,53 +195,247 @@ public class SocketManager implements SocketManagerAPI {
     }
 
     @Override
-    public void addSocket(boolean isTCP, IP_Header ipHdr, TransmissionHeader tHdr) {
-        String key = ipHdr.getDestIP() + ":" + tHdr.getDestPort();
-        if (isTCP) // This means the message is TCP
-        {
-            try {
-                SocketChannel socket = SocketChannel.open();
-                socket.configureBlocking(false);
-                socket.register(selector, SelectionKey.OP_READ, null);
-                tcpHt.put(key, socket);
-            }
-            catch (IOException e)
-            {
-                System.out.println(e.getStackTrace());
-            }
+    public void delSocket(boolean isTCP, String clntIP, int clntPort) {
+        String key = makeKey(clntIP, clntPort);
+
+        if (isTCP) {
+            delTCPSocket(key);
+        } else {
+            delUDPSocket(key);
         }
-        else // This means the message is UDP
-        {
-            try {
-                DatagramChannel socket = DatagramChannel.open();
-                socket.configureBlocking(false);
-                socket.register(selector, SelectionKey.OP_READ, null);
-                udpHt.put(key, socket);
-            }
-            catch (IOException e)
-            {
-                System.out.println(e.getStackTrace());
-            }
+    }
+
+    // Delete the TCP socket from the manager
+    private void delTCPSocket(String key) {
+        try {
+            SocketChannel tmp = tcpSock.get(key);
+            tcpInfo.remove(tmp);
+            tcpSock.remove(key);
+            tmp.close();
+        } catch (IOException e) {
+            System.out.println(e.getStackTrace());
+        }
+    }
+
+    // Delete the UDP socket from the manager
+    private void delUDPSocket(String key) {
+        try {
+            DatagramChannel tmp = udpSock.get(key);
+            udpInfo.remove(tmp);
+            tcpSock.remove(key);
+            tmp.close();
+        } catch (IOException e) {
+            System.out.println(e.getStackTrace());
         }
     }
 
     @Override
-    public void delSocket(boolean isTCP, String destIP, int destPort) {
+    public void sendMessage(boolean isTCP, String clntIP, int clntPort, String payload) {
+        String key = makeKey(clntIP, clntPort);
+        ByteBuffer msg = ByteBuffer.wrap(payload.getBytes());
 
+        if (isTCP)
+        {
+            sendTCPMessage(key, msg, payload.length());
+        } else {
+            sendUDPMessage(key, msg);
+        }
     }
 
-    @Override
-    public void sendMessage(boolean isTCP, String destIP, int destPort, String payload) {
+    // Send the message with the TCP socket
+    private void sendTCPMessage(String key, ByteBuffer msg, int size) {
+        try {
+            TCPSocketInfo info = tcpInfo.get(tcpSock.get(key));
+            info.getSocket().write(msg);
+            info.setAckNum(size);
+        } catch (IOException e) {
+            System.out.println(e.getStackTrace());
+        }
+    }
 
+    // Send the message with the UDP socket
+    private void sendUDPMessage(String key, ByteBuffer msg) {
+        try {
+            udpSock.get(key).write(msg);
+        } catch (IOException e) {
+            System.out.println(e.getStackTrace());
+        }
     }
 
     @Override
     public boolean isMessage() {
-        return false;
+        return !(msgQueue.isEmpty());
     }
 
     @Override
     public byte[] getMessage() {
-        return new byte[0];
+        return msgQueue.poll();
     }
+
+    // Make the packet and add it into the message queue
+    private void makeMessage(boolean isTCP, byte[] msg, Socket socket) {
+        byte[] packet;
+
+        if (isTCP)
+            packet = makeTCPPacket(msg, socket);
+        else
+            packet = makeUDPPacket(msg, socket);
+
+        addMessage(packet);
+    }
+
+    // Make the TCP packet
+    private byte[] makeTCPPacket(byte[] msg, Socket socket) {
+        byte[] tcp = new byte[TCPHeaderLength];
+        byte[] ip = new byte[IPHeaderLength];
+        int totalLength = msg.length + tcp.length + ip.length;
+        byte[] packet = new byte[totalLength];
+
+        TCPSocketInfo info = tcpInfoByPort.get(socket.getLocalPort());
+        String clntAddr = info.getClntIPAddr();
+        int clntPort = info.getClntPort();
+        String servAddr = socket.getInetAddress().getHostAddress().trim();
+        int servPort = socket.getPort();
+
+        byte[] serv, clnt;
+        long seq = info.getSeqNum(); // Get the sequence number
+        long ack = info.getAckNum(); // Get the acknowledge number
+        int id = info.getIdentification(); // Get the identification field number
+
+        info.setSeqNum(msg.length);
+
+        try {
+            serv = InetAddress.getByName(servAddr).getAddress();
+            clnt = InetAddress.getByName(clntAddr).getAddress();
+
+            ip[0] = (byte) 0x45;
+            ip[1] = (byte) 0x00;
+            ip[2] = (byte) ((totalLength & 0xff00) >> 8);
+            ip[3] = (byte) (totalLength & 0xff);
+            ip[4] = (byte) ((id & 0xff00) >> 8);
+            ip[5] = (byte) (id & 0xff);
+            ip[6] = (byte) 0x00;
+            ip[7] = (byte) 0x00;
+            ip[8] = (byte) 0x40;
+            ip[9] = (byte) 0x06;
+            ip[10] = (byte) 0;
+            ip[11] = (byte) 0;
+            ip[12] = serv[0];
+            ip[13] = serv[1];
+            ip[14] = serv[2];
+            ip[15] = serv[3];
+            ip[16] = clnt[0];
+            ip[17] = clnt[1];
+            ip[18] = clnt[2];
+            ip[19] = clnt[3];
+
+            int ipChecksum = makeIPChecksum(ip);
+            ip[10] = (byte) ((ipChecksum & 0xff00) >> 8);
+            ip[11] = (byte) (ipChecksum &0xff);
+
+            tcp[0] = (byte) ((servPort & 0xff00) >> 8);
+            tcp[1] = (byte) (servPort & 0xff);
+            tcp[2] = (byte) ((clntPort & 0xff00) >> 8);
+            tcp[3] = (byte) (clntPort & 0xff);
+            tcp[4] = (byte) ((seq & 0xff000000) >> 24);
+            tcp[5] = (byte) ((seq & 0xff0000) >> 16);
+            tcp[6] = (byte) ((seq & 0xff00) >> 8);
+            tcp[7] = (byte) (seq & 0xff);
+            tcp[8] = (byte) ((ack & 0xff000000) >> 24);
+            tcp[9] = (byte) ((ack & 0xff0000) >> 16);
+            tcp[10] = (byte) ((ack & 0xff00) >> 8);
+            tcp[11] = (byte) (ack & 0xff);
+            tcp[12] = (byte) 0x50;
+            tcp[13] = (byte) 16;
+            tcp[14] = (byte) ((1000 & 0xff00) >> 8);
+            tcp[15] = (byte) (1000 & 0xff);
+            tcp[16] = (byte) 0;
+            tcp[17] = (byte) 0;
+            tcp[18] = (byte) 0;
+            tcp[19] = (byte) 0;
+
+            int tcpChecksum = makeTCPChecksum(tcp, ip, msg);
+            tcp[16] = (byte) ((tcpChecksum & 0xff00) >> 8);
+            tcp[17] = (byte) (tcpChecksum & 0xff);
+
+            System.arraycopy(ip, 0, packet, 0, ip.length);
+            System.arraycopy(tcp, 0, packet, ip.length, tcp.length);
+            System.arraycopy(msg, 0, packet, ip.length + tcp.length, msg.length);
+
+        } catch (UnknownHostException e) {
+            System.out.println(e.getStackTrace());
+        }
+
+        return packet;
+    }
+
+    // Make the UDP packet
+    private byte[] makeUDPPacket(byte[] msg, Socket socket) {
+        byte[] udp = new byte[UDPHeaderLength];
+        byte[] ip = new byte[IPHeaderLength];
+        int totalLength = msg.length + udp.length + ip.length;
+        byte[] packet = new byte[totalLength];
+
+        return packet;
+    }
+
+    // Make the checksum
+    private int makeChecksum(byte[] header){
+        int length = header.length;
+        if(length == 0){
+            return 1;
+        }
+        int checksum  = 0;
+        for(int i=0; i<length ; i+=2){
+            int tmp = header[i];
+            if( (i+1) >= length) { //odd
+                checksum  = checksum +(int) ((tmp&0xff)<<8);
+            }
+            else {
+                int tmp2 = header[i+1];
+                checksum  = checksum + (int) (((tmp&0xff) << 8)|(tmp2&0xff));
+            }
+        }
+        checksum =((checksum & 0xffff) + (checksum >> 16));
+        return ~checksum ;
+    }
+
+    // Make the IP checksum
+    private int makeIPChecksum(byte[] ipHdr) {
+        return makeChecksum(ipHdr);
+    }
+
+    // Make the TCP checksum
+    private int makeTCPChecksum(byte[] tcpHdr, byte[] ipHdr, byte[] msg) {
+        int tcpLen = tcpHdr.length;
+        int msgLen = msg.length;
+
+        int offset = ((tcpHdr[12] & 0xf0) >> 4) * 4;
+
+        byte[] pseudoHdr = new byte[tcpLen + 12 + msgLen];
+        System.arraycopy(ipHdr, 12, pseudoHdr, 0, 8);
+        System.arraycopy(tcpHdr, 0, pseudoHdr, 12, tcpLen);
+        System.arraycopy(msg, 0, pseudoHdr, tcpLen + 12, msgLen);
+        pseudoHdr[8] = (byte) 0;
+        pseudoHdr[9] = (byte) 6;
+        pseudoHdr[10] = (byte) (((offset + msgLen) & 0xff00) >> 8);
+        pseudoHdr[11] = (byte) ((offset + msgLen) & 0xff);
+
+        return makeChecksum(pseudoHdr);
+    }
+
+    // Add the message in the message queue
+    private void addMessage(byte[] msg) {
+        try {
+            msgQueue.put(msg);
+        } catch (InterruptedException e) {
+            System.out.println(e.getStackTrace());
+        }
+    }
+
+    private String makeKey(String ip, int port)
+    {
+        return ip + ":" + port;
+    }
+
 }
