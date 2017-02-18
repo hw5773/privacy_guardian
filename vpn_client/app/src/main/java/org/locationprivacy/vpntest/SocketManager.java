@@ -29,13 +29,14 @@ public class SocketManager implements SocketManagerAPI {
 
     @Override
     public void addSocket(boolean isTCP, IP_Header ipHdr, TCP_Header tcpHdr) {
+        String key = ipHdr.getDestIP() + ":" + tcpHdr.getDestPort();
         if (isTCP) // This means the message is TCP
         {
             try {
                 SocketChannel socket = SocketChannel.open();
                 socket.configureBlocking(false);
                 socket.register(selector, SelectionKey.OP_READ, null);
-
+                ht.put(key, socket.socket());
             }
             catch (IOException e)
             {
@@ -48,6 +49,7 @@ public class SocketManager implements SocketManagerAPI {
                 DatagramChannel socket = DatagramChannel.open();
                 socket.configureBlocking(false);
                 socket.register(selector, SelectionKey.OP_READ, null);
+                ht.put(key, socket.socket());
             }
             catch (IOException e)
             {
