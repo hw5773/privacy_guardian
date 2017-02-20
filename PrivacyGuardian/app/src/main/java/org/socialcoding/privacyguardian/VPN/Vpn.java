@@ -100,7 +100,7 @@ public class Vpn extends VpnService {
                                 if (SendingData.length() == 0) {
                                     continue;
                                 } else {
-                                    Analyzer mainOps = new Analyzer(dPort, destIP, SendingData, mContext);
+                                    PackageNameFinder mainOps = new PackageNameFinder(dPort, destIP, SendingData, mContext);
                                     String packagename = mainOps.getPackage();
                                     Log.d(TAG, "dest port and IP : " + String.valueOf(dPort) + " : " + destIP);
                                     //SocketAddress addr = new InetSocketAddress(destIP, dPort);
