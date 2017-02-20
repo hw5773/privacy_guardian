@@ -11,12 +11,12 @@ import java.io.InputStreamReader;
 /**
  * Created by 신승수 on 2016-09-22.
  */
-public class Analyzer {
+public class PackageNameFinder {
     int SourcePort;
     String SourceIP;
     String payLoad;
    private Context mContext;
-    Analyzer(int sP, String sIP, String data, Context mc){
+    PackageNameFinder(int sP, String sIP, String data, Context mc){
         SourcePort = sP;
         SourceIP = sIP;
         payLoad = data;

@@ -39,7 +39,7 @@ import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity
         implements FirstpageFragment.onFirstpageInteractionListener, AnalyzeFragment.OnAnalyzeInteractionListener,
-    SettingsFragment.OnSettingsInteractionListener/*, Analyzer.onLogGeneratedListener*/{
+    SettingsFragment.OnSettingsInteractionListener/*, PackageNameFinder.onLogGeneratedListener*/{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
