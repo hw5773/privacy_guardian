@@ -6,9 +6,7 @@ import android.util.Log;
  * Created by 신승수 on 2016-10-25.
  */
 public class TCP_Header extends TransmissionHeader{
-    private byte[] header;
     private int ihl;
-    private int offset;
     private long SequenceNumber;
     private long AckNumber;
 

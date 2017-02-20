@@ -23,6 +23,7 @@ public class Vpn extends VpnService {
     private ParcelFileDescriptor mInterface;
     Builder builder = new Builder();
     private Context mContext = null;
+    private static int timing = 50;
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
         mContext = getApplicationContext();
@@ -85,7 +86,7 @@ public class Vpn extends VpnService {
                                 if(fin == 1 ){                      //finish the socket channel.
                                     byte[] outpacket = changeDestSrc(T_header, IP_h, null, sourceIP, destIP, sPort, dPort, seqNum ,ackNum, "fin");
                                     out.write(outpacket,0,length);
-                                    socketManager.delSocket(TCPchecker,destIP,dPort);
+                                    socketManager.delSocket(TCPchecker,sourceIP,sPort);
                                 }
                                 if (syn == 1 && ack == 0) {
                                     byte[] outpacket = changeDestSrc(T_header, IP_h, null, sourceIP, destIP, sPort, dPort, seqNum, ackNum, "syn");
@@ -108,7 +109,7 @@ public class Vpn extends VpnService {
                                 if (SendingData.length() == 0) {
                                     continue;
                                 } else {
-                                    socketManager.sendMessage(TCPchecker,destIP,dPort,SendingData);
+                                    socketManager.sendMessage(TCPchecker,sourceIP,sPort,SendingData);
                                     String packagename = PackageNameFinder.getPackage(dPort, destIP, SendingData, TCPchecker, mContext);
                                     Log.d(TAG, "dest port and IP : " + String.valueOf(dPort) + " : " + destIP);
 
@@ -134,7 +135,7 @@ public class Vpn extends VpnService {
                                 }
                             }
                         }
-                        Thread.sleep(1000);
+                        Thread.sleep(timing);
                     }
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
@@ -216,11 +217,14 @@ public class Vpn extends VpnService {
         else if(state.compareTo("fin")==0)
             T_headereader[13] = (byte) 0x11;
 
-        int payload_l = payload.length;
+        int payload_l = 0;
+        if(payload != null){
+            payload_l = payload.length;
+        }
         byte[] pseudoTCP = new byte[T_headereader.length + 12+ payload_l];                         //Pseudo + TCP header.
         System.arraycopy(T_headereader,0 ,pseudoTCP,12,T_headereader.length);
         System.arraycopy(IP_header ,12,pseudoTCP,0 ,8);
-        System.arraycopy(payload,0,pseudoTCP,T_headereader.length + 12,payload_l);
+        //System.arraycopy(payload,0,pseudoTCP,T_headereader.length + 12,payload_l);
 
         pseudoTCP[8] = (byte)0;                                                        //reserved
         pseudoTCP[9] = (byte)6;

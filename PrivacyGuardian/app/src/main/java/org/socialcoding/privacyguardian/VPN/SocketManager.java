@@ -1,5 +1,7 @@
 package org.socialcoding.privacyguardian.VPN;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -40,6 +42,8 @@ public class SocketManager implements SocketManagerAPI {
     private int TCPHeaderLength = 20;
     private int UDPHeaderLength = 20;
 
+    private static int TIMING = 100;
+
     public SocketManager() {
         try {
             tcpSelector = Selector.open();
@@ -62,7 +66,8 @@ public class SocketManager implements SocketManagerAPI {
                             int tcpChannels = tcpSelector.select();
 
                             if (tcpChannels == 0) {
-                                Thread.sleep(100);
+                                Log.d("tcpChannels", "sleeping");
+                                Thread.sleep(TIMING);
                                 continue;
                             }
                             System.out.println("Receive messages from " + tcpChannels + " TCP channels.");
@@ -100,7 +105,7 @@ public class SocketManager implements SocketManagerAPI {
                             int udpChannels = udpSelector.select();
 
                             if (udpChannels == 0) {
-                                Thread.sleep(100);
+                                Thread.sleep(TIMING);
                                 continue;
                             }
                             System.out.println("Receive messages from " + udpChannels + " UDP channels.");
@@ -156,7 +161,7 @@ public class SocketManager implements SocketManagerAPI {
             // VPN will give the SYN/ACK packet. So the destination is the client
             String key = makeKey(ipHdr.getDestIP(), tcpHdr.getDestPort());
             System.out.println("TCP is selected");
-            System.out.println("key: " + key);
+            Log.d("addTCPSocket", "addTCPSocket: " + key);
             SocketChannel socket = SocketChannel.open();
             socket.configureBlocking(false); // Set the socket in non-blocking mode
             // Connect to the server
@@ -191,10 +196,11 @@ public class SocketManager implements SocketManagerAPI {
         try {
             // Key is composed of Client IP and Client Port
             String key = makeKey(ipHdr.getDestIP(), udpHdr.getDestPort());
-            System.out.println("key: " + key);
+            Log.d("addUDPSocket", "addUDPSocket: " + key);
             DatagramChannel socket = DatagramChannel.open();
             socket.configureBlocking(false);
             socket.connect(new InetSocketAddress(ipHdr.getSourceIP(), udpHdr.getSourcePort()));
+            while(!socket.isConnected());
             udpSelector.wakeup();
             socket.register(udpSelector, SelectionKey.OP_READ, null);
             UDPSocketInfo info = new UDPSocketInfo(socket, ipHdr.getDestIP(), udpHdr.getDestPort());
@@ -202,7 +208,7 @@ public class SocketManager implements SocketManagerAPI {
             udpInfo.put(socket, info);
             udpInfoByPort.put(socket.socket().getLocalPort(), info);
             udpSock.put(key, socket);
-
+            Log.d("addUDPSocket", "addUDPSocket Finished: " + key);
         }
         catch (IOException e)
         {
@@ -263,6 +269,7 @@ public class SocketManager implements SocketManagerAPI {
     private void sendTCPMessage(String key, ByteBuffer msg, int size) {
         try
         {
+            Log.d("SendTCPMessage", "sendTCPMessage: " + key);
             SocketChannel a = tcpSock.get(key);
             TCPSocketInfo info = tcpInfo.get(a);
             info.getSocket().write(msg);
@@ -278,6 +285,7 @@ public class SocketManager implements SocketManagerAPI {
     private void sendUDPMessage(String key, ByteBuffer msg) {
         try
         {
+            Log.d("SendUDPMessage", "sendUDPMessage: " + key);
             udpSock.get(key).write(msg);
         }
         catch (IOException e)
