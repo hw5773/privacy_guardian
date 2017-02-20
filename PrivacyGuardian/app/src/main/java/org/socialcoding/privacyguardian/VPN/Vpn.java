@@ -10,7 +10,6 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
@@ -42,13 +41,16 @@ public class Vpn extends VpnService {
 
                     SocketChannel socketChannel = SocketChannel.open();
                     protect(socketChannel.socket());                                       //protection
-                    //SessionManager sessionManager = new SessionManager();
+                    SocketManager socketManager = new SocketManager();
 
                     int length = 0;                                                        //length of packet.
                     ByteBuffer packet = ByteBuffer.allocate(2048);
                     //DBHelper socketDB = new DBHelper(getApplicationContext(),"SOCKETDB.db",null,1);
                     SocketDB socketDB = new SocketDB();
                     while (true) {
+                        while(socketManager.isMessage()) {                  //is there any messages to send to
+                            out.write(socketManager.getMessage());
+                        }
                         length = in.read(packet.array());
                         if (length > 0) {
                             boolean handshake = false;
@@ -66,6 +68,7 @@ public class Vpn extends VpnService {
                             String destIP = IP_h.getDestIP();
                             TCPchecker = IP_h.getProtocol();
                             int sPort, dPort, offset;
+
                             if (TCPchecker) {                                 //TCP header
                                 TCP_Header T_header = new TCP_Header(temp_packet, ihl);
 
@@ -76,13 +79,19 @@ public class Vpn extends VpnService {
                                 long ackNum = T_header.getAckNumber();
                                 int syn = T_header.getSyn();
                                 int ack = T_header.getAck();
+                                int fin = T_header.getFin();
                                 if (syn != 1)
                                     handshake = true;
-                                if (!handshake && (sourceIP.contains("147.46.215.152") || destIP.contains("147.46.215.152"))) {
-                                    if (syn == 1 && ack == 0) {
-                                        byte[] outpacket = changeDestSrc(T_header, IP_h, null, sourceIP, destIP, sPort, dPort, seqNum, syn);
-                                        out.write(outpacket, 0, length);
-                                    }
+                                if(fin == 1 ){                      //finish the socket channel.
+                                    byte[] outpacket = changeDestSrc(T_header, IP_h, null, sourceIP, destIP, sPort, dPort, seqNum ,ackNum, "fin");
+                                    out.write(outpacket,0,length);
+                                    socketManager.delSocket(TCPchecker,destIP,dPort);
+                                }
+                                if (syn == 1 && ack == 0) {
+                                    byte[] outpacket = changeDestSrc(T_header, IP_h, null, sourceIP, destIP, sPort, dPort, seqNum, ackNum, "syn");
+                                    out.write(outpacket, 0, length);
+                                    T_header.setHeader(outpacket);
+                                    socketManager.addSocket(TCPchecker, IP_h, T_header);
                                 }
                             } else {              //UDP
                                 handshake = true;
@@ -90,9 +99,8 @@ public class Vpn extends VpnService {
                                 offset = T_header.getOffset();
                                 dPort = T_header.getDestPort();
                                 sPort = T_header.getSourcePort();
-
+                                socketManager.addSocket(TCPchecker,IP_h,T_header);
                             }
-                            //addSocket(TCPchecker, T_header,IP_h);
                             if (handshake) {                   //transmission start.
                                 byte[] tmpdata = new byte[length - ihl - offset];
                                 System.arraycopy(temp_packet, (ihl + offset), tmpdata, 0, (length - ihl - offset));
@@ -100,38 +108,40 @@ public class Vpn extends VpnService {
                                 if (SendingData.length() == 0) {
                                     continue;
                                 } else {
-                                    PackageNameFinder mainOps = new PackageNameFinder(dPort, destIP, SendingData, mContext);
-                                    String packagename = mainOps.getPackage();
+                                    socketManager.sendMessage(TCPchecker,destIP,dPort,SendingData);
+                                    String packagename = PackageNameFinder.getPackage(dPort, destIP, SendingData, TCPchecker, mContext);
                                     Log.d(TAG, "dest port and IP : " + String.valueOf(dPort) + " : " + destIP);
+
+
                                     //SocketAddress addr = new InetSocketAddress(destIP, dPort);
                                     //socketChannel.connect(addr);
-                                    networkReader = new BufferedReader(new InputStreamReader(socketChannel.socket().getInputStream()));
+                                    //networkReader = new BufferedReader(new InputStreamReader(socketChannel.socket().getInputStream()));
 
                                     //byte[] bytes = SendingData.getBytes();
-                                    ByteBuffer buffer = ByteBuffer.wrap(tmpdata);
+                                    //     ByteBuffer buffer = ByteBuffer.wrap(tmpdata);
                                     //socketChannel.write(buffer);
-                                    String rcvData;
-                                    String payLoad = "";
-                                    while ((rcvData = networkReader.readLine()) != null) {
-                                        //받은 payload.
-                                        payLoad = payLoad + rcvData;
-                                        rcvData = rcvData.replaceAll("\r\n", "");
-                                        Log.d(TAG, "Received Data :" + rcvData);
-                                    }
-                                    byte[] Rdata = new byte[payLoad.length()];
-                                    Rdata = payLoad.getBytes();
+                                    //         String rcvData;
+                                    //       String payLoad = "";
+                                    //while ((rcvData = networkReader.readLine()) != null) {
+                                    //받은 payload.
+                                    //  payLoad = payLoad + rcvData;
+                                    // rcvData = rcvData.replaceAll("\r\n", "");
+                                    // Log.d(TAG, "Received Data :" + rcvData);
+                                    // }
+                                    // byte[] Rdata = new byte[payLoad.length()];
+                                    //           Rdata = payLoad.getBytes();
                                     //public byte[] changeDestSrc(T_header,IP_h, Rdata ,sourceIP, destIP, sPort,  dPort, seqNum, syn);
                                 }
                             }
                         }
-                    Thread.sleep(1000);
-                }
-                    } catch (InterruptedException e1) {
+                        Thread.sleep(1000);
+                    }
+                } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-             catch (Exception e) {
+                catch (Exception e) {
                     e.printStackTrace();
                 } finally {
                     try {
@@ -172,7 +182,7 @@ public class Vpn extends VpnService {
         return ~answer;
     }
 
-    public byte[] changeDestSrc(TCP_Header T_header, IP_Header IP_h, byte[] payload , String sourceIP, String destIP, int sPort, int dPort, long seqNum, int syn){
+    public byte[] changeDestSrc(TCP_Header T_header,IP_Header IP_h, byte[] payload ,String sourceIP,String destIP,int sPort, int dPort,long seqNum,long ackNum,String state){
         IP_h.setDestIP(sourceIP);
         IP_h.setSourceIP(destIP);
         //change IPs.
@@ -180,8 +190,17 @@ public class Vpn extends VpnService {
         T_header.setSourcePort(dPort);
 
         T_header.setAckNum(seqNum+1);
-
-        long newSeqNum = makingSeqnum();
+        long newSeqNum=0;
+        switch(state){
+            case "syn":
+                newSeqNum = makingSeqnum();
+                break;
+            case "fin":
+                newSeqNum = ackNum;
+                break;
+            default:
+                Log.d(TAG,"???what state");
+        }
         T_header.setSequenceNumber(newSeqNum);
         int offset = T_header.getOffset();
         byte[] IP_header  = IP_h.getHeader();
@@ -192,10 +211,10 @@ public class Vpn extends VpnService {
         T_headereader[16]=(byte)0x00;
         T_headereader[17]=(byte)0x00;                                                    //make checksums to 0.
         T_headereader[12] = (byte)((T_headereader[12])&0xf1);                               //reserved
-        if(syn==1)
+        if(state.compareTo("syn")==0)
             T_headereader[13] = (byte) 0x12;                                                 //make to syn ack
-        else
-            T_headereader[13] = (byte) 0x10;
+        else if(state.compareTo("fin")==0)
+            T_headereader[13] = (byte) 0x11;
 
         int payload_l = payload.length;
         byte[] pseudoTCP = new byte[T_headereader.length + 12+ payload_l];                         //Pseudo + TCP header.
@@ -263,7 +282,7 @@ public class Vpn extends VpnService {
     public String hexToIp(String addr){                     //hex to IP addr form.
         String ip = "";
         for(int i =0;i<addr.length();i=i+2){
-            ip = ip+ Integer.valueOf(addr.substring(i,i+2),16)+".";
+            ip = ip+Integer.valueOf(addr.substring(i,i+2),16)+".";
         }
         return ip;
     }

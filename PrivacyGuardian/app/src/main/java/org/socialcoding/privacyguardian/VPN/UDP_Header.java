@@ -10,8 +10,7 @@ public class UDP_Header extends TransmissionHeader {
     private byte[] header;
     private int ihl;
     private int offset;
-    private int sPort;
-    private int dPort;
+
     UDP_Header(byte[] packet ,int ipheaderlength){
         ihl = ipheaderlength;
         offset = (packet[ihl+5] & 0xff) | ((packet[ihl+4] & 0xff) << 8);

@@ -1,6 +1,7 @@
 package org.socialcoding.privacyguardian.VPN;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -75,7 +76,8 @@ public class SocketManager implements SocketManagerAPI {
                                     SocketChannel socket = (SocketChannel) key.channel();
                                     ByteBuffer buf = ByteBuffer.allocate(256);
                                     socket.read(buf);
-                                    makeMessage(true, buf.array(), socket.socket());
+                                    byte[] packet = makeTCPPacket(buf.array(), socket.socket());
+                                    addMessage(packet);
                                 }
                             }
                         } catch (IOException e) {
@@ -109,10 +111,11 @@ public class SocketManager implements SocketManagerAPI {
 
                                 while (iter.hasNext()) {
                                     SelectionKey key = iter.next();
-                                    SocketChannel socket = (SocketChannel) key.channel();
+                                    DatagramChannel socket = (DatagramChannel) key.channel();
                                     ByteBuffer buf = ByteBuffer.allocate(256);
                                     socket.read(buf);
-                                    makeMessage(true, buf.array(), socket.socket());
+                                    byte[] packet = makeUDPPacket(buf.array(), socket.socket());
+                                    addMessage(packet);
                                 }
                             }
                         } catch (IOException e) {
@@ -260,7 +263,8 @@ public class SocketManager implements SocketManagerAPI {
     private void sendTCPMessage(String key, ByteBuffer msg, int size) {
         try
         {
-            TCPSocketInfo info = tcpInfo.get(tcpSock.get(key));
+            SocketChannel a = tcpSock.get(key);
+            TCPSocketInfo info = tcpInfo.get(a);
             info.getSocket().write(msg);
             info.setAckNum(size);
         }
@@ -290,18 +294,6 @@ public class SocketManager implements SocketManagerAPI {
     @Override
     public byte[] getMessage() {
         return msgQueue.poll();
-    }
-
-    // Make the packet and add it into the message queue
-    private void makeMessage(boolean isTCP, byte[] msg, Socket socket) {
-        byte[] packet;
-
-        if (isTCP)
-            packet = makeTCPPacket(msg, socket);
-        else
-            packet = makeUDPPacket(msg, socket);
-
-        addMessage(packet);
     }
 
     // Make the TCP packet
@@ -397,7 +389,7 @@ public class SocketManager implements SocketManagerAPI {
     }
 
     // Make the UDP packet
-    private byte[] makeUDPPacket(byte[] msg, Socket socket) {
+    private byte[] makeUDPPacket(byte[] msg, DatagramSocket socket) {
         byte[] udp = new byte[UDPHeaderLength];
         byte[] ip = new byte[IPHeaderLength];
         int totalLength = msg.length + udp.length + ip.length;
