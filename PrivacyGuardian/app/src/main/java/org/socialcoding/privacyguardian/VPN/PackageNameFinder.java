@@ -34,7 +34,8 @@ public class PackageNameFinder {
         while((line = br.readLine())!=null){
             Log.d("VpnServiceTest",line);
             String[] parser = line.trim().split(" ");
-            if(parser[2].contains(port)==true) {
+            Log.d("parser", "parsed : " + parser[7]);
+            if(parser[2].contains(port)) {
                 if(parser[7].equals(""))
                     Uid=0;
                 else
@@ -47,6 +48,10 @@ public class PackageNameFinder {
         String Packagename = "";
         PackageManager pm = mContext.getPackageManager();
         String[] names = pm.getPackagesForUid(Uid);
+        if(names == null){
+            Log.d("VpnServiceTest", "UID NOT FOUND : " + Uid);
+            return "";
+        }
         Log.d("VpnServiceTest","name = " + names[0]);           //get package name
         return names[0];
         //test codes.

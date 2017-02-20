@@ -6,9 +6,9 @@ package org.socialcoding.privacyguardian.VPN;
 
 public class TransmissionHeader {
     private byte[] header;
-    private int offset;
-    private int sPort;
-    private int dPort;
+    protected int offset;
+    protected int sPort;
+    protected int dPort;
     byte[] getHeader(){
         return header;
     }

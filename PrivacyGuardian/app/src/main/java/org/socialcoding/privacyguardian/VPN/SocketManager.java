@@ -260,7 +260,8 @@ public class SocketManager implements SocketManagerAPI {
     private void sendTCPMessage(String key, ByteBuffer msg, int size) {
         try
         {
-            TCPSocketInfo info = tcpInfo.get(tcpSock.get(key));
+            SocketChannel a = tcpSock.get(key);
+            TCPSocketInfo info = tcpInfo.get(a);
             info.getSocket().write(msg);
             info.setAckNum(size);
         }
