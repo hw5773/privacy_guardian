@@ -7,18 +7,11 @@ import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
-import java.util.StringTokenizer;
 
 
 /**
@@ -116,8 +109,7 @@ public class Vpn extends VpnService {
                                     continue;
                                 } else {
                                     socketManager.sendMessage(TCPchecker,destIP,dPort,SendingData);
-                                    PackageNameFinder mainOps = new PackageNameFinder(dPort, destIP, SendingData, mContext);
-                                    String packagename = mainOps.getPackage();
+                                    String packagename = PackageNameFinder.getPackage(dPort, destIP, SendingData, TCPchecker, mContext);
                                     Log.d(TAG, "dest port and IP : " + String.valueOf(dPort) + " : " + destIP);
 
 
