@@ -1,0 +1,31 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="org.socialcoding.privacyguardian.Fragment.FirstpageFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/hello_firstpage" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="It's Poro!"
+            android:id="@+id/firstpage_imageView1"
+            app:srcCompat="@drawable/poro" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/firstpage_button1"
+            android:text="@string/firstpage_vpnbutton"
+            android:layout_below="@+id/firstpage_imageView1"/>
+    </RelativeLayout>
+
+</FrameLayout>
