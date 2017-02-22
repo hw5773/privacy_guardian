@@ -1,12 +1,14 @@
 package org.socialcoding.privacyguardian;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.socialcoding.privacyguardian.Inteface.OnCacheMakerInteractionListener;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -22,33 +24,51 @@ import java.util.concurrent.ExecutionException;
  * Created by disxc on 2016-09-27.
  */
 
-public class CacheMaker {
+public class CacheMaker extends AsyncTask<Void, Void, Void>{
     //create DB update and table creation method.
-    private JSONArray jsonArray;
-    private String lastUpdate;
-    private ArrayList<String> appsList;
+    private final String DATE_URL = "http://147.46.215.152:2507/lastupdate";
+    private final String FETCH_URL = "http://147.46.215.152:2507/sensitiveinfo";
 
     private Context ctx;
+    private String lastUpdate;
+    private JSONArray jsonArray;
+    private ArrayList<String> appsList;
+    private String patchResultMessage;
 
-    public CacheMaker(Context context, String dateString, String patchData) {
+    private OnCacheMakerInteractionListener mListener;
+
+    public CacheMaker(Context context) {
         ctx = context;
-        //String dateString = createHTTPConnection(dateURL);
+        if(context instanceof OnCacheMakerInteractionListener){
+            mListener = (OnCacheMakerInteractionListener) context;
+        }
+        else{
+            throw new RuntimeException("Not implemented onCacheMakerIteractionListener");
+        }
+    }
 
+    @Override
+    protected Void doInBackground(Void... params) {
+        Log.d("cmbw", "I'm running");
+
+        String dateString = createHTTPConnection(DATE_URL);
         //if invalid dateString as connection failed..
         Log.d("CacheMaker", "datestring is :" + dateString);
         if( dateString.length() < 3){
             Log.d("CacheMaker", "Invalid date string... update from file");
             lastUpdate = openFromFile("ver");
-            if(fetchFromFile())
-                Toast.makeText(ctx, "기존 DB를 사용합니다.", Toast.LENGTH_SHORT).show();
-            else
-                Toast.makeText(ctx, "업데이트에 실패하였습니다.", Toast.LENGTH_SHORT).show();
-            return;
+            if(fetchFromFile()){
+                patchResultMessage = "기존 DB를 사용합니다.";
+            }
+            else {
+                patchResultMessage = "업데이트에 실패하였습니다.";
+            }
+            return null;
         }
         //if dateString is out-of-date
         else if (!checkUpdate(dateString)) {
             Log.d("creation", "updating to new version");
-            fetchFromServer(dateString, patchData);
+            fetchFromServer(dateString, createHTTPConnection(FETCH_URL));
         }
         // if dateString is up-to-date
         else {
@@ -56,7 +76,7 @@ public class CacheMaker {
             Log.d("creation", "up to date");
             lastUpdate = dateString;
             fetchFromFile();
-            Toast.makeText(ctx, "최신 DB입니다.", Toast.LENGTH_SHORT).show();
+            patchResultMessage = "최신 DB입니다.";
         }
 
         //create new list of apps.
@@ -69,6 +89,27 @@ public class CacheMaker {
                 e.printStackTrace();
             }
         }
+
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void params) {
+        Log.d("cmbw", "I'm done");
+        mListener.onCacheMakerCreated(this, patchResultMessage);
+    }
+
+    private String createHTTPConnection(String urlString){
+        HttpConnect h = new HttpConnect();
+        String ret = "";
+        try {
+            ret = h.execute(urlString).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return ret;
     }
 
     boolean fetchFromFile(){
@@ -131,8 +172,8 @@ public class CacheMaker {
         return "";
     }
 
+    //newly is server-given last update. return false if outdated, return true if updated.
     public boolean checkUpdate(String newly){
-        //newly is server-given last update. return false if outdated, return true if updated.
         String ihave;
         ihave = openFromFile("ver");
         newly = newly.replaceAll("(\\r|\\n)", "");
@@ -151,14 +192,14 @@ public class CacheMaker {
         return null;
     }
 
+    // prints update date and cache data
     public void printCacheData(){
-        // prints update date and cache data
         Log.d("printCacheData", "cache :" + jsonArray.toString());
         Log.d("printCacheData", "last update : " + lastUpdate);
     }
 
+    // write jsonArray and lastUpdate to file ("json", "ver")
     private void saveCacheData(){
-        // write jsonArray and lastUpdate to file ("json", "ver")
         OutputStream outputStream;
         try {
             outputStream = ctx.openFileOutput("json", ctx.MODE_PRIVATE);
@@ -178,4 +219,5 @@ public class CacheMaker {
     public List<String> getAppsList(){
         return appsList;
     }
+
 }
