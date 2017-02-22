@@ -1,6 +1,7 @@
 package org.socialcoding.privacyguardian.VPN;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -75,7 +76,7 @@ public class SocketManager implements SocketManagerAPI {
                                     SocketChannel socket = (SocketChannel) key.channel();
                                     ByteBuffer buf = ByteBuffer.allocate(256);
                                     socket.read(buf);
-                                    makeMessage(true, buf.array(), socket.socket());
+                                    makeTCPPacket(buf.array(), socket.socket());
                                 }
                             }
                         } catch (IOException e) {
@@ -109,10 +110,10 @@ public class SocketManager implements SocketManagerAPI {
 
                                 while (iter.hasNext()) {
                                     SelectionKey key = iter.next();
-                                    SocketChannel socket = (SocketChannel) key.channel();
+                                    DatagramChannel socket = (DatagramChannel) key.channel();
                                     ByteBuffer buf = ByteBuffer.allocate(256);
                                     socket.read(buf);
-                                    makeMessage(true, buf.array(), socket.socket());
+                                    makeUDPPacket(buf.array(), socket.socket());
                                 }
                             }
                         } catch (IOException e) {
@@ -179,6 +180,7 @@ public class SocketManager implements SocketManagerAPI {
         }
         catch (IOException e)
         {
+            System.out.println("Socket is not generated well");
             System.out.println(e.getStackTrace());
         }
     }
@@ -192,6 +194,8 @@ public class SocketManager implements SocketManagerAPI {
             DatagramChannel socket = DatagramChannel.open();
             socket.configureBlocking(false);
             socket.connect(new InetSocketAddress(ipHdr.getSourceIP(), udpHdr.getSourcePort()));
+            while (!socket.isConnected());
+            System.out.println("This socket is connected to " + makeKey(ipHdr.getSourceIP(), udpHdr.getSourcePort()));
             udpSelector.wakeup();
             socket.register(udpSelector, SelectionKey.OP_READ, null);
             UDPSocketInfo info = new UDPSocketInfo(socket, ipHdr.getDestIP(), udpHdr.getDestPort());
@@ -203,6 +207,7 @@ public class SocketManager implements SocketManagerAPI {
         }
         catch (IOException e)
         {
+            System.out.println("Socket is not generated well");
             System.out.println(e.getStackTrace());
         }
     }
@@ -248,8 +253,7 @@ public class SocketManager implements SocketManagerAPI {
         String key = makeKey(clntIP, clntPort);
         ByteBuffer msg = ByteBuffer.wrap(payload.getBytes());
 
-        if (isTCP)
-        {
+        if (isTCP) {
             sendTCPMessage(key, msg, payload.length());
         } else {
             sendUDPMessage(key, msg);
@@ -258,26 +262,30 @@ public class SocketManager implements SocketManagerAPI {
 
     // Send the message with the TCP socket
     private void sendTCPMessage(String key, ByteBuffer msg, int size) {
-        try
-        {
-            TCPSocketInfo info = tcpInfo.get(tcpSock.get(key));
-            info.getSocket().write(msg);
-            info.setAckNum(size);
+        try {
+            if (tcpSock.containsKey(key)) {
+                TCPSocketInfo info = tcpInfo.get(tcpSock.get(key));
+                info.getSocket().write(msg);
+                info.setAckNum(size);
+            } else {
+                System.out.println("Socket is not found in tcpSock " + key);
+            }
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             System.out.println(e.getStackTrace());
         }
     }
 
     // Send the message with the UDP socket
     private void sendUDPMessage(String key, ByteBuffer msg) {
-        try
-        {
-            udpSock.get(key).write(msg);
+        try {
+            System.out.println("Send the message from " + key);
+            if (udpSock.containsKey(key))
+                udpSock.get(key).write(msg);
+            else
+                System.out.println("Socket is not found in udpSock with " + key);
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             System.out.println(e.getStackTrace());
         }
     }
@@ -292,17 +300,6 @@ public class SocketManager implements SocketManagerAPI {
         return msgQueue.poll();
     }
 
-    // Make the packet and add it into the message queue
-    private void makeMessage(boolean isTCP, byte[] msg, Socket socket) {
-        byte[] packet;
-
-        if (isTCP)
-            packet = makeTCPPacket(msg, socket);
-        else
-            packet = makeUDPPacket(msg, socket);
-
-        addMessage(packet);
-    }
 
     // Make the TCP packet
     private byte[] makeTCPPacket(byte[] msg, Socket socket) {
@@ -397,7 +394,7 @@ public class SocketManager implements SocketManagerAPI {
     }
 
     // Make the UDP packet
-    private byte[] makeUDPPacket(byte[] msg, Socket socket) {
+    private byte[] makeUDPPacket(byte[] msg, DatagramSocket socket) {
         byte[] udp = new byte[UDPHeaderLength];
         byte[] ip = new byte[IPHeaderLength];
         int totalLength = msg.length + udp.length + ip.length;
@@ -411,6 +408,9 @@ public class SocketManager implements SocketManagerAPI {
         int length = udp.length + msg.length;
 
         System.out.println("Making the UDP Packet");
+        byte[] tmp = new byte[25];
+        System.arraycopy(msg, 12, tmp, 0, 25);
+        System.out.println("message: " + new String(tmp));
 
         byte[] serv, clnt;
 
@@ -543,9 +543,7 @@ public class SocketManager implements SocketManagerAPI {
         }
     }
 
-    private String makeKey(String ip, int port)
-    {
-        return ip + ":" + port;
+    private String makeKey(String sourceIP, int sourcePort) {
+        return sourceIP + ":" + sourcePort;
     }
-
 }
