@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="sample_payload1">
-        POST /location HTTP/1.1\\r\\nContent-Type: application/json\\r\\nUser-Agent: Dalvik/2.1.0 (Linux; U; Android 5.1.1; Android SDK built for x86_64 Build/LMY48X)\\r\\nHost: 147.46.215.152:7979\\r\\nConnection: Keep-Alive\\r\\nAccept-Encoding: gzip\\r\\nContent-Length: 62\\r\\n\\r\\n[{\"message\":\"client\",\"latitude\":\"37.42\",\"longitude\":\"122.08\"}]\n
-    </string>
-    <string name="sample_payload2">
-        POST /location HTTP/1.1\\r\\nContent-Type: application/json\\r\\nUser-Agent: Dalvik/2.1.0 (Linux; U; Android 5.1.1; Android SDK built for x86_64 Build/LMY48X)\\r\\nHost: 147.46.215.152:7979\\r\\nConnection: Keep-Alive\\r\\nAccept-Encoding: gzip\\r\\nContent-Length: 30\\r\\n\\r\\n[{\"test1\":\"38\",\"test2\":\"120\"}]
-    </string>
-</resources>

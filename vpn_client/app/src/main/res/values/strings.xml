@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">VPNTest</string>
-    <string name="connecting">Connecting</string>
-    <string name="connected">Connected</string>
-    <string name="disconnected">Disconnected</string>
-</resources>
