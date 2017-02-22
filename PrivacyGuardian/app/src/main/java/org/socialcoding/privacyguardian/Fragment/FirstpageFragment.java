@@ -9,12 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.OnFirstpageInteractionListener;
 import org.socialcoding.privacyguardian.R;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link onFirstpageInteractionListener} interface
+ * {@link OnFirstpageInteractionListener} interface
  * to handle interaction events.
  * Use the {@link FirstpageFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -29,7 +30,7 @@ public class FirstpageFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private onFirstpageInteractionListener mListener;
+    private OnFirstpageInteractionListener mListener;
 
     public FirstpageFragment() {
         // Required empty public constructor
@@ -80,11 +81,11 @@ public class FirstpageFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof onFirstpageInteractionListener) {
-            mListener = (onFirstpageInteractionListener) context;
+        if (context instanceof OnFirstpageInteractionListener) {
+            mListener = (OnFirstpageInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement onFirstpageInteractionListener");
+                    + " must implement OnFirstpageInteractionListener");
         }
     }
 
@@ -106,17 +107,4 @@ public class FirstpageFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface onFirstpageInteractionListener {
-        void onFirstpageInteraction();
-    }
 }

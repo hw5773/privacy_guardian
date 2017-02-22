@@ -3,7 +3,6 @@ package org.socialcoding.privacyguardian.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -32,7 +31,8 @@ import org.socialcoding.privacyguardian.DatabaseHelper;
 import org.socialcoding.privacyguardian.Fragment.AnalyzeFragment;
 import org.socialcoding.privacyguardian.Fragment.FirstpageFragment;
 import org.socialcoding.privacyguardian.Fragment.SettingsFragment;
-import org.socialcoding.privacyguardian.Inteface.*;
+import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.*;
+import org.socialcoding.privacyguardian.Inteface.OnCacheMakerInteractionListener;
 import org.socialcoding.privacyguardian.R;
 
 import java.text.SimpleDateFormat;
@@ -41,8 +41,8 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-        implements FirstpageFragment.onFirstpageInteractionListener, AnalyzeFragment.OnAnalyzeInteractionListener,
-        SettingsFragment.OnSettingsInteractionListener, OnCacheMakerInteractionListener {
+        implements OnFirstpageInteractionListener, OnAnalyzeInteractionListener,
+        OnSettingsInteractionListener, OnCacheMakerInteractionListener {
 
     /**
      * The {@link PagerAdapter} that will provide

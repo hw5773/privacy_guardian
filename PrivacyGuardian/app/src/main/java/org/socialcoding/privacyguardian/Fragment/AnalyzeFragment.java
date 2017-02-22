@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.OnAnalyzeInteractionListener;
 import org.socialcoding.privacyguardian.R;
 
 import java.util.ArrayList;
@@ -97,6 +98,8 @@ public class AnalyzeFragment extends Fragment {
         //super.onViewCreated(view, savedInstanceState);
     }
 
+    /* interaction with main activity */
+
     private void onClearDBButtonPressed() {
         if(mListener != null){
             mListener.onClearDBPressed();
@@ -148,24 +151,6 @@ public class AnalyzeFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnAnalyzeInteractionListener {
-        void onAnalyzePressed();
-        void onSamplePayloadPressed(int index);
-        void onClearDBPressed();
-        String[] onListRequired();
     }
 
 }
