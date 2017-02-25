@@ -15,6 +15,7 @@ import android.widget.ListView;
 
 import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.OnAnalyzeInteractionListener;
 import org.socialcoding.privacyguardian.R;
+import org.socialcoding.privacyguardian.ResultItem;
 
 import java.util.ArrayList;
 
@@ -151,6 +152,13 @@ public class AnalyzeFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    //todo: implement result items
+    private class resultAdapter extends ArrayAdapter<ResultItem>{
+        public resultAdapter(Context context, int resource, int textViewResourceId) {
+            super(context, resource, textViewResourceId);
+        }
     }
 
 }
