@@ -49,8 +49,6 @@ public class CacheMaker extends AsyncTask<Void, Void, Void>{
 
     @Override
     protected Void doInBackground(Void... params) {
-        Log.d("cmbw", "I'm running");
-
         String dateString = createHTTPConnection(DATE_URL);
         //if invalid dateString as connection failed..
         Log.d("CacheMaker", "datestring is :" + dateString);
@@ -95,7 +93,6 @@ public class CacheMaker extends AsyncTask<Void, Void, Void>{
 
     @Override
     protected void onPostExecute(Void params) {
-        Log.d("cmbw", "I'm done");
         mListener.onCacheMakerCreated(this, patchResultMessage);
     }
 

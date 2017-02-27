@@ -23,8 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-
 import org.socialcoding.privacyguardian.Analyzer;
 import org.socialcoding.privacyguardian.CacheMaker;
 import org.socialcoding.privacyguardian.DatabaseHelper;
@@ -65,11 +63,6 @@ public class MainActivity extends AppCompatActivity
 
     public static String APPS_LIST = "AppsList";
     static final int START_ANALYZE_REQUEST_CODE = 1;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -266,6 +259,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onCacheMakerCreated(CacheMaker cm, String pm) {
+        this.cm = cm;
         Snackbar.make(findViewById(R.id.fab), pm, Snackbar.LENGTH_SHORT).show();
         analyzer = new Analyzer(cm, getApplicationContext());
         analyzer.setOnLogGenerated(new Analyzer.onLogGeneratedListener(){

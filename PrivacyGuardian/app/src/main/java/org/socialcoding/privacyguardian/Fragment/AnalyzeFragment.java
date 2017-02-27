@@ -92,7 +92,7 @@ public class AnalyzeFragment extends Fragment {
             }
         });
 
-        arrayAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, LIST_MENU);
+        arrayAdapter = new ArrayAdapter(getContext(), R.layout.result_list_item, LIST_MENU);
         listView = (ListView) view.findViewById(R.id.listview1);
         listView.setAdapter(arrayAdapter);
         refreshList();
