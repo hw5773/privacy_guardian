@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity
             if (resultCode == RESULT_OK) {
                 Calendar date = Calendar.getInstance();
                 String app, type;
-                date.setTimeInMillis(data.getLongExtra("date", 0L));
+                date.setTimeInMillis(data.getLongExtra("date_start", 0L));
                 app = data.getStringExtra("app");
                 type = data.getStringExtra("type");
                 Log.d("onActivityResult", date.toString() + "/" + app + "/" + type);

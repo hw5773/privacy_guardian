@@ -32,7 +32,8 @@ public class DataSelectActivity extends AppCompatActivity
     public static String[] appsList;
 
     private String selectedApp = "";
-    private Calendar selectedDate = null;
+    private Calendar selectedStartDate = null;
+    private Calendar selectedEndDate = null;
     private String selectedType = "";
 
     /**
@@ -80,7 +81,7 @@ public class DataSelectActivity extends AppCompatActivity
             Toast.makeText(getApplicationContext(), "앱을 선택해 주세요", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(selectedDate == null){
+        if(selectedStartDate == null || selectedEndDate == null){
             Toast.makeText(getApplicationContext(), "날짜를 선택해 주세요", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -90,7 +91,8 @@ public class DataSelectActivity extends AppCompatActivity
         }
         Intent data = new Intent();
         data.putExtra("app", selectedApp);
-        data.putExtra("date_long", selectedDate.getTimeInMillis());
+        data.putExtra("date_start", selectedStartDate.getTimeInMillis());
+        data.putExtra("date_end", selectedStartDate.getTimeInMillis());
         data.putExtra("type", selectedType);
         setResult(RESULT_OK, data);
         finish();
@@ -126,15 +128,21 @@ public class DataSelectActivity extends AppCompatActivity
     }
 
     @Override
-    public void onDateSelectionChanged(Calendar start, Calendar end) {
-        Log.d("onDateSelectionChanged", "Date selected");
-        selectedDate = start;
-    }
-
-    @Override
     public void onTypeSelectionChanged(String type) {
         Log.d("onTypeSelectionChanged", "Type selected");
         selectedType = type;
+    }
+
+    @Override
+    public void onStartDateSelectionChanged(Calendar start) {
+        Log.d("dateSelection", "start Date selected");
+        selectedStartDate = start;
+    }
+
+    @Override
+    public void onEndDateSelectionChanged(Calendar end) {
+        Log.d("dateSelection", "end Date selected");
+        selectedEndDate = end;
     }
 
     /**
