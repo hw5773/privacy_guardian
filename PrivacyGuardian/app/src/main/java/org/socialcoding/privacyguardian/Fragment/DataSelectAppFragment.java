@@ -100,7 +100,6 @@ public class DataSelectAppFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnAppSelectionChangedListener {
-        // TODO: Update argument type and name
         void onAppSelectionChanged(DataSelectAppContent.AppsItem item);
     }
 }

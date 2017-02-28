@@ -4,9 +4,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -20,34 +23,33 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import org.socialcoding.privacyguardian.Analyzer;
+import org.socialcoding.privacyguardian.AppInfoCache;
 import org.socialcoding.privacyguardian.CacheMaker;
 import org.socialcoding.privacyguardian.DatabaseHelper;
 import org.socialcoding.privacyguardian.Fragment.AnalyzeFragment;
 import org.socialcoding.privacyguardian.Fragment.FirstpageFragment;
 import org.socialcoding.privacyguardian.Fragment.SettingsFragment;
-import org.socialcoding.privacyguardian.HttpConnect;
+import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.*;
+import org.socialcoding.privacyguardian.Inteface.OnCacheMakerInteractionListener;
 import org.socialcoding.privacyguardian.R;
+import org.socialcoding.privacyguardian.ResultItem;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity
-        implements FirstpageFragment.onFirstpageInteractionListener, AnalyzeFragment.OnAnalyzeInteractionListener,
-    SettingsFragment.OnSettingsInteractionListener/*, PackageNameFinder.onLogGeneratedListener*/{
+        implements OnFirstpageInteractionListener, OnAnalyzeInteractionListener,
+        OnSettingsInteractionListener, OnCacheMakerInteractionListener {
 
     /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
+     * The {@link PagerAdapter} that will provide
      * fragments for each of the sections. We use a
      * {@link FragmentPagerAdapter} derivative, which will keep every
      * loaded fragment in memory. If this becomes too memory intensive, it
      * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     * {@link FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity
     CacheMaker cm = null;
     Analyzer analyzer = null;
     DatabaseHelper mDatabase;
+    AppInfoCache mAppInfoCache;
 
     public static String APPS_LIST = "AppsList";
     static final int START_ANALYZE_REQUEST_CODE = 1;
@@ -92,6 +95,9 @@ public class MainActivity extends AppCompatActivity
         });
 
         mDatabase = new DatabaseHelper(this);
+        mAppInfoCache = new AppInfoCache(this);
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
     }
 
 
@@ -118,14 +124,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     //분석 필터 액티비티 시작
-    public void startAnalyze(List<String> appsList){
+    public void startAnalyze(List<String> appsList) {
         Log.d("startAnalyze", appsList.toArray().toString());
         Intent intent = new Intent(this, DataSelectActivity.class);
         intent.putExtra(APPS_LIST, (appsList.toArray(new String[0])));
         startActivityForResult(intent, START_ANALYZE_REQUEST_CODE);
     }
 
-    public void startVPN(){
+    public void startVPN() {
         Intent intent = new Intent(this, VPNTestActivity.class);
         startActivity(intent);
     }
@@ -133,11 +139,11 @@ public class MainActivity extends AppCompatActivity
     //분석 필터 액티비티 결과 수신
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == START_ANALYZE_REQUEST_CODE){
-            if(resultCode == RESULT_OK){
+        if (requestCode == START_ANALYZE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
                 Calendar date = Calendar.getInstance();
                 String app, type;
-                date.setTimeInMillis(data.getLongExtra("date", 0L));
+                date.setTimeInMillis(data.getLongExtra("date_start", 0L));
                 app = data.getStringExtra("app");
                 type = data.getStringExtra("type");
                 Log.d("onActivityResult", date.toString() + "/" + app + "/" + type);
@@ -146,42 +152,36 @@ public class MainActivity extends AppCompatActivity
     }
 
     //firstpage와 interaction 하는 리스너?
-    public void onFirstpageInteraction(){
+    public void onFirstpageInteraction() {
         startVPN();
     }
 
-    public void onSettingsInteraction(){
+    public void onSettingsInteraction() {
 
     }
 
     //button when update button pressed
     public void onUpdateButtonClicked(View v) {
         try {
-            Log.d("updateButton", "DOIT");
-            new CacheMakerBackgroundWorker().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        } catch(Exception e){
+            Snackbar.make(findViewById(R.id.fab), "업데이트를 시작합니다.", Snackbar.LENGTH_SHORT).show();
+            new CacheMaker(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } catch (Exception e) {
             e.printStackTrace();
             Log.d("button", "something Wrong...");
         }
     }
 
-
-
-    public String[] getQueryList(){
+    //returns array of resultItem that matches with query
+    public ResultItem[] getQueryList() {
         SQLiteDatabase db = mDatabase.getReadableDatabase();
-        //TODO: 내 언어에 맞는 시간대 출력하는 방법 찾기
 
-        SimpleDateFormat inputFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-        SimpleDateFormat outputFormat = new SimpleDateFormat("mmm dd HH:mm");
-
-        // Define a projection that specifies which columns from the database
-        // you will actually use after this query.
         String[] projection = {
                 DatabaseHelper.LogEntry._ID,
                 DatabaseHelper.LogEntry.COLUMN_DATETIME,
                 DatabaseHelper.LogEntry.COLUMN_PACKAGE_NAME,
                 DatabaseHelper.LogEntry.COLUMN_DATA_TYPE,
-                DatabaseHelper.LogEntry.COLUMN_DATA_VALUE
+                DatabaseHelper.LogEntry.COLUMN_DATA_VALUE,
+                DatabaseHelper.LogEntry.COLUMN_HOST_ADDRESS
         };
 
         // Filter results WHERE "title" = 'My Title'
@@ -202,105 +202,70 @@ public class MainActivity extends AppCompatActivity
                 sortOrder                                 // The sort order
         );
         Log.d("getQueryList", "query got " + c.getCount());
-        String[] strings = new String[c.getCount()];
+        ResultItem[] resultItems = new ResultItem[c.getCount()];
         int i = 0;
-        if(c.moveToFirst()){
-            do{
-                Date date = null;
-                String str = "";
-                str += c.getString(0);/*
-                //TODO: 제대로 된 LOCALE 시간 알아내기
-                try{
-                    date = inputFormat.parse(c.getString(1));
-                    str += outputFormat.format(date);
-                }
-                catch(Exception e){
-                    e.printStackTrace();
-                }*/
-                str += ", " + c.getString(2);
-                str += ", " + c.getString(3);
-                str += ", " + c.getString(4);
-                strings[i++] = str;
-
-            }while(c.moveToNext());
+        if (c.moveToFirst()) {
+            do {
+                ResultItem ri = new ResultItem();
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(c.getLong(1));
+                ri.time = cal;
+                ri.packageName = c.getString(2);
+                ri.appName = mAppInfoCache.getAppName(ri.packageName);
+                ri.dataType = c.getString(3);
+                ri.dataValue = c.getString(4);
+                ri.hostAddress = c.getString(5);
+                ri.appIcon = mAppInfoCache.getAppIcon(ri.packageName);
+                resultItems[i++] = ri;
+            } while (c.moveToNext());
         }
-        if(i == 0)
+        if (i == 0)
             return null;
-        return strings;
+        return resultItems;
     }
 
     @Override
     public void onAnalyzePressed() {
-        if(cm != null && analyzer != null)
+        if (cm != null && analyzer != null)
             startAnalyze(cm.getAppsList());
     }
 
     @Override
     public void onSamplePayloadPressed(int index) {
-        if(analyzer != null)
+        if (analyzer != null)
             analyzer.runSamplePayload(index);
     }
 
     @Override
     public void onClearDBPressed() {
-        if(mDatabase != null)
+        if (mDatabase != null)
             mDatabase.clearDB();
     }
 
     @Override
-    public String[] onListRequired() {
-        if(mDatabase != null){
+    public ResultItem[] onListRequired() {
+        if (mDatabase != null) {
             return getQueryList();
         }
         return null;
     }
 
-    public class CacheMakerBackgroundWorker extends AsyncTask<Void, Void, String[]> implements Analyzer.onLogGeneratedListener{
-        private final String dateURL = "http://147.46.215.152:2507/lastupdate";
-        private final String fetchURL = "http://147.46.215.152:2507/sensitiveinfo";
-
-        @Override
-        protected void onPreExecute() {
-            Toast.makeText(getApplicationContext(), "업데이트를 시작합니다.", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        protected String[] doInBackground(Void... params) {
-            Log.d("cmbw", "I'm running");
-            String[] ret = {createHTTPConnection(dateURL), createHTTPConnection(fetchURL)};
-            return ret;
-        }
-
-        @Override
-        protected void onPostExecute(String... strings) {
-            Log.d("cmbw", "I'm done");
-            cm = new CacheMaker(getApplicationContext(), strings[0], strings[1]);
-            analyzer = new Analyzer(cm, getApplicationContext());
-            analyzer.setOnLogGenerated(this);
-        }
-
-        @Override
-        public void onLogGenerated() {
-            if(mSectionsPagerAdapter.getCurrentFragment() instanceof AnalyzeFragment){
-                Log.d("onLogGenerated", "find success...");
-                ((AnalyzeFragment) mSectionsPagerAdapter.getCurrentFragment()).refreshList();
-            }else {
-                Log.d("onLogGenerated", "failed...");
+    @Override
+    public void onCacheMakerCreated(CacheMaker cm, String pm) {
+        this.cm = cm;
+        Snackbar.make(findViewById(R.id.fab), pm, Snackbar.LENGTH_SHORT).show();
+        analyzer = new Analyzer(cm, getApplicationContext());
+        analyzer.setOnLogGenerated(new Analyzer.onLogGeneratedListener(){
+            @Override
+            public void onLogGenerated() {
+                if (mSectionsPagerAdapter.getCurrentFragment() instanceof AnalyzeFragment) {
+                    Log.d("onLogGenerated", "find success...");
+                    ((AnalyzeFragment) mSectionsPagerAdapter.getCurrentFragment()).refreshList();
+                } else {
+                    Log.d("onLogGenerated", "failed...");
+                }
             }
-        }
-
-        private String createHTTPConnection(String urlString){
-            HttpConnect h = new HttpConnect();
-            String ret = "";
-            try {
-                ret = h.execute(urlString).get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-            return ret;
-        }
+        });
     }
 
     /**
@@ -309,16 +274,18 @@ public class MainActivity extends AppCompatActivity
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         private Fragment mCurrentFragment;
-        public Fragment getCurrentFragment(){
+
+        public Fragment getCurrentFragment() {
             return mCurrentFragment;
         }
+
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
         public void setPrimaryItem(ViewGroup container, int position, Object object) {
-            if(getCurrentFragment() != object){
+            if (getCurrentFragment() != object) {
                 mCurrentFragment = (Fragment) object;
             }
             super.setPrimaryItem(container, position, object);
@@ -329,7 +296,7 @@ public class MainActivity extends AppCompatActivity
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             //return PlaceholderFragment.newInstance(position + 1);
-            switch(position){
+            switch (position) {
                 case 0:
                     return FirstpageFragment.newInstance("1", "2");
                 case 1:

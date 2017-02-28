@@ -18,4 +18,10 @@
     <string name="ds_select_type_message">개인정보의 종류를 선택해 주세요</string>
     <string name="ds_select_app">앱을 선택해 주세요</string>
     <string name="firstpage_vpnbutton">vpn test</string>
+    <string name="latitude">위치/위도</string>
+    <string name="longitude">위치/경도</string>
+    <string name="latlng">위치</string>
+    <string name="unknown_type">알수없음</string>
+    <string name="ds_date_s">시작 날짜</string>
+    <string name="ds_date_e">종료 날짜</string>
 </resources>
