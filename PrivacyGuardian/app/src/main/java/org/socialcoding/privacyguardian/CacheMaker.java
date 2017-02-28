@@ -189,9 +189,9 @@ public class CacheMaker extends AsyncTask<Void, Void, Void>{
         return null;
     }
 
-    // prints update date and cache data
+    // prints update date and nameCache data
     public void printCacheData(){
-        Log.d("printCacheData", "cache :" + jsonArray.toString());
+        Log.d("printCacheData", "nameCache :" + jsonArray.toString());
         Log.d("printCacheData", "last update : " + lastUpdate);
     }
 

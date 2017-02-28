@@ -1,9 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
+
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/appname"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceListItemSmall"
-    android:gravity="center_vertical"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall"/>
+    android:layout_height="48dp"
+    android:layout_width="match_parent">
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:id="@+id/app_image"/>
+    <TextView
+        android:id="@+id/appname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/app_image"/>
+    <TextView
+        android:id="@+id/type"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/appname"
+        android:layout_alignParentRight="true"
+        android:gravity="end"/>
+    <TextView
+        android:id="@+id/datetime"
+        android:layout_width="96dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/app_image"
+        android:layout_alignParentBottom="true"/>
+    <TextView
+        android:id="@+id/value"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/datetime"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:gravity="end"/>
+</RelativeLayout>

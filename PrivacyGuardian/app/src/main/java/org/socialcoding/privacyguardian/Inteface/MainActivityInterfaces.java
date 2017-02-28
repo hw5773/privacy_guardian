@@ -1,5 +1,7 @@
 package org.socialcoding.privacyguardian.Inteface;
 
+import org.socialcoding.privacyguardian.ResultItem;
+
 /**
  * Created by disxc on 2017-02-22.
  */
@@ -9,7 +11,7 @@ public interface MainActivityInterfaces {
         void onAnalyzePressed();
         void onSamplePayloadPressed(int index);
         void onClearDBPressed();
-        String[] onListRequired();
+        ResultItem[] onListRequired();
     }
 
     interface OnFirstpageInteractionListener {

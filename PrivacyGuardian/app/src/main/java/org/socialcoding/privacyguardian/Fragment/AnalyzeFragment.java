@@ -16,6 +16,7 @@ import android.widget.ListView;
 import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.OnAnalyzeInteractionListener;
 import org.socialcoding.privacyguardian.R;
 import org.socialcoding.privacyguardian.ResultItem;
+import org.socialcoding.privacyguardian.ResultAdapter;
 
 import java.util.ArrayList;
 
@@ -29,7 +30,7 @@ import java.util.ArrayList;
  */
 public class AnalyzeFragment extends Fragment {
     ListView listView = null;
-    ArrayList<String> LIST_MENU = new ArrayList<String>();
+    ArrayList<ResultItem> LIST_MENU = new ArrayList<ResultItem>();
     ArrayAdapter arrayAdapter = null;
 
     private OnAnalyzeInteractionListener mListener;
@@ -92,11 +93,10 @@ public class AnalyzeFragment extends Fragment {
             }
         });
 
-        arrayAdapter = new ArrayAdapter(getContext(), R.layout.result_list_item, LIST_MENU);
+        arrayAdapter = new ResultAdapter(getContext(), R.layout.result_list_item, LIST_MENU);
         listView = (ListView) view.findViewById(R.id.listview1);
         listView.setAdapter(arrayAdapter);
         refreshList();
-        //super.onViewCreated(view, savedInstanceState);
     }
 
     /* interaction with main activity */
@@ -123,14 +123,14 @@ public class AnalyzeFragment extends Fragment {
     }
 
     public void refreshList() {
-        String[] items = mListener.onListRequired();
+        ResultItem[] items = mListener.onListRequired();
         LIST_MENU.clear();
         if(items == null){
             Log.d("refreshList", "no items found");
         }
         else{
-            for(String str : items){
-                LIST_MENU.add(str);
+            for(ResultItem item : items){
+                LIST_MENU.add(item);
             }
         }
         arrayAdapter.notifyDataSetChanged();
@@ -153,12 +153,4 @@ public class AnalyzeFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
-    //todo: implement result items
-    private class resultAdapter extends ArrayAdapter<ResultItem>{
-        public resultAdapter(Context context, int resource, int textViewResourceId) {
-            super(context, resource, textViewResourceId);
-        }
-    }
-
 }

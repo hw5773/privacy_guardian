@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -24,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.socialcoding.privacyguardian.Analyzer;
+import org.socialcoding.privacyguardian.AppInfoCache;
 import org.socialcoding.privacyguardian.CacheMaker;
 import org.socialcoding.privacyguardian.DatabaseHelper;
 import org.socialcoding.privacyguardian.Fragment.AnalyzeFragment;
@@ -32,10 +34,9 @@ import org.socialcoding.privacyguardian.Fragment.SettingsFragment;
 import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.*;
 import org.socialcoding.privacyguardian.Inteface.OnCacheMakerInteractionListener;
 import org.socialcoding.privacyguardian.R;
+import org.socialcoding.privacyguardian.ResultItem;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity
     CacheMaker cm = null;
     Analyzer analyzer = null;
     DatabaseHelper mDatabase;
+    AppInfoCache mAppInfoCache;
 
     public static String APPS_LIST = "AppsList";
     static final int START_ANALYZE_REQUEST_CODE = 1;
@@ -93,6 +95,7 @@ public class MainActivity extends AppCompatActivity
         });
 
         mDatabase = new DatabaseHelper(this);
+        mAppInfoCache = new AppInfoCache(this);
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
     }
@@ -168,22 +171,17 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
-    public String[] getQueryList() {
+    //returns array of resultItem that matches with query
+    public ResultItem[] getQueryList() {
         SQLiteDatabase db = mDatabase.getReadableDatabase();
-        //TODO: 내 언어에 맞는 시간대 출력하는 방법 찾기
 
-        SimpleDateFormat inputFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
-        SimpleDateFormat outputFormat = new SimpleDateFormat("mmm dd HH:mm");
-
-        // Define a projection that specifies which columns from the database
-        // you will actually use after this query.
         String[] projection = {
                 DatabaseHelper.LogEntry._ID,
                 DatabaseHelper.LogEntry.COLUMN_DATETIME,
                 DatabaseHelper.LogEntry.COLUMN_PACKAGE_NAME,
                 DatabaseHelper.LogEntry.COLUMN_DATA_TYPE,
-                DatabaseHelper.LogEntry.COLUMN_DATA_VALUE
+                DatabaseHelper.LogEntry.COLUMN_DATA_VALUE,
+                DatabaseHelper.LogEntry.COLUMN_HOST_ADDRESS
         };
 
         // Filter results WHERE "title" = 'My Title'
@@ -204,31 +202,26 @@ public class MainActivity extends AppCompatActivity
                 sortOrder                                 // The sort order
         );
         Log.d("getQueryList", "query got " + c.getCount());
-        String[] strings = new String[c.getCount()];
+        ResultItem[] resultItems = new ResultItem[c.getCount()];
         int i = 0;
         if (c.moveToFirst()) {
             do {
-                Date date = null;
-                String str = "";
-                str += c.getString(0);/*
-                //TODO: 제대로 된 LOCALE 시간 알아내기
-                try{
-                    date = inputFormat.parse(c.getString(1));
-                    str += outputFormat.format(date);
-                }
-                catch(Exception e){
-                    e.printStackTrace();
-                }*/
-                str += ", " + c.getString(2);
-                str += ", " + c.getString(3);
-                str += ", " + c.getString(4);
-                strings[i++] = str;
-
+                ResultItem ri = new ResultItem();
+                Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(c.getLong(1));
+                ri.time = cal;
+                ri.packageName = c.getString(2);
+                ri.appName = mAppInfoCache.getAppName(ri.packageName);
+                ri.dataType = c.getString(3);
+                ri.dataValue = c.getString(4);
+                ri.hostAddress = c.getString(5);
+                ri.appIcon = mAppInfoCache.getAppIcon(ri.packageName);
+                resultItems[i++] = ri;
             } while (c.moveToNext());
         }
         if (i == 0)
             return null;
-        return strings;
+        return resultItems;
     }
 
     @Override
@@ -250,7 +243,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public String[] onListRequired() {
+    public ResultItem[] onListRequired() {
         if (mDatabase != null) {
             return getQueryList();
         }

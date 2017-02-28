@@ -11,8 +11,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
-import java.util.Objects;
 import java.util.Vector;
+
+import org.socialcoding.privacyguardian.Structs.SensitiveInfoTypes;
 
 /**
  * Created by disxc on 2016-10-13.
@@ -23,10 +24,6 @@ public class Analyzer {
     private Context ctx;
     private DatabaseHelper mDatabase;
     private onLogGeneratedListener mListener;
-
-    private final String TYPE_LOCATION_LAT = "Location.getLatitude";
-    private final String TYPE_LOCATION_LNG = "Location.getLongitude";
-    private final String TYPE_LOCATION_LATLNG = "Location.getLatLng";
 
     public Analyzer(CacheMaker cm, Context context){
         cache = cm;
@@ -86,11 +83,11 @@ public class Analyzer {
                     v.add(type);
                     v.add(value);
                     logvector.add(v);
-                    if(type.compareTo(TYPE_LOCATION_LAT) == 0){
+                    if(type.compareTo(SensitiveInfoTypes.TYPE_LOCATION_LAT) == 0){
                         latFound = value;
                         latlngHost = "127.0.0.1";
                     }
-                    if(type.compareTo(TYPE_LOCATION_LNG) == 0){
+                    if(type.compareTo(SensitiveInfoTypes.TYPE_LOCATION_LNG) == 0){
                         lngFound = value;
                     }
                     //log(appName, "127.0.0.1", type, value);
@@ -116,7 +113,7 @@ public class Analyzer {
 
             //when lat lng both found
             if(latFound != null && lngFound !=null){
-                log(packageName, latlngHost, TYPE_LOCATION_LATLNG, latFound +";" + lngFound);
+                log(packageName, latlngHost, SensitiveInfoTypes.TYPE_LOCATION_LATLNG, latFound +";" + lngFound);
             }
 
             if(ret.compareTo("") == 0)
@@ -146,6 +143,7 @@ public class Analyzer {
         SQLiteDatabase db = mDatabase.getWritableDatabase();
         ContentValues values = new ContentValues();
 
+        //saves time in milliseconds
         values.put(DatabaseHelper.LogEntry.COLUMN_DATETIME, c.getTime().getTime());
         values.put(DatabaseHelper.LogEntry.COLUMN_PACKAGE_NAME, packageName);
         values.put(DatabaseHelper.LogEntry.COLUMN_HOST_ADDRESS, ip);
