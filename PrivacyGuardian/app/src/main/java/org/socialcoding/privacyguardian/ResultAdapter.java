@@ -14,7 +14,6 @@ import org.socialcoding.privacyguardian.Structs.SensitiveInfoTypes;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -67,9 +66,7 @@ public class ResultAdapter extends ArrayAdapter<ResultItem> {
                 tvType.setText(typestr);
             }
             if(tvDatetime != null){
-                Date date = resultItem.time.getTime();
-                DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(getContext());
-                tvDatetime.setText(dateFormat.format(date));
+                tvDatetime.setText(DateFormat.getInstance().format(resultItem.time.getTime()));
             }
             if(tvValue != null){
                 tvValue.setText(resultItem.dataValue);
