@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
+import android.widget.DatePicker;
 
 import org.socialcoding.privacyguardian.R;
 
@@ -75,7 +76,7 @@ public class DataSelectDateFragment extends Fragment {
     public void onButtonPressed() {
         //TODO: DO SOMETHING!!!
         if (mListener != null) {
-            //mListener.onDateSelectionChanged(new Date(), new Date());
+            //mListener.onStartDateSelectionChanged(new Date(), new Date());
         }
     }
 
@@ -98,15 +99,22 @@ public class DataSelectDateFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        CalendarView calendarView = (CalendarView) view.findViewById(R.id.calendarView);
-        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener(){
+        DatePicker datePicker1 = (DatePicker) view.findViewById(R.id.ds_start_dp);
+        datePicker1.init(1992, 11, 22, new DatePicker.OnDateChangedListener() {
             @Override
-            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-                Calendar start = Calendar.getInstance();
-                Calendar end = Calendar.getInstance();
-                start.set(year, month, dayOfMonth);
-
-                mListener.onDateSelectionChanged(start, end);
+            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, monthOfYear, dayOfMonth);
+                mListener.onStartDateSelectionChanged(calendar);
+            }
+        });
+        DatePicker datePicker2 = (DatePicker) view.findViewById(R.id.ds_end_dp);
+        datePicker2.init(2016, 11, 22, new DatePicker.OnDateChangedListener() {
+            @Override
+            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, monthOfYear, dayOfMonth);
+                mListener.onEndDateSelectionChanged(calendar);
             }
         });
     }
@@ -122,6 +130,7 @@ public class DataSelectDateFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnDateSelectionChangedListener {
-        void onDateSelectionChanged(Calendar start, Calendar end);
+        void onStartDateSelectionChanged(Calendar start);
+        void onEndDateSelectionChanged(Calendar end);
     }
 }

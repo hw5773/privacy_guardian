@@ -13,7 +13,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.OnAnalyzeInteractionListener;
 import org.socialcoding.privacyguardian.R;
+import org.socialcoding.privacyguardian.ResultItem;
+import org.socialcoding.privacyguardian.ResultAdapter;
 
 import java.util.ArrayList;
 
@@ -27,7 +30,7 @@ import java.util.ArrayList;
  */
 public class AnalyzeFragment extends Fragment {
     ListView listView = null;
-    ArrayList<String> LIST_MENU = new ArrayList<String>();
+    ArrayList<ResultItem> LIST_MENU = new ArrayList<ResultItem>();
     ArrayAdapter arrayAdapter = null;
 
     private OnAnalyzeInteractionListener mListener;
@@ -90,12 +93,13 @@ public class AnalyzeFragment extends Fragment {
             }
         });
 
-        arrayAdapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, LIST_MENU);
+        arrayAdapter = new ResultAdapter(getContext(), R.layout.result_list_item, LIST_MENU);
         listView = (ListView) view.findViewById(R.id.listview1);
         listView.setAdapter(arrayAdapter);
         refreshList();
-        //super.onViewCreated(view, savedInstanceState);
     }
+
+    /* interaction with main activity */
 
     private void onClearDBButtonPressed() {
         if(mListener != null){
@@ -119,14 +123,14 @@ public class AnalyzeFragment extends Fragment {
     }
 
     public void refreshList() {
-        String[] items = mListener.onListRequired();
+        ResultItem[] items = mListener.onListRequired();
         LIST_MENU.clear();
         if(items == null){
             Log.d("refreshList", "no items found");
         }
         else{
-            for(String str : items){
-                LIST_MENU.add(str);
+            for(ResultItem item : items){
+                LIST_MENU.add(item);
             }
         }
         arrayAdapter.notifyDataSetChanged();
@@ -149,23 +153,4 @@ public class AnalyzeFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnAnalyzeInteractionListener {
-        void onAnalyzePressed();
-        void onSamplePayloadPressed(int index);
-        void onClearDBPressed();
-        String[] onListRequired();
-    }
-
 }

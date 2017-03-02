@@ -187,6 +187,7 @@ public class SocketManager implements SocketManagerAPI {
         }
         catch (IOException e)
         {
+            System.out.println("Socket is not generated well");
             System.out.println(e.getStackTrace());
         }
     }
@@ -200,7 +201,8 @@ public class SocketManager implements SocketManagerAPI {
             DatagramChannel socket = DatagramChannel.open();
             socket.configureBlocking(false);
             socket.connect(new InetSocketAddress(ipHdr.getSourceIP(), udpHdr.getSourcePort()));
-            while(!socket.isConnected());
+            while (!socket.isConnected());
+            System.out.println("This socket is connected to " + makeKey(ipHdr.getSourceIP(), udpHdr.getSourcePort()));
             udpSelector.wakeup();
             socket.register(udpSelector, SelectionKey.OP_READ, null);
             UDPSocketInfo info = new UDPSocketInfo(socket, ipHdr.getDestIP(), udpHdr.getDestPort());
@@ -212,6 +214,7 @@ public class SocketManager implements SocketManagerAPI {
         }
         catch (IOException e)
         {
+            System.out.println("Socket is not generated well");
             System.out.println(e.getStackTrace());
         }
     }
@@ -257,8 +260,7 @@ public class SocketManager implements SocketManagerAPI {
         String key = makeKey(clntIP, clntPort);
         ByteBuffer msg = ByteBuffer.wrap(payload.getBytes());
 
-        if (isTCP)
-        {
+        if (isTCP) {
             sendTCPMessage(key, msg, payload.length());
         } else {
             sendUDPMessage(key, msg);
@@ -267,29 +269,30 @@ public class SocketManager implements SocketManagerAPI {
 
     // Send the message with the TCP socket
     private void sendTCPMessage(String key, ByteBuffer msg, int size) {
-        try
-        {
-            Log.d("SendTCPMessage", "sendTCPMessage: " + key);
-            SocketChannel a = tcpSock.get(key);
-            TCPSocketInfo info = tcpInfo.get(a);
-            info.getSocket().write(msg);
-            info.setAckNum(size);
+        try {
+            if (tcpSock.containsKey(key)) {
+                TCPSocketInfo info = tcpInfo.get(tcpSock.get(key));
+                info.getSocket().write(msg);
+                info.setAckNum(size);
+            } else {
+                System.out.println("Socket is not found in tcpSock " + key);
+            }
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             System.out.println(e.getStackTrace());
         }
     }
 
     // Send the message with the UDP socket
     private void sendUDPMessage(String key, ByteBuffer msg) {
-        try
-        {
-            Log.d("SendUDPMessage", "sendUDPMessage: " + key);
-            udpSock.get(key).write(msg);
+        try {
+            System.out.println("Send the message from " + key);
+            if (udpSock.containsKey(key))
+                udpSock.get(key).write(msg);
+            else
+                System.out.println("Socket is not found in udpSock with " + key);
         }
-        catch (IOException e)
-        {
+        catch (IOException e) {
             System.out.println(e.getStackTrace());
         }
     }
@@ -411,6 +414,9 @@ public class SocketManager implements SocketManagerAPI {
         int length = udp.length + msg.length;
 
         System.out.println("Making the UDP Packet");
+        byte[] tmp = new byte[25];
+        System.arraycopy(msg, 12, tmp, 0, 25);
+        System.out.println("message: " + new String(tmp));
 
         byte[] serv, clnt;
 
@@ -543,9 +549,7 @@ public class SocketManager implements SocketManagerAPI {
         }
     }
 
-    private String makeKey(String ip, int port)
-    {
-        return ip + ":" + port;
+    private String makeKey(String sourceIP, int sourcePort) {
+        return sourceIP + ":" + sourcePort;
     }
-
 }

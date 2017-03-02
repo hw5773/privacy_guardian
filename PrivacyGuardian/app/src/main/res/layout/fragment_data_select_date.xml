@@ -5,22 +5,44 @@
     tools:context="org.socialcoding.privacyguardian.Fragment.DataSelectDateFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <TextView
+        android:layout_height="match_parent">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/ds_select_date" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/ds_pick_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ds_select_date" />
 
-        <CalendarView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/calendarView"
-            android:layout_gravity="center"/>
+            <TextView
+                android:id="@+id/ds_start_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ds_date_s"
+                android:layout_below="@id/ds_pick_tv"/>
+            <DatePicker
+                android:id="@+id/ds_start_dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ds_start_tv"
+                android:datePickerMode="calendar"></DatePicker>
+            <TextView
+                android:id="@+id/ds_end_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ds_date_e"
+                android:layout_below="@+id/ds_start_dp"/>
+            <DatePicker
+                android:id="@+id/ds_end_dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ds_end_tv"
+                android:datePickerMode="calendar"></DatePicker>
 
-    </LinearLayout>
-
-
+        </RelativeLayout>
+    </ScrollView>
 </FrameLayout>
