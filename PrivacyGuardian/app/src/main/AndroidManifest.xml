@@ -3,6 +3,8 @@
     package="org.socialcoding.privacyguardian">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -10,6 +12,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <uses-library android:name="com.google.android.maps"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/googlemaps_key"/>
