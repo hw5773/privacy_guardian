@@ -36,11 +36,9 @@ public class HttpConnect extends AsyncTask<String, Object, String> {
             urlConnection.setDefaultUseCaches(false); // 캐싱데이터 디폴트 값 설정
             urlConnection.setConnectTimeout(5000);
             try {
-                Log.d("httpconn", "fetching");
                 InputStream in = new BufferedInputStream(urlConnection.getInputStream());
                 StringBuilder builder = new StringBuilder();   //문자열을 담기 위한 객체
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));  //문자열 셋 세팅
-                Log.d("httpconn", "building");
                 String line = "";
                 while ((line = reader.readLine()) != null) {
                     builder.append(line + "\n");
