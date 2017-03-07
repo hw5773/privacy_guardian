@@ -30,6 +30,7 @@ import org.socialcoding.privacyguardian.CacheMaker;
 import org.socialcoding.privacyguardian.DatabaseHelper;
 import org.socialcoding.privacyguardian.Fragment.AnalyzeFragment;
 import org.socialcoding.privacyguardian.Fragment.FirstpageFragment;
+import org.socialcoding.privacyguardian.Fragment.GoogleMapsFragment;
 import org.socialcoding.privacyguardian.Fragment.SettingsFragment;
 import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.*;
 import org.socialcoding.privacyguardian.Inteface.OnCacheMakerInteractionListener;
@@ -301,6 +302,8 @@ public class MainActivity extends AppCompatActivity
                     return FirstpageFragment.newInstance("1", "2");
                 case 1:
                     return AnalyzeFragment.newInstance();
+                case 3:
+                    return GoogleMapsFragment.newInstance();
                 default:
                     return SettingsFragment.newInstance();
             }
@@ -309,7 +312,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 4;
         }
 
         @Override
@@ -321,6 +324,8 @@ public class MainActivity extends AppCompatActivity
                     return "분석";
                 case 2:
                     return "설정";
+                case 3:
+                    return "지도";
             }
             return null;
         }

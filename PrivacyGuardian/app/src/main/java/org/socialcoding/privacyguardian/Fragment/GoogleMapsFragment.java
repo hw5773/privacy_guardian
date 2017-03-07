@@ -36,6 +36,15 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
     private GoogleMap googleMap;
     private MapView mapView;
 
+    public static GoogleMapsFragment newInstance() {
+        
+        Bundle args = new Bundle();
+        
+        GoogleMapsFragment fragment = new GoogleMapsFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+    
     @Override
     public void onMapReady(GoogleMap map){
         map.addMarker(new MarkerOptions()
