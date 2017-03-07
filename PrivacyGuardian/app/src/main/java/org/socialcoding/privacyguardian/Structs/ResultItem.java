@@ -1,4 +1,4 @@
-package org.socialcoding.privacyguardian;
+package org.socialcoding.privacyguardian.Structs;
 
 import android.graphics.drawable.Drawable;
 
@@ -17,6 +17,8 @@ public class ResultItem {
     public String hostAddress;
 
     public ResultItem(){
-
+        time = Calendar.getInstance();
+        appIcon = null;
+        packageName = appName = dataType = dataValue = hostAddress = "?";
     }
 }

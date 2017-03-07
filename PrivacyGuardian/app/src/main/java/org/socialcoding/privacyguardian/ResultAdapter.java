@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.socialcoding.privacyguardian.Structs.ResultItem;
 import org.socialcoding.privacyguardian.Structs.SensitiveInfoTypes;
 
 import java.text.DateFormat;

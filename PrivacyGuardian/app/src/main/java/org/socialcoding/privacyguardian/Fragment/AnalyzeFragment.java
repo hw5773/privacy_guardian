@@ -15,7 +15,7 @@ import android.widget.ListView;
 
 import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.OnAnalyzeInteractionListener;
 import org.socialcoding.privacyguardian.R;
-import org.socialcoding.privacyguardian.ResultItem;
+import org.socialcoding.privacyguardian.Structs.ResultItem;
 import org.socialcoding.privacyguardian.ResultAdapter;
 
 import java.util.ArrayList;

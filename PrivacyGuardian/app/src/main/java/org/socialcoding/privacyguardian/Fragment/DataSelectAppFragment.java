@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 
 import org.socialcoding.privacyguardian.Activity.DataSelectActivity;
 import org.socialcoding.privacyguardian.R;
-import org.socialcoding.privacyguardian.Fragment.dummy.DataSelectAppContent;
+import org.socialcoding.privacyguardian.Fragment.AppsItem.DataSelectAppContent;
 
 /**
  * A fragment representing a list of Items.
@@ -22,9 +22,7 @@ import org.socialcoding.privacyguardian.Fragment.dummy.DataSelectAppContent;
  */
 public class DataSelectAppFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnAppSelectionChangedListener mListener;
 
@@ -66,7 +64,7 @@ public class DataSelectAppFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(DataSelectAppContent.ITEMS, mListener));
+            recyclerView.setAdapter(new AppsItemRecyclerViewAdapter(DataSelectAppContent.ITEMS, mListener));
         }
         return view;
     }

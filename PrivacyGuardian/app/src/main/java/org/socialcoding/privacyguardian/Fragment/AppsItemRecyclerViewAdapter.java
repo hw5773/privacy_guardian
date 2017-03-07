@@ -9,7 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.socialcoding.privacyguardian.Fragment.DataSelectAppFragment.OnAppSelectionChangedListener;
-import org.socialcoding.privacyguardian.Fragment.dummy.DataSelectAppContent.AppsItem;
+import org.socialcoding.privacyguardian.Fragment.AppsItem.DataSelectAppContent.AppsItem;
 import org.socialcoding.privacyguardian.R;
 
 import java.util.List;
@@ -19,12 +19,12 @@ import java.util.List;
  * specified {@link OnAppSelectionChangedListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
+public class AppsItemRecyclerViewAdapter extends RecyclerView.Adapter<AppsItemRecyclerViewAdapter.ViewHolder> {
 
     private final List<AppsItem> mValues;
     private final OnAppSelectionChangedListener mListener;
 
-    public MyItemRecyclerViewAdapter(List<AppsItem> items, OnAppSelectionChangedListener listener) {
+    public AppsItemRecyclerViewAdapter(List<AppsItem> items, OnAppSelectionChangedListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -39,14 +39,14 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        //holder.mIdView.setText(mValues.get(position).id);
+        //holder.mIdView.setText(mValues.get(position).appName);
         holder.mImageView.setImageResource(R.drawable.poro);
         holder.mContentView.setText(mValues.get(position).content);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(v.getContext(), holder.mItem.content, Toast.LENGTH_SHORT);
+                Toast.makeText(v.getContext(), holder.mItem.content, Toast.LENGTH_SHORT).show();
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
@@ -72,7 +72,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
             super(view);
             mView = view;
             mImageView = (ImageView) view.findViewById(R.id.image);
-            //mIdView = (TextView) view.findViewById(R.id.id);
+            //mIdView = (TextView) view.findViewById(R.appName.appName);
             mContentView = (TextView) view.findViewById(R.id.content);
         }
 
@@ -80,5 +80,10 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
         public String toString() {
             return super.toString() + " '" + mContentView.getText() + "'";
         }
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position, List<Object> payloads) {
+        AppsItem item = mValues.get(position);
     }
 }

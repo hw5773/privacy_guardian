@@ -29,7 +29,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/ds_start_tv"
-                android:datePickerMode="calendar"></DatePicker>
+                android:datePickerMode="spinner"></DatePicker>
             <TextView
                 android:id="@+id/ds_end_tv"
                 android:layout_width="wrap_content"
@@ -41,7 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/ds_end_tv"
-                android:datePickerMode="calendar"></DatePicker>
+                android:datePickerMode="spinner"></DatePicker>
 
         </RelativeLayout>
     </ScrollView>

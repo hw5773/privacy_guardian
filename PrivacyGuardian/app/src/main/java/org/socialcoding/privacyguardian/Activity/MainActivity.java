@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -34,7 +33,7 @@ import org.socialcoding.privacyguardian.Fragment.SettingsFragment;
 import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.*;
 import org.socialcoding.privacyguardian.Inteface.OnCacheMakerInteractionListener;
 import org.socialcoding.privacyguardian.R;
-import org.socialcoding.privacyguardian.ResultItem;
+import org.socialcoding.privacyguardian.Structs.ResultItem;
 
 import java.util.Calendar;
 import java.util.List;
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity
     DatabaseHelper mDatabase;
     AppInfoCache mAppInfoCache;
 
-    public static String APPS_LIST = "AppsList";
+    public static final String APPS_LIST = "AppsList";
     static final int START_ANALYZE_REQUEST_CODE = 1;
 
     @Override

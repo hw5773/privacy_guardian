@@ -1,4 +1,4 @@
-package org.socialcoding.privacyguardian.Fragment.dummy;
+package org.socialcoding.privacyguardian.Fragment.AppsItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,25 +13,12 @@ import java.util.Map;
  */
 public class DataSelectAppContent {
 
-    /**
-     * An array of sample (dummy) items.
-     */
     public static final List<AppsItem> ITEMS = new ArrayList<AppsItem>();
 
-    /**
-     * A map of sample (dummy) items, by ID.
-     */
     public static final Map<String, AppsItem> ITEM_MAP = new HashMap<String, AppsItem>();
 
     private static final int COUNT = 25;
     private static boolean initiated = false;
-
-    /*static {
-        // Add some sample items.
-        for (int i = 1; i <= COUNT; i++) {
-            addItem(createDummyItem(i));
-        }
-    }*/
 
     public static void init(String[] appsList){
         if(initiated)
@@ -44,7 +31,7 @@ public class DataSelectAppContent {
 
     private static void addItem(AppsItem item) {
         ITEMS.add(item);
-        ITEM_MAP.put(item.id, item);
+        ITEM_MAP.put(item.appName, item);
     }
 
     private static AppsItem createDummyItem(int position, String name) {
@@ -60,17 +47,15 @@ public class DataSelectAppContent {
         return builder.toString();
     }
 
-    /**
-     * A dummy item representing a piece of content.
-     */
+    //app item
     public static class AppsItem {
-        public final String id;
+        public final String appName;
         public final String image;
         public final String content;
         public final String details;
 
-        public AppsItem(String id, String image, String content, String details) {
-            this.id = id;
+        public AppsItem(String appName, String image, String content, String details) {
+            this.appName = appName;
             this.image = image;
             this.content = content;
             this.details = details;
