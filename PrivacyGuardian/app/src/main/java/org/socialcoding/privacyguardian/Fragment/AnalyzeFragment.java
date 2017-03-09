@@ -93,6 +93,16 @@ public class AnalyzeFragment extends Fragment {
             }
         });
 
+
+        Button buttonGoogleMaps = (Button) view.findViewById(R.id.maps);
+        buttonStartAnalyze.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                }
+        });
+
+
         arrayAdapter = new ResultAdapter(getContext(), R.layout.result_list_item, LIST_MENU);
         listView = (ListView) view.findViewById(R.id.listview1);
         listView.setAdapter(arrayAdapter);
@@ -114,7 +124,11 @@ public class AnalyzeFragment extends Fragment {
             refreshList();
         }
     }
-
+    public void onMapsButtonPressed(){
+        if(mListener !=null){
+            mListener.onMapsPressed();
+        }
+    }
     public void onSamplePayloadPressed(int i){
         if (mListener!= null){
             mListener.onSamplePayloadPressed(i);

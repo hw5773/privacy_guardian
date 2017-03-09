@@ -1,5 +1,6 @@
 package org.socialcoding.privacyguardian.Activity;
 
+import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,6 +14,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -23,6 +25,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.gms.maps.SupportMapFragment;
 
 import org.socialcoding.privacyguardian.Analyzer;
 import org.socialcoding.privacyguardian.AppInfoCache;
@@ -249,6 +253,14 @@ public class MainActivity extends AppCompatActivity
             return getQueryList();
         }
         return null;
+    }
+
+    @Override
+    public void onMapsPressed() {
+        Fragment fragment = new GoogleMapsFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_analyze, fragment);
+        fragmentTransaction.commit();
     }
 
     @Override
