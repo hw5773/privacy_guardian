@@ -225,8 +225,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onAnalyzePressed() {
-        if (cm != null && analyzer != null)
+        if (cm != null && analyzer != null){
             startAnalyze(cm.getAppsList());
+        }
     }
 
     @Override

@@ -60,8 +60,8 @@ public class CacheMaker extends AsyncTask<Void, Void, Void>{
             }
             else {
                 patchResultMessage = "업데이트에 실패하였습니다.";
+                return null;
             }
-            return null;
         }
         //if dateString is out-of-date
         else if (!checkUpdate(dateString)) {

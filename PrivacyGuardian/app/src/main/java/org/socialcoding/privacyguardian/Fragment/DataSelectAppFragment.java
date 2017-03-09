@@ -77,7 +77,7 @@ public class DataSelectAppFragment extends Fragment {
             mListener = (OnAppSelectionChangedListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnAppSelectionChangedListener");
+                + " must implement OnAppSelectionChangedListener");
         }
     }
 
