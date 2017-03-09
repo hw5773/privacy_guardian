@@ -10,8 +10,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import org.socialcoding.privacyguardian.Activity.MainActivity;
+import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces;
 import org.socialcoding.privacyguardian.R;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,6 +37,7 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
 
     private GoogleMap googleMap;
     private MapView mapView;
+    private MainActivityInterfaces.OnAnalyzeInteractionListener mListener;
 
     public static GoogleMapsFragment newInstance() {
         
@@ -61,6 +64,14 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_google_maps, container, false);
+
+        Button button = (Button) rootView.findViewById(R.id.button2);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackButtonPressed();
+            }
+        });
 
         mapView = (MapView) rootView.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
@@ -113,4 +124,9 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
         mapView.onLowMemory();
     }
 
+    public void onBackButtonPressed(){
+        if(mListener !=null){
+            mListener.onBackPressed();
+        }
+    }
 }

@@ -14,6 +14,8 @@ public interface MainActivityInterfaces {
         ResultItem[] onListRequired();
 
         void onMapsPressed();
+
+        void onBackPressed();
     }
 
     interface OnFirstpageInteractionListener {

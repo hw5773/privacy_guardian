@@ -95,10 +95,10 @@ public class AnalyzeFragment extends Fragment {
 
 
         Button buttonGoogleMaps = (Button) view.findViewById(R.id.maps);
-        buttonStartAnalyze.setOnClickListener(new View.OnClickListener() {
+        buttonGoogleMaps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                    onMapsButtonPressed();
                 }
         });
 

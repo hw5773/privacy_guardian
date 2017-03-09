@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.fitness.data.Goal;
 import com.google.android.gms.maps.SupportMapFragment;
 
 import org.socialcoding.privacyguardian.Analyzer;
@@ -254,7 +255,13 @@ public class MainActivity extends AppCompatActivity
         }
         return null;
     }
-
+    @Override
+    public void onBackPressed(){
+        Fragment fragment= new AnalyzeFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_analyze, fragment);
+        fragmentTransaction.commit();
+    }
     @Override
     public void onMapsPressed() {
         Fragment fragment = new GoogleMapsFragment();
