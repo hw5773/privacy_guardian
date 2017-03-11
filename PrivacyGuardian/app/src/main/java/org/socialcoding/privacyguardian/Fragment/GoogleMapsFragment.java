@@ -1,110 +1,132 @@
 package org.socialcoding.privacyguardian.Fragment;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
+import org.socialcoding.privacyguardian.Activity.MainActivity;
+import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces;
 import org.socialcoding.privacyguardian.R;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link GoogleMapsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link GoogleMapsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class GoogleMapsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import static org.socialcoding.privacyguardian.R.id.container;
+import static org.socialcoding.privacyguardian.R.id.map;
+import static org.socialcoding.privacyguardian.R.id.submenuarrow;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
 
-    private OnFragmentInteractionListener mListener;
+    private GoogleMap googleMap;
+    private MapView mapView;
+    private MainActivityInterfaces.OnAnalyzeInteractionListener mListener;
 
-    public GoogleMapsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment GoogleMapsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static GoogleMapsFragment newInstance(String param1, String param2) {
-        GoogleMapsFragment fragment = new GoogleMapsFragment();
+    public static GoogleMapsFragment newInstance() {
+        
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        
+        GoogleMapsFragment fragment = new GoogleMapsFragment();
         fragment.setArguments(args);
         return fragment;
     }
-
+    
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onMapReady(GoogleMap map){
+        map.addMarker(new MarkerOptions()
+                .position(new LatLng(0,0))
+                .title("Marker"));
+    }
+    /*
+    @Override
+    public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+        mapView.onCreate(savedInstanceState);
+    }*/
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_google_maps, container, false);
-    }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_google_maps, container, false);
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+        Button button = (Button) rootView.findViewById(R.id.button2);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackButtonPressed();
+            }
+        });
+
+        mapView = (MapView) rootView.findViewById(R.id.map);
+        mapView.onCreate(savedInstanceState);
+
+        mapView.onResume();  // needed to get the map to display immediately
+        try{
+            MapsInitializer.initialize(getActivity().getApplicationContext());
+        }catch (Exception e){
+            e.printStackTrace();
         }
+        //from http://stackoverflow.com/questions/19353255/how-to-put-google-maps-v2-on-a-fragment-using-viewpager
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap mMap) {
+                googleMap = mMap;
+
+                //For showing a move to my location button
+               // googleMap.setMyLocationEnabled(true);
+
+                //For dropping a marker at a point on the Map
+                LatLng sydney = new LatLng(-34,151);
+                googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
+
+                //For zooming automatically to the location of the marker
+                CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(12).build();
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            }
+        });
+
+        return rootView;
+    }
+    @Override
+    public void onResume(){
+        super.onResume();
+        mapView.onResume();
+    }
+    @Override
+    public void onPause(){
+        super.onPause();
+        mapView.onPause();
+    }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+    @Override
+    public void onLowMemory(){
+        super.onLowMemory();
+        mapView.onLowMemory();
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+    public void onBackButtonPressed(){
+        if(mListener !=null){
+            mListener.onBackPressed();
         }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 }

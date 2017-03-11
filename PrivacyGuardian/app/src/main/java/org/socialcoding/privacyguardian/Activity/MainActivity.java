@@ -1,5 +1,6 @@
 package org.socialcoding.privacyguardian.Activity;
 
+import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,6 +14,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -24,12 +26,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.fitness.data.Goal;
+import com.google.android.gms.maps.SupportMapFragment;
+
 import org.socialcoding.privacyguardian.Analyzer;
 import org.socialcoding.privacyguardian.AppInfoCache;
 import org.socialcoding.privacyguardian.CacheMaker;
 import org.socialcoding.privacyguardian.DatabaseHelper;
 import org.socialcoding.privacyguardian.Fragment.AnalyzeFragment;
 import org.socialcoding.privacyguardian.Fragment.FirstpageFragment;
+import org.socialcoding.privacyguardian.Fragment.GoogleMapsFragment;
 import org.socialcoding.privacyguardian.Fragment.SettingsFragment;
 import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.*;
 import org.socialcoding.privacyguardian.Inteface.OnCacheMakerInteractionListener;
@@ -249,6 +255,20 @@ public class MainActivity extends AppCompatActivity
         }
         return null;
     }
+    @Override
+    public void onBackPressed(){
+        Fragment fragment= new AnalyzeFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_analyze, fragment);
+        fragmentTransaction.commit();
+    }
+    @Override
+    public void onMapsPressed() {
+        Fragment fragment = new GoogleMapsFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_analyze, fragment);
+        fragmentTransaction.commit();
+    }
 
     @Override
     public void onCacheMakerCreated(CacheMaker cm, String pm) {
@@ -301,6 +321,8 @@ public class MainActivity extends AppCompatActivity
                     return FirstpageFragment.newInstance("1", "2");
                 case 1:
                     return AnalyzeFragment.newInstance();
+                case 3:
+                    return GoogleMapsFragment.newInstance();
                 default:
                     return SettingsFragment.newInstance();
             }
@@ -309,7 +331,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 4;
         }
 
         @Override
@@ -321,6 +343,8 @@ public class MainActivity extends AppCompatActivity
                     return "분석";
                 case 2:
                     return "설정";
+                case 3:
+                    return "지도";
             }
             return null;
         }
