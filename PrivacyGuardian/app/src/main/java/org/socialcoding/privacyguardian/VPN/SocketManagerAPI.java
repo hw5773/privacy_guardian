@@ -5,14 +5,18 @@ package org.socialcoding.privacyguardian.VPN;
  */
 
 public interface SocketManagerAPI {
+
+    // Checking whether the socket is in the SocketManager
+    boolean checkSocket(boolean isTCP, String clntIP, int clntPort);
+
     // Adding the socket in the SocketManager
-    void addSocket(boolean isTCP, IP_Header ipHdr, TransmissionHeader tHdr);
+    void addSocket(boolean isTCP, IPHeader ipHdr, TransportHeader tHdr);
 
     // Deleting the socket in the SocketManager
     void delSocket(boolean isTCP, String clntIP, int clntPort);
 
     // Sending the message to the corresponding server
-    void sendMessage(boolean isTCP, String clntIP, int clntPort, String payload);
+    void sendMessage(boolean isTCP, String clntIP, int clntPort, byte[] payload);
 
     // Checking whether the message is in the queue
     boolean isMessage();

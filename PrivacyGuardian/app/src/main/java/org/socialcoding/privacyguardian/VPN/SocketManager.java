@@ -1,7 +1,5 @@
 package org.socialcoding.privacyguardian.VPN;
 
-import android.util.Log;
-
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -41,8 +39,9 @@ public class SocketManager implements SocketManagerAPI {
     private int IPHeaderLength = 20;
     private int TCPHeaderLength = 20;
     private int UDPHeaderLength = 20;
-
-    private static int TIMING = 100;
+    private int IPHeaderMaxLength = 65536;
+    private int MAX_BYTES = 2048;
+    private int TIMING = 100;
 
     public SocketManager() {
         try {
@@ -66,7 +65,6 @@ public class SocketManager implements SocketManagerAPI {
                             int tcpChannels = tcpSelector.select();
 
                             if (tcpChannels == 0) {
-                                Log.d("tcpChannels", "sleeping");
                                 Thread.sleep(TIMING);
                                 continue;
                             }
@@ -79,10 +77,16 @@ public class SocketManager implements SocketManagerAPI {
                                 while (iter.hasNext()) {
                                     SelectionKey key = iter.next();
                                     SocketChannel socket = (SocketChannel) key.channel();
-                                    ByteBuffer buf = ByteBuffer.allocate(256);
-                                    socket.read(buf);
-                                    byte[] packet = makeTCPPacket(buf.array(), socket.socket());
-                                    addMessage(packet);
+                                    ByteBuffer buf = ByteBuffer.allocate(MAX_BYTES);
+                                    int bytes = 0, recv;
+                                    while (true) {
+                                        recv = socket.read(buf);
+                                        if (recv == 0)
+                                            break;
+                                        bytes += recv;
+                                    }
+                                    System.out.println("Received " + bytes + " TCP bytes.");
+                                    makeTCPPacket(buf.array(), socket.socket());
                                 }
                             }
                         } catch (IOException e) {
@@ -117,10 +121,16 @@ public class SocketManager implements SocketManagerAPI {
                                 while (iter.hasNext()) {
                                     SelectionKey key = iter.next();
                                     DatagramChannel socket = (DatagramChannel) key.channel();
-                                    ByteBuffer buf = ByteBuffer.allocate(256);
-                                    socket.read(buf);
-                                    byte[] packet = makeUDPPacket(buf.array(), socket.socket());
-                                    addMessage(packet);
+                                    ByteBuffer buf = ByteBuffer.allocate(MAX_BYTES);
+                                    int bytes = 0, recv;
+                                    while (true) {
+                                        recv = socket.read(buf);
+                                        if (recv == 0)
+                                            break;
+                                        bytes += recv;
+                                    }
+                                    System.out.println("Received " + bytes + " UDP bytes.");
+                                    makeUDPPacket(buf.array(), socket.socket());
                                 }
                             }
                         } catch (IOException e) {
@@ -142,40 +152,60 @@ public class SocketManager implements SocketManagerAPI {
         udpThread.start();
     }
 
-    @Override
-    public void addSocket(boolean isTCP, IP_Header ipHdr, TransmissionHeader tHdr) {
+    public boolean checkSocket(boolean isTCP, String clntIP, int clntPort) {
+        String key = makeKey(clntIP, clntPort);
+        boolean ret = false;
 
         if (isTCP) {
-            TCP_Header tcpHdr = (TCP_Header) tHdr;
+            if (tcpSock.containsKey(key))
+                ret = true;
+        } else {
+            if (udpSock.containsKey(key))
+                ret = true;
+        }
+
+        return ret;
+    }
+
+    @Override
+    public void addSocket(boolean isTCP, IPHeader ipHdr, TransportHeader tHdr) {
+
+        if (isTCP)
+            System.out.println("TCP packet is added to SocketManager.");
+        else
+            System.out.println("UDP packet is added to SocketManager.");
+
+        if (isTCP) {
+            TCPHeader tcpHdr = (TCPHeader) tHdr;
             addTCPSocket(ipHdr, tcpHdr);
         } else {
-            UDP_Header udpHdr = (UDP_Header) tHdr;
+            UDPHeader udpHdr = (UDPHeader) tHdr;
             addUDPSocket(ipHdr, udpHdr);
         }
     }
 
     // Add the TCP Socket into the manager
-    private void addTCPSocket(IP_Header ipHdr, TCP_Header tcpHdr) {
+    private void addTCPSocket(IPHeader ipHdr, TCPHeader tcpHdr) {
         try {
             // Key is the combination of the client IP address and the client port
             // VPN will give the SYN/ACK packet. So the destination is the client
-            String key = makeKey(ipHdr.getDestIP(), tcpHdr.getDestPort());
+            String key = makeKey(ipHdr.getSourceIP(), tcpHdr.getSourcePort());
             System.out.println("TCP is selected");
-            Log.d("addTCPSocket", "addTCPSocket: " + key);
+            System.out.println("key: " + key);
             SocketChannel socket = SocketChannel.open();
             socket.configureBlocking(false); // Set the socket in non-blocking mode
             // Connect to the server
-            socket.connect(new InetSocketAddress(ipHdr.getSourceIP(), tcpHdr.getSourcePort()));
+            socket.connect(new InetSocketAddress(ipHdr.getDestIP(), tcpHdr.getDestPort()));
             while (!socket.finishConnect()); // Wait until finishing TCP handshake
 
             // Log message
-            System.out.println("Complete to make the socket with " + makeKey(ipHdr.getSourceIP(), tcpHdr.getSourcePort()));
+            System.out.println("Complete to make the socket with " + makeKey(ipHdr.getDestIP(), tcpHdr.getDestPort()));
             System.out.println("Socket in addSocket: " + socket);
 
             tcpSelector.wakeup();
             socket.register(tcpSelector, SelectionKey.OP_READ, null);
             System.out.println("Socket is registered in the Selector");
-            TCPSocketInfo info = new TCPSocketInfo(socket, ipHdr.getDestIP(), tcpHdr.getDestPort(), tcpHdr.getSequenceNumber(), tcpHdr.getAckNumber());
+            TCPSocketInfo info = new TCPSocketInfo(socket, ipHdr.getSourceIP(), tcpHdr.getSourcePort(), tcpHdr.getSequenceNumber(), tcpHdr.getAckNumber());
             info.setSeqNum(1);
 
             // Input the information and the socket into the appropriate table
@@ -193,24 +223,23 @@ public class SocketManager implements SocketManagerAPI {
     }
 
     // Add the UDP socket into the manager
-    private void addUDPSocket(IP_Header ipHdr, UDP_Header udpHdr) {
+    private void addUDPSocket(IPHeader ipHdr, UDPHeader udpHdr) {
         try {
             // Key is composed of Client IP and Client Port
-            String key = makeKey(ipHdr.getDestIP(), udpHdr.getDestPort());
-            Log.d("addUDPSocket", "addUDPSocket: " + key);
+            String key = makeKey(ipHdr.getSourceIP(), udpHdr.getSourcePort());
+            System.out.println("Key: " + key);
             DatagramChannel socket = DatagramChannel.open();
             socket.configureBlocking(false);
-            socket.connect(new InetSocketAddress(ipHdr.getSourceIP(), udpHdr.getSourcePort()));
+            socket.connect(new InetSocketAddress(ipHdr.getDestIP(), udpHdr.getDestPort()));
             while (!socket.isConnected());
-            System.out.println("This socket is connected to " + makeKey(ipHdr.getSourceIP(), udpHdr.getSourcePort()));
+            System.out.println("This socket is connected to " + makeKey(ipHdr.getDestIP(), udpHdr.getDestPort()));
             udpSelector.wakeup();
             socket.register(udpSelector, SelectionKey.OP_READ, null);
-            UDPSocketInfo info = new UDPSocketInfo(socket, ipHdr.getDestIP(), udpHdr.getDestPort());
+            UDPSocketInfo info = new UDPSocketInfo(socket, ipHdr.getSourceIP(), udpHdr.getSourcePort());
 
             udpInfo.put(socket, info);
             udpInfoByPort.put(socket.socket().getLocalPort(), info);
             udpSock.put(key, socket);
-            Log.d("addUDPSocket", "addUDPSocket Finished: " + key);
         }
         catch (IOException e)
         {
@@ -232,36 +261,40 @@ public class SocketManager implements SocketManagerAPI {
 
     // Delete the TCP socket from the manager
     private void delTCPSocket(String key) {
-        try {
-            SocketChannel tmp = tcpSock.get(key);
-            tcpInfo.remove(tmp);
-            tcpSock.remove(key);
-            tmp.close();
-            System.out.println("Now Socket is deleted.");
-        } catch (IOException e) {
-            System.out.println(e.getStackTrace());
+        if (tcpSock.containsKey(key)) {
+            try {
+                SocketChannel tmp = tcpSock.get(key);
+                tcpInfo.remove(tmp);
+                tcpSock.remove(key);
+                tmp.close();
+                System.out.println("Now Socket is deleted.");
+            } catch (IOException e) {
+                System.out.println(e.getStackTrace());
+            }
         }
     }
 
     // Delete the UDP socket from the manager
     private void delUDPSocket(String key) {
-        try {
-            DatagramChannel tmp = udpSock.get(key);
-            udpInfo.remove(tmp);
-            tcpSock.remove(key);
-            tmp.close();
-        } catch (IOException e) {
-            System.out.println(e.getStackTrace());
+        if (udpSock.containsKey(key)) {
+            try {
+                DatagramChannel tmp = udpSock.get(key);
+                udpInfo.remove(tmp);
+                tcpSock.remove(key);
+                tmp.close();
+            } catch (IOException e) {
+                System.out.println(e.getStackTrace());
+            }
         }
     }
 
     @Override
-    public void sendMessage(boolean isTCP, String clntIP, int clntPort, String payload) {
+    public void sendMessage(boolean isTCP, String clntIP, int clntPort, byte[] payload) {
         String key = makeKey(clntIP, clntPort);
-        ByteBuffer msg = ByteBuffer.wrap(payload.getBytes());
+        ByteBuffer msg = ByteBuffer.wrap(payload);
 
         if (isTCP) {
-            sendTCPMessage(key, msg, payload.length());
+            sendTCPMessage(key, msg, payload.length);
         } else {
             sendUDPMessage(key, msg);
         }
@@ -285,16 +318,72 @@ public class SocketManager implements SocketManagerAPI {
 
     // Send the message with the UDP socket
     private void sendUDPMessage(String key, ByteBuffer msg) {
+
+        byte[] payload = new byte[31];
+        payload[0] = (byte) 0xec;
+        payload[1] = (byte) 0x6c;
+        payload[2] = (byte) 0x01;
+        payload[3] = (byte) 0x00;
+        payload[4] = (byte) 0x00;
+        payload[5] = (byte) 0x01;
+        payload[6] = (byte) 0x00;
+        payload[7] = (byte) 0x00;
+        payload[8] = (byte) 0x00;
+        payload[9] = (byte) 0x00;
+        payload[10] = (byte) 0x00;
+        payload[11] = (byte) 0x00;
+        payload[12] = (byte) 0x03;
+        payload[13] = (byte) 0x77;
+        payload[14] = (byte) 0x77;
+        payload[15] = (byte) 0x77;
+        payload[16] = (byte) 0x05;
+        payload[17] = (byte) 0x6e;
+        payload[18] = (byte) 0x61;
+        payload[19] = (byte) 0x76;
+        payload[20] = (byte) 0x65;
+        payload[21] = (byte) 0x72;
+        payload[22] = (byte) 0x03;
+        payload[23] = (byte) 0x63;
+        payload[24] = (byte) 0x6f;
+        payload[25] = (byte) 0x6d;
+        payload[26] = (byte) 0x00;
+        payload[27] = (byte) 0x00;
+        payload[28] = (byte) 0x01;
+        payload[29] = (byte) 0x00;
+        payload[30] = (byte) 0x01;
+
         try {
             System.out.println("Send the message from " + key);
-            if (udpSock.containsKey(key))
-                udpSock.get(key).write(msg);
-            else
+            int bytes = 0;
+            if (udpSock.containsKey(key)) {
+                System.out.println("Send the test message");
+                bytes = udpSock.get(key).write(ByteBuffer.wrap(payload));
+                //bytes = udpSock.get(key).write(msg);
+            }
+            else {
                 System.out.println("Socket is not found in udpSock with " + key);
+            }
+
+            //System.out.println("Send bytes: " + bytes + ", Msg bytes: " + msg.array().length);
+            System.out.println("Send bytes: " + bytes + ", Test Msg bytes: " + payload.length);
+            System.out.println("Receiver: " + udpSock.get(key).socket().getInetAddress());
+            System.out.println("UDP Msg: " + bytesToHex(payload));
         }
         catch (IOException e) {
             System.out.println(e.getStackTrace());
         }
+    }
+
+    final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 3];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xff;
+            hexChars[j * 3] = hexArray[ v >>> 4 ];
+            hexChars[j * 3 + 1] = hexArray[ v & 0x0f ];
+            hexChars[j * 3 + 2] = ' ';
+        }
+        return new String(hexChars);
     }
 
     @Override
@@ -306,6 +395,7 @@ public class SocketManager implements SocketManagerAPI {
     public byte[] getMessage() {
         return msgQueue.poll();
     }
+
 
     // Make the TCP packet
     private byte[] makeTCPPacket(byte[] msg, Socket socket) {
@@ -552,4 +642,5 @@ public class SocketManager implements SocketManagerAPI {
     private String makeKey(String sourceIP, int sourcePort) {
         return sourceIP + ":" + sourcePort;
     }
+
 }
