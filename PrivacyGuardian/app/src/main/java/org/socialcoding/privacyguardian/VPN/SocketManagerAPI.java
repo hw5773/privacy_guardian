@@ -1,5 +1,8 @@
 package org.socialcoding.privacyguardian.VPN;
 
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SocketChannel;
+
 /**
  * Created by Hyunwoo Lee on 2017-02-06.
  */
@@ -10,7 +13,9 @@ public interface SocketManagerAPI {
     boolean checkSocket(boolean isTCP, String clntIP, int clntPort);
 
     // Adding the socket in the SocketManager
-    void addSocket(boolean isTCP, IPHeader ipHdr, TransportHeader tHdr);
+    void addTCPSocket(SocketChannel channel, IPHeader ipHdr, TCPHeader tHdr);
+
+    void addUDPSocket(DatagramChannel channel, IPHeader ipHdr, UDPHeader tHdr);
 
     // Deleting the socket in the SocketManager
     void delSocket(boolean isTCP, String clntIP, int clntPort);

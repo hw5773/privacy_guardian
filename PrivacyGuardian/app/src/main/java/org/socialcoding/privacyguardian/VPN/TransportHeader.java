@@ -30,7 +30,7 @@ public abstract class TransportHeader {
     }
     void setSourcePort(int port){
         sPort = port;
-        header[0] = (byte)((port)>>8);
+        header[0] = (byte)((port) >> 8);
         header[1] = (byte)(port);
     }
 
