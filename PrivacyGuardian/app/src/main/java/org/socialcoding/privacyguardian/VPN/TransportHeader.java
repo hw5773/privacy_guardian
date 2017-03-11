@@ -14,6 +14,7 @@ public abstract class TransportHeader {
     protected int payloadLength;
     protected int sPort;
     protected int dPort;
+    protected int checksum;
 
     // Return the length of the transport layer packet, involving the length of the payload.
     int getLength() { return length; }
@@ -42,4 +43,6 @@ public abstract class TransportHeader {
         header[2] = (byte)((port)>>8);
         header[3] = (byte)(port);
     }
+
+    int getChecksum() { return checksum; }
 }

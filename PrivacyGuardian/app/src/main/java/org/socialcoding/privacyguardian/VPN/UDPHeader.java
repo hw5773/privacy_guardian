@@ -32,11 +32,13 @@ public class UDPHeader extends TransportHeader {
     }
 
     void setLength(int length) {
+        this.length = length;
         header[4] = (byte) ((length & 0xff00) >> 8);
         header[5] = (byte) (length & 0xff);
     }
 
     void setChecksum(int checksum) {
+        this.checksum = checksum;
         header[6] = (byte) ((checksum & 0xff00) >> 8);
         header[7] = (byte) (checksum & 0xff);
     }
