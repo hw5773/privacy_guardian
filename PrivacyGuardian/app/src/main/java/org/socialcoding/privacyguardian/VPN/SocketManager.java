@@ -92,19 +92,23 @@ public class SocketManager implements SocketManagerAPI {
                                     int bytes = 0, recv = 0;
                                     System.out.println("Let's read the Response");
                                     while (true) {
-                                        System.out.println("Start Reading");
                                         recv = socket.read(buf);
-                                        System.out.println("Received total bytes in while loop: " + bytes);
-                                        System.out.println("Received bytes in while loop: " + recv);
                                         if (bytes > 0 && recv == -1)
                                             break;
-                                        else
+                                        else if (recv != -1)
                                             bytes += recv;
                                     }
                                     System.out.println("Received " + bytes + " TCP bytes.");
                                     byte[] msg = new byte[bytes];
                                     System.arraycopy(buf.array(), 0, msg, 0, bytes);
-                                    byte[] packet = makeTCPPacket(msg, socket.socket());
+
+                                    // TODO: Need to implement the fragmentation.
+                                    byte[] packet = makeTCPPacket(msg, socket.socket(), 1);
+                                    addMessage(packet);
+                                    tcpInfo.get(socket).setSeqNum(bytes);
+
+                                    // Generate FIN packet
+                                    byte[] fin = makeTCPPacket(null, socket.socket(), 2);
                                     addMessage(packet);
                                 }
                             }
@@ -236,15 +240,15 @@ public class SocketManager implements SocketManagerAPI {
             tcpSelector.wakeup();
             socket.register(tcpSelector, SelectionKey.OP_READ, null);
             System.out.println("Socket is registered in the Selector");
+            System.out.println("ACK Number in addTCPSocket before set: " + tcpHdr.getSequenceNumber());
             TCPSocketInfo info = new TCPSocketInfo(socket, ipHdr.getSourceIP(), tcpHdr.getSourcePort(), tcpHdr.getSequenceNumber(), tcpHdr.getAckNumber());
+            System.out.println("ACK Number in addTCPSocket after set: " + info.getAckNum());
             info.setSeqNum(1);
 
             // Input the information and the socket into the appropriate table
             tcpInfo.put(socket, info);
             tcpInfoByPort.put(socket.socket().getLocalPort(), info);
             tcpSock.put(key, socket);
-
-            System.out.println("Socket is inputted into the TCP hash table");
         }
         catch (IOException e)
         {
@@ -339,9 +343,14 @@ public class SocketManager implements SocketManagerAPI {
             int bytes = 0;
             if (tcpSock.containsKey(key)) {
                 TCPSocketInfo info = tcpInfo.get(tcpSock.get(key));
-                bytes = info.getSocket().write(msg);
+                SocketChannel socket = info.getSocket();
+                bytes = socket.write(msg);
+                System.out.println("ACK in sendTCPMessage before: " + info.getAckNum() + " " + key);
                 info.setAckNum(bytes);
-                System.out.println("Send TCP " + bytes + " bytes");
+                System.out.println("Send TCP " + bytes + " bytes " + key);
+                System.out.println("ACK in sendTCPMessage after: " + info.getAckNum() + " " + key);
+                byte[] ack = makeTCPPacket(null, socket.socket(), 0);
+                addMessage(ack);
             } else {
                 System.out.println("Socket is not found in tcpSock " + key);
             }
@@ -392,11 +401,19 @@ public class SocketManager implements SocketManagerAPI {
 
 
     // Make the TCP packet
-    private byte[] makeTCPPacket(byte[] msg, Socket socket) {
-        System.out.println("Make TCP Packet: " + msg.length);
+    // Flags: 0 (ACK), 1 (PSH/ACK), 2 (FIN/ACK)
+    private byte[] makeTCPPacket(byte[] msg, Socket socket, int flags) {
+        int msgLength = 0;
+        if (msg != null) {
+            System.out.println("Make TCP Packet: " + msg.length);
+            msgLength = msg.length;
+        } else {
+            System.out.println("Send the ACK Packet");
+        }
+
         byte[] tcp = new byte[TCP_HEADER_LENGTH];
         byte[] ip = new byte[IP_HEADER_LENGTH];
-        int totalLength = msg.length + tcp.length + ip.length;
+        int totalLength = msgLength + tcp.length + ip.length;
         byte[] packet = new byte[totalLength];
 
         TCPSocketInfo info = tcpInfoByPort.get(socket.getLocalPort());
@@ -410,14 +427,14 @@ public class SocketManager implements SocketManagerAPI {
         long ack = info.getAckNum(); // Get the acknowledge number
         int id = info.getIdentification(); // Get the identification field number
 
-        info.setSeqNum(msg.length);
+        info.setSeqNum(msgLength);
 
         IPHeader ipH = new IPHeader();
         ipH.setTotalLength(totalLength);
         ipH.setIdentifier(id);
         ipH.setSourceIP(servAddr);
         ipH.setDestIP(clntAddr);
-        ipH.setUDP();
+        ipH.setTCP();
         int ipChecksum = makeIPChecksum(ipH.getHeader());
         ipH.setChecksum(ipChecksum);
         ip = ipH.getHeader();
@@ -429,7 +446,7 @@ public class SocketManager implements SocketManagerAPI {
         tcpH.setDestPort(clntPort);
         tcpH.setSequenceNumber(seq);
         tcpH.setAckNumber(ack);
-        tcpH.setAck();
+        tcpH.setFlag(flags);
 
         System.out.println("RESP- SEQ from Server: " + tcpH.getSequenceNumber() + " " + ipH.getDestIP() + ":" + tcpH.getDestPort());
         System.out.println("RESP- ACK from Server: " + tcpH.getAckNumber() + " " + ipH.getDestIP() + ":" + tcpH.getDestPort());
@@ -440,7 +457,9 @@ public class SocketManager implements SocketManagerAPI {
 
         System.arraycopy(ip, 0, packet, 0, ip.length);
         System.arraycopy(tcp, 0, packet, ip.length, tcp.length);
-        System.arraycopy(msg, 0, packet, ip.length + tcp.length, msg.length);
+
+        if (msg != null)
+            System.arraycopy(msg, 0, packet, ip.length + tcp.length, msgLength);
 
         return packet;
     }
@@ -526,14 +545,20 @@ public class SocketManager implements SocketManagerAPI {
     // Make the TCP checksum
     private int makeTCPChecksum(byte[] tcpHdr, byte[] ipHdr, byte[] msg) {
         int tcpLen = tcpHdr.length;
-        int msgLen = msg.length;
+        int msgLen = 0;
+
+        if (msg != null)
+            msgLen = msg.length;
 
         int offset = ((tcpHdr[12] & 0xf0) >> 4) * 4;
 
         byte[] pseudoHdr = new byte[tcpLen + 12 + msgLen];
         System.arraycopy(ipHdr, 12, pseudoHdr, 0, 8);
         System.arraycopy(tcpHdr, 0, pseudoHdr, 12, tcpLen);
-        System.arraycopy(msg, 0, pseudoHdr, tcpLen + 12, msgLen);
+
+        if (msg != null)
+            System.arraycopy(msg, 0, pseudoHdr, tcpLen + 12, msgLen);
+
         pseudoHdr[8] = (byte) 0x0;
         pseudoHdr[9] = (byte) 0x6;
         pseudoHdr[10] = (byte) (((offset + msgLen) & 0xff00) >> 8);

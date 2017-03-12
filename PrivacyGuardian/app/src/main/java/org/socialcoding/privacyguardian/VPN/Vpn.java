@@ -239,8 +239,14 @@ public class Vpn extends VpnService {
 
         tHeader.setAckNumber(seqNum+1);
         tHeader.setSequenceNumber(ackNum);
-        System.out.println("SYN/ACK- Seq from Server: " + tHeader.getSequenceNumber() + " " + ipHeader.getDestIP() + ":" + tHeader.getDestPort());
-        System.out.println("SYN/ACK- Ack from Server: " + tHeader.getAckNumber() + " " + ipHeader.getDestIP() + ":" + tHeader.getDestPort());
+        switch(state) {
+            case "syn":
+                System.out.println("SYN/ACK- Seq from Server: " + tHeader.getSequenceNumber() + " " + ipHeader.getDestIP() + ":" + tHeader.getDestPort()) ;
+                System.out.println("SYN/ACK- Ack from Server: " + tHeader.getAckNumber() + " " + ipHeader.getDestIP() + ":" + tHeader.getDestPort());
+                break;
+            case "fin":
+                System.out.println("ACK for FIN/ACK");
+        }
         int offset = tHeader.getHeaderLength();
         byte[] ipH  = ipHeader.getHeader();
         byte[] tHeaderReader = tHeader.getHeader();

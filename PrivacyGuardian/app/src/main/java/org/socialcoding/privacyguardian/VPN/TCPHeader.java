@@ -12,6 +12,7 @@ public class TCPHeader extends TransportHeader {
     TCPHeader() {
         header = new byte[TCP_HEADER_LENGTH];
         header[12] = 0x50;
+        header[13] = (byte) 0;
         header[14] = (byte) ((WINDOWS_SIZE & 0xff00) >> 8);
         header[15] = (byte) (WINDOWS_SIZE & 0xff);
         header[16] = (byte) 0;
@@ -77,7 +78,27 @@ public class TCPHeader extends TransportHeader {
 
         return ret;
     }
-    void setAck() { header[13] = 0x10; }
+
+    void setFlag(int flag) {
+        switch(flag) {
+            case 0:
+                setAck();
+                break;
+            case 1:
+                setPsh();
+                setAck();
+                break;
+            case 2:
+                setFin();
+                setAck();
+                break;
+        }
+    }
+    void setAck() { header[13] |= 0x10; }
+    void setPsh() { header[13] |= 0x08; }
+    void setFin() { header[13] |= 0x01; }
+
+    int getFlag() { return header[13]; }
 
     long getAckNumber() { return ackNumber;}
     void setAckNumber(long ackNum) {
