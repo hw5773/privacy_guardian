@@ -150,6 +150,11 @@ public class Vpn extends VpnService {
             } catch(IOException e) {
                 e.printStackTrace();
             }
+
+            ///// Analyzer Interface Needed /////
+            ///// Package Name: packageName / Payload: tcpHeader.getPayload
+            /////////////////////////////////////
+
             sm.sendMessage(true, ipHeader.getSourceIP(), tcpHeader.getSourcePort(), tcpHeader.getPayload());
         }
     }
