@@ -1,10 +1,20 @@
 package org.socialcoding.privacyguardian.VPN;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.VpnService;
+import android.os.Binder;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.os.ParcelFileDescriptor;
+import android.os.RemoteException;
 import android.util.Log;
+
+import org.socialcoding.privacyguardian.Activity.MainActivity;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -26,9 +36,51 @@ public class Vpn extends VpnService {
     private int MAX_BYTES = 2048;
     private int UDP_OFFSET = 8;
 
+    private boolean mIsRunning;
+
+    //VPN SERVICE SECTION START
+
+    Messenger mainMessenger;
+
+    public static final int REGISTER = 1000;
+    public static final int SENDPAYLOAD = 1001;
+    public static final int ENDVPN = 1002;
+
+    class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch(msg.what){
+                case REGISTER:
+                    Log.d("INCOMING", "GOT REGISTER");
+                    mainMessenger = msg.replyTo;
+                    break;
+                case ENDVPN:
+                    Log.d("INCOMING", "GOT END SIGNAL");
+                    try {
+                        mInterface.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    mIsRunning = false;
+                    stopSelf();
+                    Log.d("INCOMING", "ENDED");
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
+
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
+
     @Override
+    public IBinder onBind(Intent intent) {
+        return mMessenger.getBinder();
+    }
+
     public int onStartCommand(final Intent intent, int flags, int startId) {
         mContext = getApplicationContext();
+        mIsRunning = true;
         mThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -44,7 +96,7 @@ public class Vpn extends VpnService {
                     int length;                                                        //length of packet.
                     ByteBuffer packet = ByteBuffer.allocate(MAX_BYTES);
 
-                    while (true) {
+                    while (mIsRunning) {
                         // Send the message to the client applications, if any.
                         while (socketManager.isMessage()) {
                             System.out.println("Found the Message");
@@ -111,6 +163,8 @@ public class Vpn extends VpnService {
         return START_STICKY;
     }
 
+
+
     private int getIhl(byte[] packet) {
         return (packet[0] & 0xf) * 4;
     }
@@ -143,7 +197,7 @@ public class Vpn extends VpnService {
             System.out.println("Send the TCP message from " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort() + " to " + ipHeader.getDestIP() + ":" + tcpHeader.getDestPort());
             System.out.println("TCP Message Size: " + tcpHeader.getPayloadLength());
             System.out.println("Now Finding the Package Name");
-            String packageName;
+            String packageName = "";
             try {
                 packageName = PackageNameFinder.getPackage(true, tcpHeader.getSourcePort(), getApplicationContext());
                 System.out.println("Package Name: " + packageName);
@@ -151,11 +205,26 @@ public class Vpn extends VpnService {
                 e.printStackTrace();
             }
 
+            analyzePacket(packageName, tcpHeader.getPayload());
             ///// Analyzer Interface Needed /////
             ///// Package Name: packageName / Payload: tcpHeader.getPayload
             /////////////////////////////////////
 
             sm.sendMessage(true, ipHeader.getSourceIP(), tcpHeader.getSourcePort(), tcpHeader.getPayload());
+        }
+    }
+
+    private void analyzePacket(String packageName, byte[] payload) {
+        String strPayload = new String(payload);
+        try{
+            Message msg = Message.obtain(null, SENDPAYLOAD);
+            Bundle data = new Bundle();
+            data.putString("packageName", packageName);
+            data.putString("payload", strPayload);
+            msg.setData(data);
+            mainMessenger.send(msg);
+        } catch(Exception e){
+            e.printStackTrace();
         }
     }
 
