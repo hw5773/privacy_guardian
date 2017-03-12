@@ -84,13 +84,18 @@ public class SocketManager implements SocketManagerAPI {
 
                             if (tcpChannels > 0) {
                                 Set<SelectionKey> selectedKeys = tcpSelector.selectedKeys();
+                                System.out.println("Get the selectedKeys");
                                 Iterator<SelectionKey> iter = selectedKeys.iterator();
+                                System.out.println("Get the iterator");
 
                                 while (iter.hasNext()) {
                                     SelectionKey key = iter.next();
+                                    System.out.println("Get the key");
                                     SocketChannel socket = (SocketChannel) key.channel();
+                                    System.out.println("Get the TCP Channel: " + socket.socket().getInetAddress() + ":" + socket.socket().getPort());
                                     ByteBuffer buf = ByteBuffer.allocate(MAX_BYTES);
                                     int bytes = 0, recv;
+                                    System.out.println("Let's read the Response");
                                     while (true) {
                                         recv = socket.read(buf);
                                         if (bytes > 0 && recv == 0)
@@ -168,6 +173,31 @@ public class SocketManager implements SocketManagerAPI {
         }
         tcpThread.start();
         udpThread.start();
+    }
+
+    private boolean validChecksum(byte[] packet) {
+        int result = 0;
+        boolean ret = false;
+
+        for (int i=0; i<packet.length; i+=2) {
+            result += (int)(((packet[i] & 0xff) << 8) | (packet[i+1] & 0xff));
+        }
+
+        for (int i=0; i<2; i++) {
+            result = ((result & 0xffff0000) >> 16) + (result & 0xffff);
+        }
+
+        result = (~result) & 0xffff;
+
+        if (result == 0) {
+            System.out.println("Result: " + result);
+            ret = true;
+        } else {
+            System.out.println("Result: " + result);
+            ret = false;
+        }
+
+        return ret;
     }
 
     public boolean checkSocket(boolean isTCP, String clntIP, int clntPort) {
@@ -306,10 +336,13 @@ public class SocketManager implements SocketManagerAPI {
     // Send the message with the TCP socket
     private void sendTCPMessage(String key, ByteBuffer msg, int size) {
         try {
+            System.out.println("Send the message from " + key);
+            int bytes = 0;
             if (tcpSock.containsKey(key)) {
                 TCPSocketInfo info = tcpInfo.get(tcpSock.get(key));
-                info.getSocket().write(msg);
+                bytes = info.getSocket().write(msg);
                 info.setAckNum(size);
+                System.out.println("Send TCP " + bytes + " bytes");
             } else {
                 System.out.println("Socket is not found in tcpSock " + key);
             }
@@ -325,7 +358,6 @@ public class SocketManager implements SocketManagerAPI {
             System.out.println("Send the message from " + key);
             int bytes = 0;
             if (udpSock.containsKey(key)) {
-                System.out.println("Send the test message");
                 bytes = udpSock.get(key).write(msg);
             }
             else {
@@ -362,6 +394,7 @@ public class SocketManager implements SocketManagerAPI {
 
     // Make the TCP packet
     private byte[] makeTCPPacket(byte[] msg, Socket socket) {
+        System.out.println("Make TCP Packet: " + msg.length);
         byte[] tcp = new byte[TCPHeaderLength];
         byte[] ip = new byte[IPHeaderLength];
         int totalLength = msg.length + tcp.length + ip.length;
@@ -383,71 +416,32 @@ public class SocketManager implements SocketManagerAPI {
 
         info.setSeqNum(msg.length);
 
-        try {
-            serv = InetAddress.getByName(servAddr).getAddress();
-            clnt = InetAddress.getByName(clntAddr).getAddress();
+        IPHeader ipH = new IPHeader();
+        ipH.setTotalLength(totalLength);
+        ipH.setIdentifier(id);
+        ipH.setSourceIP(servAddr);
+        ipH.setDestIP(clntAddr);
+        ipH.setUDP();
+        int ipChecksum = makeIPChecksum(ipH.getHeader());
+        ipH.setChecksum(ipChecksum);
+        ip = ipH.getHeader();
 
-            ip[0] = (byte) 0x45;
-            ip[1] = (byte) 0x00;
-            ip[2] = (byte) ((totalLength & 0xff00) >> 8);
-            ip[3] = (byte) (totalLength & 0xff);
-            ip[4] = (byte) ((id & 0xff00) >> 8);
-            ip[5] = (byte) (id & 0xff);
-            ip[6] = (byte) 0x00;
-            ip[7] = (byte) 0x00;
-            ip[8] = (byte) 0x40;
-            ip[9] = (byte) 0x06;
-            ip[10] = (byte) 0;
-            ip[11] = (byte) 0;
-            ip[12] = serv[0];
-            ip[13] = serv[1];
-            ip[14] = serv[2];
-            ip[15] = serv[3];
-            ip[16] = clnt[0];
-            ip[17] = clnt[1];
-            ip[18] = clnt[2];
-            ip[19] = clnt[3];
+        System.out.println("Verify IP Checksum: " + validChecksum(ip));
 
-            int ipChecksum = makeIPChecksum(ip);
-            ip[10] = (byte) ((ipChecksum & 0xff00) >> 8);
-            ip[11] = (byte) (ipChecksum &0xff);
+        TCPHeader tcpH = new TCPHeader();
+        tcpH.setSourcePort(servPort);
+        tcpH.setDestPort(clntPort);
+        tcpH.setSequenceNumber(seq);
+        tcpH.setAckNumber(ack);
+        tcpH.setAck();
 
-            tcp[0] = (byte) ((servPort & 0xff00) >> 8);
-            tcp[1] = (byte) (servPort & 0xff);
-            System.out.println("TCP servPort: " + servPort);
-            System.out.println("TCP servPort in packet: " + (((tcp[0] & 0xff) << 8) | (tcp[1] & 0xff)));
-            tcp[2] = (byte) ((clntPort & 0xff00) >> 8);
-            tcp[3] = (byte) (clntPort & 0xff);
-            System.out.println("TCP clntPort: " + clntPort);
-            System.out.println("TCP clntPort in packet: " + (((tcp[2] & 0xff) << 8) | (tcp[3] & 0xff)));
-            tcp[4] = (byte) ((seq & 0xff000000) >> 24);
-            tcp[5] = (byte) ((seq & 0xff0000) >> 16);
-            tcp[6] = (byte) ((seq & 0xff00) >> 8);
-            tcp[7] = (byte) (seq & 0xff);
-            tcp[8] = (byte) ((ack & 0xff000000) >> 24);
-            tcp[9] = (byte) ((ack & 0xff0000) >> 16);
-            tcp[10] = (byte) ((ack & 0xff00) >> 8);
-            tcp[11] = (byte) (ack & 0xff);
-            tcp[12] = (byte) 0x50;
-            tcp[13] = (byte) 16;
-            tcp[14] = (byte) ((1000 & 0xff00) >> 8);
-            tcp[15] = (byte) (1000 & 0xff);
-            tcp[16] = (byte) 0;
-            tcp[17] = (byte) 0;
-            tcp[18] = (byte) 0;
-            tcp[19] = (byte) 0;
+        int tcpChecksum = makeTCPChecksum(tcpH.getHeader(), ip, msg);
+        tcpH.setChecksum(tcpChecksum);
+        tcp = tcpH.getHeader();
 
-            int tcpChecksum = makeTCPChecksum(tcp, ip, msg);
-            tcp[16] = (byte) ((tcpChecksum & 0xff00) >> 8);
-            tcp[17] = (byte) (tcpChecksum & 0xff);
-
-            System.arraycopy(ip, 0, packet, 0, ip.length);
-            System.arraycopy(tcp, 0, packet, ip.length, tcp.length);
-            System.arraycopy(msg, 0, packet, ip.length + tcp.length, msg.length);
-
-        } catch (UnknownHostException e) {
-            System.out.println(e.getStackTrace());
-        }
+        System.arraycopy(ip, 0, packet, 0, ip.length);
+        System.arraycopy(tcp, 0, packet, ip.length, tcp.length);
+        System.arraycopy(msg, 0, packet, ip.length + tcp.length, msg.length);
 
         return packet;
     }
@@ -481,6 +475,8 @@ public class SocketManager implements SocketManagerAPI {
         int ipChecksum = makeIPChecksum(ipH.getHeader());
         ipH.setChecksum(ipChecksum);
         ip = ipH.getHeader();
+
+        System.out.println("Verify IP Checksum: " + validChecksum(ip));
 
         // Generating the UDP header
         UDPHeader udpH = new UDPHeader();
@@ -552,7 +548,7 @@ public class SocketManager implements SocketManagerAPI {
         int udpLen = udpHdr.length;
         int msgLen = msg.length;
 
-        int offset = ((udpHdr[4] & 0xff) << 8) | (udpHdr[5] & 0xff);
+        int length = ((udpHdr[4] & 0xff) << 8) | (udpHdr[5] & 0xff);
 
         byte[] pseudoHdr = new byte[udpLen + 12 + msgLen];
         System.arraycopy(ipHdr, 12, pseudoHdr, 0, 8);
@@ -560,8 +556,8 @@ public class SocketManager implements SocketManagerAPI {
         System.arraycopy(msg, 0, pseudoHdr, udpLen + 12, msgLen);
         pseudoHdr[8] = (byte) 0x0;
         pseudoHdr[9] = (byte) 0x11;
-        pseudoHdr[10] = (byte) (((offset + msgLen) & 0xff00) >> 8);
-        pseudoHdr[11] = (byte) ((offset + msgLen) & 0xff);
+        pseudoHdr[10] = (byte) ((length & 0xff00) >> 8);
+        pseudoHdr[11] = (byte) (length & 0xff);
 
         return makeChecksum(pseudoHdr);
     }

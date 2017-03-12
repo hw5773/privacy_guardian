@@ -20,8 +20,8 @@ public class TCPSocketInfo {
         this.socket = socket;
         this.clntIPAddr = clntIPAddr;
         this.clntPort = clntPort;
-        this.seqNum = seqNum;
-        this.ackNum = ackNum;
+        this.seqNum = ackNum + 1;
+        this.ackNum = seqNum + 2;
         this.identification = (int) (Math.random() * Integer.MAX_VALUE);
     }
 

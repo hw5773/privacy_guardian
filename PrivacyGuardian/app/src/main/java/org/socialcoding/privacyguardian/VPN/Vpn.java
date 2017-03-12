@@ -128,13 +128,19 @@ public class Vpn extends VpnService {
             try {
                 SocketChannel channel = SocketChannel.open();
                 protect(channel.socket());
+                System.out.println("Sequence from Client: " + tcpHeader.getSequenceNumber());
+                tcpHeader.setAckNumber(makingSeqnum());
                 sm.addTCPSocket(channel, ipHeader, tcpHeader);
+                processTCPHandshake(in, out, ipHeader, tcpHeader);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else if (tcpHeader.getFin()) {
+            processTCPHandshake(in, out, ipHeader, tcpHeader);
             // Delete the TCP Socket in the SocketManager
             sm.delSocket(true, ipHeader.getSourceIP(), tcpHeader.getSourcePort());
+        } else if (tcpHeader.getAck() && tcpHeader.getPayloadLength() == 0) {
+            System.out.println("TCP handshake complete");
         } else {
             // Send the Message
             System.out.println("Send the TCP message from " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort() + " to " + ipHeader.getDestIP() + ":" + tcpHeader.getDestPort());
@@ -235,18 +241,9 @@ public class Vpn extends VpnService {
         tHeader.setSourcePort(dPort);
 
         tHeader.setAckNumber(seqNum+1);
-        long newSeqNum=0;
-        switch(state){
-            case "syn":
-                newSeqNum = makingSeqnum();
-                break;
-            case "fin":
-                newSeqNum = ackNum;
-                break;
-            default:
-                Log.d(TAG,"???what state");
-        }
-        tHeader.setSequenceNumber(newSeqNum);
+        tHeader.setSequenceNumber(ackNum);
+        System.out.println("Sequence from Server: " + tHeader.getSequenceNumber());
+        System.out.println("Ack from Server: " + tHeader.getAckNumber());
         int offset = tHeader.getHeaderLength();
         byte[] ipH  = ipHeader.getHeader();
         byte[] tHeaderReader = tHeader.getHeader();

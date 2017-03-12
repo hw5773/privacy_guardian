@@ -5,17 +5,17 @@ package org.socialcoding.privacyguardian.VPN;
  */
 
 public class UDPHeader extends TransportHeader {
-    private int UDP_BYTES = 8;
+    private int UDP_HEADER_BYTES = 8;
 
     UDPHeader() {
-        header = new byte[UDP_BYTES];
+        header = new byte[UDP_HEADER_BYTES];
     }
 
     UDPHeader(byte[] packet , int ihl){
         this.ihl = ihl;
         this.length = ((packet[ihl+4] & 0xff) << 8) | (packet[ihl+5] & 0xff);
         System.out.println("Packet Length: " + packet.length + ", IP Header Length: " + ihl + ", Length: " + length);
-        this.headerLength = UDP_BYTES;
+        this.headerLength = UDP_HEADER_BYTES;
         this.payloadLength = length - headerLength;
 
         header = new byte[headerLength];
