@@ -1,16 +1,11 @@
 package org.socialcoding.privacyguardian.VPN;
 
-import android.net.VpnService;
 import android.os.StrictMode;
-import android.provider.ContactsContract;
-import android.util.Log;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
@@ -41,12 +36,12 @@ public class SocketManager implements SocketManagerAPI {
     private LinkedBlockingQueue<byte[]> msgQueue;
     private Thread tcpThread;
     private Thread udpThread;
-    private int IPHeaderLength = 20;
-    private int TCPHeaderLength = 20;
-    private int UDPHeaderLength = 8;
-    private int IPHeaderMaxLength = 65536;
+    private int IP_HEADER_LENGTH = 20;
+    private int TCP_HEADER_LENGTH = 20;
+    private int UDP_HEADER_LENGTH = 8;
+    private int IP_HEADER_LENGTH_MAX_SIZE = 65536;
     private int MAX_BYTES = 2048;
-    private int TIMING = 10;
+    private int TIMING = 5;
 
     public SocketManager() {
 
@@ -94,13 +89,17 @@ public class SocketManager implements SocketManagerAPI {
                                     SocketChannel socket = (SocketChannel) key.channel();
                                     System.out.println("Get the TCP Channel: " + socket.socket().getInetAddress() + ":" + socket.socket().getPort());
                                     ByteBuffer buf = ByteBuffer.allocate(MAX_BYTES);
-                                    int bytes = 0, recv;
+                                    int bytes = 0, recv = 0;
                                     System.out.println("Let's read the Response");
                                     while (true) {
+                                        System.out.println("Start Reading");
                                         recv = socket.read(buf);
-                                        if (bytes > 0 && recv == 0)
+                                        System.out.println("Received total bytes in while loop: " + bytes);
+                                        System.out.println("Received bytes in while loop: " + recv);
+                                        if (bytes > 0 && recv == -1)
                                             break;
-                                        bytes += recv;
+                                        else
+                                            bytes += recv;
                                     }
                                     System.out.println("Received " + bytes + " TCP bytes.");
                                     byte[] msg = new byte[bytes];
@@ -341,7 +340,7 @@ public class SocketManager implements SocketManagerAPI {
             if (tcpSock.containsKey(key)) {
                 TCPSocketInfo info = tcpInfo.get(tcpSock.get(key));
                 bytes = info.getSocket().write(msg);
-                info.setAckNum(size);
+                info.setAckNum(bytes);
                 System.out.println("Send TCP " + bytes + " bytes");
             } else {
                 System.out.println("Socket is not found in tcpSock " + key);
@@ -395,8 +394,8 @@ public class SocketManager implements SocketManagerAPI {
     // Make the TCP packet
     private byte[] makeTCPPacket(byte[] msg, Socket socket) {
         System.out.println("Make TCP Packet: " + msg.length);
-        byte[] tcp = new byte[TCPHeaderLength];
-        byte[] ip = new byte[IPHeaderLength];
+        byte[] tcp = new byte[TCP_HEADER_LENGTH];
+        byte[] ip = new byte[IP_HEADER_LENGTH];
         int totalLength = msg.length + tcp.length + ip.length;
         byte[] packet = new byte[totalLength];
 
@@ -410,9 +409,6 @@ public class SocketManager implements SocketManagerAPI {
         long seq = info.getSeqNum(); // Get the sequence number
         long ack = info.getAckNum(); // Get the acknowledge number
         int id = info.getIdentification(); // Get the identification field number
-
-        System.out.println("Source Addr in make: " + makeKey(servAddr, servPort));
-        System.out.println("Dest Addr in make: " + makeKey(clntAddr, clntPort));
 
         info.setSeqNum(msg.length);
 
@@ -435,6 +431,9 @@ public class SocketManager implements SocketManagerAPI {
         tcpH.setAckNumber(ack);
         tcpH.setAck();
 
+        System.out.println("RESP- SEQ from Server: " + tcpH.getSequenceNumber() + " " + ipH.getDestIP() + ":" + tcpH.getDestPort());
+        System.out.println("RESP- ACK from Server: " + tcpH.getAckNumber() + " " + ipH.getDestIP() + ":" + tcpH.getDestPort());
+
         int tcpChecksum = makeTCPChecksum(tcpH.getHeader(), ip, msg);
         tcpH.setChecksum(tcpChecksum);
         tcp = tcpH.getHeader();
@@ -448,8 +447,8 @@ public class SocketManager implements SocketManagerAPI {
 
     // Make the UDP packet
     private byte[] makeUDPPacket(byte[] msg, DatagramSocket socket) {
-        byte[] udp = new byte[UDPHeaderLength];
-        byte[] ip = new byte[IPHeaderLength];
+        byte[] udp = new byte[UDP_HEADER_LENGTH];
+        byte[] ip = new byte[IP_HEADER_LENGTH];
         int totalLength = msg.length + udp.length + ip.length;
         byte[] packet = new byte[totalLength];
         UDPSocketInfo info = udpInfoByPort.get(socket.getLocalPort());

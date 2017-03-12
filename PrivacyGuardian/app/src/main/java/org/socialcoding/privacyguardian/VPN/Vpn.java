@@ -22,7 +22,7 @@ public class Vpn extends VpnService {
     private ParcelFileDescriptor mInterface;
     Builder builder = new Builder();
     private Context mContext = null;
-    private static int TIMING = 1000;
+    private static int TIMING = 5;
     private int MAX_BYTES = 2048;
     private int UDP_OFFSET = 8;
 
@@ -39,9 +39,6 @@ public class Vpn extends VpnService {
                          .addRoute("0.0.0.0", 0).establish();
                     FileInputStream in = new FileInputStream(mInterface.getFileDescriptor());
                     FileOutputStream out = new FileOutputStream(mInterface.getFileDescriptor());
-
-                    SocketChannel socketChannel = SocketChannel.open();
-                    protect(socketChannel.socket());                                       //protection
                     SocketManager socketManager = new SocketManager();
 
                     int length;                                                        //length of packet.
@@ -128,7 +125,7 @@ public class Vpn extends VpnService {
             try {
                 SocketChannel channel = SocketChannel.open();
                 protect(channel.socket());
-                System.out.println("Sequence from Client: " + tcpHeader.getSequenceNumber());
+                System.out.println("SYN- Seq from Client: " + tcpHeader.getSequenceNumber() + " " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort());
                 tcpHeader.setAckNumber(makingSeqnum());
                 sm.addTCPSocket(channel, ipHeader, tcpHeader);
                 processTCPHandshake(in, out, ipHeader, tcpHeader);
@@ -140,7 +137,7 @@ public class Vpn extends VpnService {
             // Delete the TCP Socket in the SocketManager
             sm.delSocket(true, ipHeader.getSourceIP(), tcpHeader.getSourcePort());
         } else if (tcpHeader.getAck() && tcpHeader.getPayloadLength() == 0) {
-            System.out.println("TCP handshake complete");
+            System.out.println("ACK- TCP handshake complete");
         } else {
             // Send the Message
             System.out.println("Send the TCP message from " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort() + " to " + ipHeader.getDestIP() + ":" + tcpHeader.getDestPort());
@@ -242,8 +239,8 @@ public class Vpn extends VpnService {
 
         tHeader.setAckNumber(seqNum+1);
         tHeader.setSequenceNumber(ackNum);
-        System.out.println("Sequence from Server: " + tHeader.getSequenceNumber());
-        System.out.println("Ack from Server: " + tHeader.getAckNumber());
+        System.out.println("SYN/ACK- Seq from Server: " + tHeader.getSequenceNumber() + " " + ipHeader.getDestIP() + ":" + tHeader.getDestPort());
+        System.out.println("SYN/ACK- Ack from Server: " + tHeader.getAckNumber() + " " + ipHeader.getDestIP() + ":" + tHeader.getDestPort());
         int offset = tHeader.getHeaderLength();
         byte[] ipH  = ipHeader.getHeader();
         byte[] tHeaderReader = tHeader.getHeader();
