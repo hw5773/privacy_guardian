@@ -142,6 +142,14 @@ public class Vpn extends VpnService {
             // Send the Message
             System.out.println("Send the TCP message from " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort() + " to " + ipHeader.getDestIP() + ":" + tcpHeader.getDestPort());
             System.out.println("TCP Message Size: " + tcpHeader.getPayloadLength());
+            System.out.println("Now Finding the Package Name");
+            String packageName;
+            try {
+                packageName = PackageNameFinder.getPackage(true, tcpHeader.getSourcePort(), getApplicationContext());
+                System.out.println("Package Name: " + packageName);
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
             sm.sendMessage(true, ipHeader.getSourceIP(), tcpHeader.getSourcePort(), tcpHeader.getPayload());
         }
     }

@@ -17,51 +17,51 @@ public class PackageNameFinder {
 
     }
 
-    public static String getPackage(int SourcePort, String SourceIP, String payLoad, boolean isTCP, Context mContext) throws IOException {
+    public static String getPackage(boolean isTCP, int sourcePort, Context mContext) throws IOException {
         String cmd = "cat /proc/net/";              //cat /proc/uid/status
 
         if(isTCP){
             cmd += "tcp6";
+        } else {
+            System.out.println("UDP is not supported yet");
+            return "";
         }
-        else{
-            cmd += "udp6";
-        }
+
         Process process = Runtime.getRuntime().exec(cmd);
         BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line =  null;
-        Log.d("VpnServiceTest", SourceIP);
-        String port = Integer.toHexString(SourcePort).toUpperCase();
-        Log.d("VpnServiceTest",port);
+
+        System.out.println("Find the Package name about " + sourcePort);
+        String port = Integer.toHexString(sourcePort).toUpperCase();
         int uid = 0, i = 0;
         int localAddrIdx = 0, uidIdx = 0;
 
         line = br.readLine();
-        Log.d("VpnServiceTest", line);
-        System.out.println("line: " + line);
         String[] keywords = line.trim().split("\\s+");
 
         for (i=0; i<keywords.length; i++) {
 
             if (keywords[i].contains("local_address")) {
                 localAddrIdx = i;
-                System.out.println("localAddrIdx: " + localAddrIdx);
             }
 
             if (keywords[i].contains("uid")) {
-                uidIdx = i;
-                System.out.println("uidIdx: " + uidIdx);
+                uidIdx = i - 2;
             }
         }
 
         while((line = br.readLine()) != null){
-            System.out.println("Line: " + line);
             String[] values = line.trim().split(" ");
+            //System.out.println("Values[LocalAddr]: " + values[localAddrIdx]);
+            //System.out.println("Port: " + port);
             if(values[localAddrIdx].contains(port)) {
+                //System.out.println("Line: " + line);
+                //System.out.println("Uid: " + values[uidIdx]);
                 if(values[uidIdx].equals(""))
                     uid = 0;
                 else
                     uid = Integer.parseInt(values[uidIdx]);
-                Log.d("VpnServiceTest","uid is " + uid);
+                //System.out.println("UID of the Package: " + uid);
                 break;
             }
             continue;
@@ -70,10 +70,10 @@ public class PackageNameFinder {
         PackageManager pm = mContext.getPackageManager();
         String[] names = pm.getPackagesForUid(uid);
         if(names == null){
-            Log.d("VpnServiceTest", "UID NOT FOUND : " + uid);
+            //System.out.println("UID NOT FOUND : " + uid);
             return "";
         }
-        Log.d("VpnServiceTest","name = " + names[0]);           //get package name
+        //System.out.println("name = " + names[0]);
         process.destroy();
         return names[0];
     }
