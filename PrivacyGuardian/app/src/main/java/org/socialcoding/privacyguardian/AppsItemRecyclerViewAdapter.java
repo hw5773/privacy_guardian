@@ -4,6 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,17 +40,20 @@ public class AppsItemRecyclerViewAdapter extends RecyclerView.Adapter<AppsItemRe
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        //holder.mIdView.setText(mValues.get(position).appName);
-        holder.mImageView.setImageResource(R.drawable.poro);
+        holder.mImageView.setImageDrawable(mValues.get(position).image);
         holder.mContentView.setText(mValues.get(position).content);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(v.getContext(), holder.mItem.content, Toast.LENGTH_SHORT).show();
+                //TODO: DO app list changed action.
+                if(!holder.mCheckBox.isChecked()){
+                    holder.mCheckBox.setChecked(true);
+                }
+                else{
+                    holder.mCheckBox.setChecked(false);
+                }
                 if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
                     mListener.onAppSelectionChanged(holder.mItem);
                 }
             }
@@ -65,13 +70,17 @@ public class AppsItemRecyclerViewAdapter extends RecyclerView.Adapter<AppsItemRe
         //public final TextView mIdView;
         public final TextView mContentView;
         public final ImageView mImageView;
+        public final CheckBox mCheckBox;
         public AppsItem mItem;
+        public boolean isChecked;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             mImageView = (ImageView) view.findViewById(R.id.image);
             mContentView = (TextView) view.findViewById(R.id.content);
+            mCheckBox = (CheckBox) view.findViewById(R.id.app_checkbox);
+            isChecked = false;
         }
 
         @Override

@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
     <RelativeLayout
+        android:padding="4dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -12,18 +13,19 @@
             android:layout_width="match_parent"
             android:layout_height="120dp" />
 
-        <!--TextView
-            android:id="@+id/id"
+        <CheckBox
+            android:id="@+id/app_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:textAppearance="?attr/textAppearanceListItem" /-->
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true" />
 
         <TextView
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/image"
+            android:textAlignment="center"
             android:textAppearance="?attr/textAppearanceListItem" />
     </RelativeLayout>
 

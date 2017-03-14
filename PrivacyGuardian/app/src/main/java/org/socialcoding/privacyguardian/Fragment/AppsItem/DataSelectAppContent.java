@@ -1,5 +1,9 @@
 package org.socialcoding.privacyguardian.Fragment.AppsItem;
 
+import android.graphics.drawable.Drawable;
+
+import org.socialcoding.privacyguardian.AppInfoCache;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +23,12 @@ public class DataSelectAppContent {
 
     private static final int COUNT = 25;
     private static boolean initiated = false;
+    private static AppInfoCache infoCache;
 
-    public static void init(String[] appsList){
+    public static void init(String[] appsList, AppInfoCache appInfoCache){
         if(initiated)
             return;
+        infoCache = appInfoCache;
         for(int i = 0; i < appsList.length; i++){
             addItem(createDummyItem(i, appsList[i]));
         }
@@ -35,7 +41,7 @@ public class DataSelectAppContent {
     }
 
     private static AppsItem createDummyItem(int position, String name) {
-        return new AppsItem(String.valueOf(position), "", name, makeDetails(position));
+        return new AppsItem(String.valueOf(position), infoCache.getAppIcon(name), infoCache.getAppName(name), makeDetails(position));
     }
 
     private static String makeDetails(int position) {
@@ -50,11 +56,11 @@ public class DataSelectAppContent {
     //app item
     public static class AppsItem {
         public final String appName;
-        public final String image;
+        public final Drawable image;
         public final String content;
         public final String details;
 
-        public AppsItem(String appName, String image, String content, String details) {
+        public AppsItem(String appName, Drawable image, String content, String details) {
             this.appName = appName;
             this.image = image;
             this.content = content;

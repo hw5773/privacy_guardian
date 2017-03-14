@@ -48,7 +48,7 @@ public class DataSelectAppFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DataSelectAppContent.init(DataSelectActivity.appsList);
+        DataSelectAppContent.init(DataSelectActivity.appsList, mListener.onAppCacheDemanded());
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
