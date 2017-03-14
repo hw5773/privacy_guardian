@@ -373,19 +373,26 @@ public class MainActivity extends AppCompatActivity
         return null;
     }
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    public void onbackButtonPressed(){
         Fragment fragment= new AnalyzeFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_analyze, fragment);
         fragmentTransaction.commit();
+        Log.d("back", "i'm back");
     }
+
+
     @Override
 
     public void onMapsPressed() {
         Fragment fragment = new GoogleMapsFragment();
-       // FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.fragment_analyze,fragment);
-        //fragmentTransaction.replace(R.id.fragment_analyze, fragment);
+       FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        //fragmentTransaction.add(R.id.fragment_analyze,fragment);
+        fragmentTransaction.replace(R.id.fragment_analyze, fragment);
         fragmentTransaction.commit();
     }
 

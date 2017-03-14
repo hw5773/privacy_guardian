@@ -103,6 +103,18 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
 
         return rootView;
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof MainActivityInterfaces.OnGoogleMapsInteractionListener) {
+            mListener = (MainActivityInterfaces.OnGoogleMapsInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement MainActivityInterfaces.OnGoogleMapsInteractionListener");
+        }
+    }
+
     @Override
     public void onResume(){
         super.onResume();
@@ -126,7 +138,7 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
 
     public void onBackButtonPressed(){
         if(mListener !=null){
-            mListener.onBackPressed();
+            mListener.onbackButtonPressed();
         }
     }
 }
