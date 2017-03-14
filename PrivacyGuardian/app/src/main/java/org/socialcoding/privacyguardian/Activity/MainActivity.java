@@ -171,7 +171,6 @@ public class MainActivity extends AppCompatActivity
                         return;
                     }
                     //Start VPN connection establishing
-                    Log.d("onChecked", "checked");
                     Intent intent = VpnService.prepare(getApplicationContext());
                     if (intent != null) {
                         startActivityForResult(intent, VPN_ACTIVITY_REQUEST_CODE);
@@ -182,7 +181,6 @@ public class MainActivity extends AppCompatActivity
                 }
                 else{
                     //end VPN Connection
-                    Log.d("onChecked", "unchecked");
                     if(mIsBound){
                         try{
                             Message msg = Message.obtain(null, Vpn.ENDVPN);
@@ -245,11 +243,6 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(intent, START_ANALYZE_REQUEST_CODE);
     }
 
-    public void startVPN() {
-        Intent intent = new Intent(this, VPNTestActivity.class);
-        startActivity(intent);
-    }
-
     //분석 필터 액티비티 결과 수신
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -278,7 +271,7 @@ public class MainActivity extends AppCompatActivity
 
     //firstpage와 interaction 하는 리스너?
     public void onFirstpageInteraction() {
-        startVPN();
+
     }
 
     public void onSettingsInteraction() {

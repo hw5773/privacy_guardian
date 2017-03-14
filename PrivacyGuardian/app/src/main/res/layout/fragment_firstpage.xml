@@ -20,12 +20,6 @@
             android:id="@+id/firstpage_imageView1"
             app:srcCompat="@drawable/poro" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/firstpage_button1"
-            android:text="@string/firstpage_vpnbutton"
-            android:layout_below="@+id/firstpage_imageView1"/>
     </RelativeLayout>
 
 </FrameLayout>
