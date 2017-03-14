@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity
     public static String APPS_LIST = "AppsList";
     static final int START_ANALYZE_REQUEST_CODE = 1;
     static final int VPN_ACTIVITY_REQUEST_CODE = 2;
-
+    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
     //VPN MESSEAGING SECTIONS
 
     Messenger mService = null;
@@ -380,11 +380,12 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.commit();
     }
     @Override
+
     public void onMapsPressed() {
         Fragment fragment = new GoogleMapsFragment();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        //fragmentTransaction.add(R.id.fragment_analyze,)
-        fragmentTransaction.replace(R.id.fragment_analyze, fragment);
+       // FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.fragment_analyze,fragment);
+        //fragmentTransaction.replace(R.id.fragment_analyze, fragment);
         fragmentTransaction.commit();
     }
 
