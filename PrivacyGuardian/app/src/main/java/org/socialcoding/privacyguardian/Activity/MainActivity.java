@@ -52,8 +52,11 @@ import org.socialcoding.privacyguardian.R;
 import org.socialcoding.privacyguardian.ResultItem;
 import org.socialcoding.privacyguardian.VPN.Vpn;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import static org.socialcoding.privacyguardian.Structs.SensitiveInfoTypes.TYPE_LOCATION_LATLNG;
 
 public class MainActivity extends AppCompatActivity
         implements OnFirstpageInteractionListener, OnAnalyzeInteractionListener,
@@ -387,10 +390,21 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-
-    public void onMapsPressed() {
+    public void onMapsPressed(ArrayList<ResultItem> arrayList) {
         Fragment fragment = new GoogleMapsFragment();
-       FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        //loading arguments
+        Bundle bundle = new Bundle();
+        String[] strings = new String[arrayList.size()];
+        for(int i = 0; i < arrayList.size(); i++){
+            ResultItem item = arrayList.get(i);
+            if(item.dataType == TYPE_LOCATION_LATLNG){
+                strings[i] = item.dataValue;
+            }
+
+        }
+        bundle.putStringArray(GoogleMapsFragment.ARG_LAT_LANG, strings);
+        fragment.setArguments(bundle);
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         //fragmentTransaction.add(R.id.fragment_analyze,fragment);
         fragmentTransaction.replace(R.id.fragment_analyze, fragment);
         fragmentTransaction.commit();

@@ -2,6 +2,8 @@ package org.socialcoding.privacyguardian.Inteface;
 
 import org.socialcoding.privacyguardian.ResultItem;
 
+import java.util.ArrayList;
+
 /**
  * Created by disxc on 2017-02-22.
  */
@@ -12,8 +14,7 @@ public interface MainActivityInterfaces {
         void onSamplePayloadPressed(int index);
         void onClearDBPressed();
         ResultItem[] onListRequired();
-
-        void onMapsPressed();
+        void onMapsPressed(ArrayList<ResultItem> arrayList);
 
     }
 

@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,19 +35,12 @@ import static org.socialcoding.privacyguardian.R.id.map;
 import static org.socialcoding.privacyguardian.R.id.submenuarrow;
 
 public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
-
     private GoogleMap googleMap;
     private MapView mapView;
     private MainActivityInterfaces.OnGoogleMapsInteractionListener mListener;
+    private String[] coordinates;
 
-    public static GoogleMapsFragment newInstance() {
-        
-        Bundle args = new Bundle();
-        
-        GoogleMapsFragment fragment = new GoogleMapsFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
+    public static final String ARG_LAT_LANG = "DataLatLng";
     
     @Override
     public void onMapReady(GoogleMap map){
@@ -54,12 +48,15 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
                 .position(new LatLng(0,0))
                 .title("Marker"));
     }
-    /*
+
     @Override
-    public void onCreate(Bundle savedInstanceState){
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mapView.onCreate(savedInstanceState);
-    }*/
+        if(getArguments() != null){
+            //coordinates are saved as string "123.456;78.91234"
+            coordinates = getArguments().getStringArray(ARG_LAT_LANG);
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
