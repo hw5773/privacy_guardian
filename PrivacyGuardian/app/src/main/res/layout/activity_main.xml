@@ -22,6 +22,10 @@
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/AppTheme.PopupOverlay">
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/vpn_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
         </android.support.v7.widget.Toolbar>
 

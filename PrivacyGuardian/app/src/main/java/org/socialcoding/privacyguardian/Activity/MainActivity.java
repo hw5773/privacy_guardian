@@ -1,17 +1,28 @@
 package org.socialcoding.privacyguardian.Activity;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.ServiceConnection;
+import android.net.VpnService;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -23,6 +34,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.Toast;
+
 
 import org.socialcoding.privacyguardian.Analyzer;
 import org.socialcoding.privacyguardian.AppInfoCache;
@@ -30,11 +44,13 @@ import org.socialcoding.privacyguardian.CacheMaker;
 import org.socialcoding.privacyguardian.DatabaseHelper;
 import org.socialcoding.privacyguardian.Fragment.AnalyzeFragment;
 import org.socialcoding.privacyguardian.Fragment.FirstpageFragment;
+import org.socialcoding.privacyguardian.Fragment.GoogleMapsFragment;
 import org.socialcoding.privacyguardian.Fragment.SettingsFragment;
 import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.*;
 import org.socialcoding.privacyguardian.Inteface.OnCacheMakerInteractionListener;
 import org.socialcoding.privacyguardian.R;
 import org.socialcoding.privacyguardian.ResultItem;
+import org.socialcoding.privacyguardian.VPN.Vpn;
 
 import java.util.Calendar;
 import java.util.List;
@@ -65,6 +81,65 @@ public class MainActivity extends AppCompatActivity
 
     public static String APPS_LIST = "AppsList";
     static final int START_ANALYZE_REQUEST_CODE = 1;
+    static final int VPN_ACTIVITY_REQUEST_CODE = 2;
+
+    //VPN MESSEAGING SECTIONS
+
+    Messenger mService = null;
+    boolean mIsBound;
+
+    class IncomingHandler extends Handler{
+        @Override
+        public void handleMessage(Message msg) {
+            switch(msg.what){
+                case Vpn.SENDPAYLOAD:
+                    Log.d("incoming", "i got packet");
+                    if(analyzer != null){
+                        Bundle bundle = msg.getData();
+                        analyzer.analyze(bundle.getString("packageName"), bundle.getString("payload"));
+                    }
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
+
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mService = new Messenger(service);
+            Log.d("service", "connected");
+            try{
+                Message msg = Message.obtain(null, Vpn.REGISTER);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+            Log.d("service", "disconnected");
+        }
+    };
+
+    void doBindService(){
+        bindService(new Intent(this, Vpn.class),
+                mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
+        Log.d("service", "binding");
+    }
+
+    void doUnbindService(){
+        mIsBound = false;
+        Log.d("service", "unbinding");
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +156,43 @@ public class MainActivity extends AppCompatActivity
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        //set toggle button event
+        SwitchCompat vpnSwitch = (SwitchCompat) findViewById(R.id.vpn_toggle);
+        vpnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    if(analyzer == null){
+                        Toast.makeText(getApplicationContext(), "업데이트를 수행해 주세요", Toast.LENGTH_LONG).show();
+                        buttonView.setChecked(false);
+                        return;
+                    }
+                    //Start VPN connection establishing
+                    Log.d("onChecked", "checked");
+                    Intent intent = VpnService.prepare(getApplicationContext());
+                    if (intent != null) {
+                        startActivityForResult(intent, VPN_ACTIVITY_REQUEST_CODE);
+                    } else {
+                        onActivityResult(VPN_ACTIVITY_REQUEST_CODE, RESULT_OK, null);
+                    }
+
+                }
+                else{
+                    //end VPN Connection
+                    Log.d("onChecked", "unchecked");
+                    if(mIsBound){
+                        try{
+                            Message msg = Message.obtain(null, Vpn.ENDVPN);
+                            mService.send(msg);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                        doUnbindService();
+                    }
+                }
+            }
+        });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
@@ -139,6 +251,8 @@ public class MainActivity extends AppCompatActivity
     //분석 필터 액티비티 결과 수신
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        //FILTER ACTIVITY
         if (requestCode == START_ANALYZE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Calendar date = Calendar.getInstance();
@@ -147,6 +261,15 @@ public class MainActivity extends AppCompatActivity
                 app = data.getStringExtra("app");
                 type = data.getStringExtra("type");
                 Log.d("onActivityResult", date.toString() + "/" + app + "/" + type);
+            }
+        }
+
+        //VPN Service
+        if (requestCode == VPN_ACTIVITY_REQUEST_CODE){
+            if (resultCode == RESULT_OK) {
+                Intent intent = new Intent(this, Vpn.class);
+                startService(intent);
+                doBindService();
             }
         }
     }
@@ -249,6 +372,20 @@ public class MainActivity extends AppCompatActivity
         }
         return null;
     }
+    @Override
+    public void onBackPressed(){
+        Fragment fragment= new AnalyzeFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_analyze, fragment);
+        fragmentTransaction.commit();
+    }
+    @Override
+    public void onMapsPressed() {
+        Fragment fragment = new GoogleMapsFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_analyze, fragment);
+        fragmentTransaction.commit();
+    }
 
     @Override
     public void onCacheMakerCreated(CacheMaker cm, String pm) {
@@ -260,13 +397,14 @@ public class MainActivity extends AppCompatActivity
             public void onLogGenerated() {
                 if (mSectionsPagerAdapter.getCurrentFragment() instanceof AnalyzeFragment) {
                     Log.d("onLogGenerated", "find success...");
-                    ((AnalyzeFragment) mSectionsPagerAdapter.getCurrentFragment()).refreshList();
                 } else {
                     Log.d("onLogGenerated", "failed...");
                 }
+                ((AnalyzeFragment) mSectionsPagerAdapter.getCurrentFragment()).refreshList();
             }
         });
     }
+
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
