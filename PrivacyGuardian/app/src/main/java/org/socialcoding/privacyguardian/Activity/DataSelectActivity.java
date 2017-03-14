@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import org.socialcoding.privacyguardian.AppInfoCache;
 import org.socialcoding.privacyguardian.Fragment.DataSelectAppFragment;
 import org.socialcoding.privacyguardian.Fragment.DataSelectDateFragment;
 import org.socialcoding.privacyguardian.Fragment.DataSelectTypeFragment;
@@ -23,18 +24,20 @@ import org.socialcoding.privacyguardian.Fragment.AppsItem.DataSelectAppContent;
 import org.socialcoding.privacyguardian.R;
 
 import java.util.Calendar;
+import org.socialcoding.privacyguardian.Inteface.DataSelectActivityInterFaces.*;
 
 public class DataSelectActivity extends AppCompatActivity
-    implements DataSelectAppFragment.OnAppSelectionChangedListener,
-    DataSelectDateFragment.OnDateSelectionChangedListener,
-        DataSelectTypeFragment.OnTypeSelectionChangedListener {
+    implements OnAppSelectionInteractionListener, OnDateSelectionChangedListener,
+        OnTypeSelectionChangedListener {
     private static final int APP_SELECT_COLUMN = 3;
-    public static String[] appsList;
+    private AppInfoCache mAppInfo;
 
     private String selectedApp = "*";
     private Calendar selectedStartDate = Calendar.getInstance();
     private Calendar selectedEndDate = Calendar.getInstance();
     private String selectedType = "*";
+
+    public static String[] appsList;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -54,6 +57,10 @@ public class DataSelectActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //create appInfoCache
+        mAppInfo = new AppInfoCache(getApplicationContext());
+
         setContentView(R.layout.activity_dataselect);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -112,6 +119,11 @@ public class DataSelectActivity extends AppCompatActivity
     public void onAppSelectionChanged(DataSelectAppContent.AppsItem item) {
         Log.d("onAppSelectionChanged", "App selected");
         selectedApp = item.content;
+    }
+
+    @Override
+    public AppInfoCache onAppCacheDemanded() {
+        return mAppInfo;
     }
 
     @Override

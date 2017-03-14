@@ -1,4 +1,4 @@
-package org.socialcoding.privacyguardian.Fragment;
+package org.socialcoding.privacyguardian;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,23 +8,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.socialcoding.privacyguardian.Fragment.DataSelectAppFragment.OnAppSelectionChangedListener;
-import org.socialcoding.privacyguardian.Fragment.AppsItem.DataSelectAppContent.AppsItem;
-import org.socialcoding.privacyguardian.R;
-
 import java.util.List;
+
+import org.socialcoding.privacyguardian.Fragment.AppsItem.DataSelectAppContent.AppsItem;
+import org.socialcoding.privacyguardian.Inteface.DataSelectActivityInterFaces.OnAppSelectionInteractionListener;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link AppsItem} and makes a call to the
- * specified {@link OnAppSelectionChangedListener}.
+ * specified {@link OnAppSelectionInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class AppsItemRecyclerViewAdapter extends RecyclerView.Adapter<AppsItemRecyclerViewAdapter.ViewHolder> {
 
     private final List<AppsItem> mValues;
-    private final OnAppSelectionChangedListener mListener;
+    private final OnAppSelectionInteractionListener mListener;
 
-    public AppsItemRecyclerViewAdapter(List<AppsItem> items, OnAppSelectionChangedListener listener) {
+    public AppsItemRecyclerViewAdapter(List<AppsItem> items, OnAppSelectionInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -72,7 +71,6 @@ public class AppsItemRecyclerViewAdapter extends RecyclerView.Adapter<AppsItemRe
             super(view);
             mView = view;
             mImageView = (ImageView) view.findViewById(R.id.image);
-            //mIdView = (TextView) view.findViewById(R.appName.appName);
             mContentView = (TextView) view.findViewById(R.id.content);
         }
 
@@ -82,8 +80,4 @@ public class AppsItemRecyclerViewAdapter extends RecyclerView.Adapter<AppsItemRe
         }
     }
 
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position, List<Object> payloads) {
-        AppsItem item = mValues.get(position);
-    }
 }
