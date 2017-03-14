@@ -26,8 +26,8 @@ import java.util.concurrent.ExecutionException;
 
 public class CacheMaker extends AsyncTask<Void, Void, Void>{
     //create DB update and table creation method.
-    private final String DATE_URL = "http://147.46.215.152:2507/lastupdate";
-    private final String FETCH_URL = "http://147.46.215.152:2507/sensitiveinfo";
+    private final String DATE_URL = "http://147.46.216.207:2507/lastupdate";
+    private final String FETCH_URL = "http://147.46.216.207:2507/sensitiveinfo";
 
     private Context ctx;
     private String lastUpdate;
@@ -132,7 +132,7 @@ public class CacheMaker extends AsyncTask<Void, Void, Void>{
             jsonArray = new JSONArray(jo.getString("List"));
             lastUpdate = dateString;
             saveCacheData();
-            Toast.makeText(ctx, "최신 DB로 업데이트 했습니다.", Toast.LENGTH_SHORT).show();
+            patchResultMessage = "최신 DB로 업데이트 했습니다.";
             Log.d("fetchFromServer", "Successful");
         }
         catch(Exception e) {

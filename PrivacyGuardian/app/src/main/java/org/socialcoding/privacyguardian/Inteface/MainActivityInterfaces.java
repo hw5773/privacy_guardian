@@ -12,6 +12,10 @@ public interface MainActivityInterfaces {
         void onSamplePayloadPressed(int index);
         void onClearDBPressed();
         ResultItem[] onListRequired();
+
+        void onMapsPressed();
+
+        void onBackPressed();
     }
 
     interface OnFirstpageInteractionListener {
