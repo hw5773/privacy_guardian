@@ -52,6 +52,7 @@ import org.socialcoding.privacyguardian.R;
 import org.socialcoding.privacyguardian.ResultItem;
 import org.socialcoding.privacyguardian.VPN.Vpn;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -387,10 +388,17 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-
-    public void onMapsPressed() {
+    public void onMapsPressed(ArrayList<ResultItem> arrayList) {
         Fragment fragment = new GoogleMapsFragment();
-       FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        //loading arguments
+        Bundle bundle;
+        char[] strings;
+        for(int i = 0; i < arrayList.size(); i++){
+            ResultItem item = (ResultItem) arrayList[i];
+        }
+        bundle.putCharArray();
+        fragment.setArguments();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         //fragmentTransaction.add(R.id.fragment_analyze,fragment);
         fragmentTransaction.replace(R.id.fragment_analyze, fragment);
         fragmentTransaction.commit();
