@@ -26,8 +26,8 @@ import java.util.concurrent.ExecutionException;
 
 public class CacheMaker extends AsyncTask<Void, Void, Void>{
     //create DB update and table creation method.
-    private final String DATE_URL = "http://147.46.216.37:2507/lastupdate";
-    private final String FETCH_URL = "http://147.46.216.37:2507/sensitiveinfo";
+    private final String DATE_URL = "http://147.46.216.207:2507/lastupdate";
+    private final String FETCH_URL = "http://147.46.216.207:2507/sensitiveinfo";
 
     private Context ctx;
     private String lastUpdate;
@@ -60,8 +60,8 @@ public class CacheMaker extends AsyncTask<Void, Void, Void>{
             }
             else {
                 patchResultMessage = "업데이트에 실패하였습니다.";
+                return null;
             }
-            return null;
         }
         //if dateString is out-of-date
         else if (!checkUpdate(dateString)) {
