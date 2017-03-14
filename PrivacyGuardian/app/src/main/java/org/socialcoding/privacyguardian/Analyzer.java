@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Vector;
 
 import org.socialcoding.privacyguardian.Structs.SensitiveInfoTypes;
@@ -24,16 +25,22 @@ public class Analyzer {
     private Context ctx;
     private DatabaseHelper mDatabase;
     private onLogGeneratedListener mListener;
+    private List<String> availables;
 
     public Analyzer(CacheMaker cm, Context context){
         cache = cm;
         ctx = context;
         mDatabase = new DatabaseHelper(context);
+        availables = cm.getAppsList();
     }
 
     public void analyze(String packageName, String payload){
+        if(!availables.contains(packageName)){
+            return;
+        }
+        Log.d("analyze", "payload:" + payload);
         JSONObject payloadObject;
-        JSONArray hookedTarget;
+        JSONArray hookTarget;
         String ret = "";
         HttpResponse httpResponse = new HttpResponse(payload);
         String responseBody = httpResponse.responseBody;
@@ -42,10 +49,13 @@ public class Analyzer {
         String lngFound = null;
         String latlngHost = null;
 
+        //response can be null
         if(responseBody.length() == 0){
             Log.d("AnalyzeFragment", "Response is null...");
             return;
         }
+
+        //only work for json payload
         if(httpResponse.contentType.compareTo("application/json") != 0){
             Log.d("AnalyzeFragment", "dropping non-json payload");
             return;
@@ -54,27 +64,22 @@ public class Analyzer {
         try {
             payloadObject = new JSONArray(responseBody).getJSONObject(0);
             JSONObject target = cache.getByAppId(packageName);
-            if(target == null){
-                Toast.makeText(ctx, "분석할 수 없는 앱: " + packageName, Toast.LENGTH_SHORT);
-                Log.d("AnalyzeFragment", "Couldn't find app:" + packageName);
-                return;
-            }
 
             //Cache is only implmented for json
             if(target.getString("Format").compareTo("json") != 0){
                 throw new RuntimeException("not implemented Exception");
             }
 
-            hookedTarget = target.getJSONArray("HookTarget");
-            Log.d("AnalyzeFragment", "target: " + payloadObject.toString());
+            hookTarget = target.getJSONArray("HookTarget");
+            Log.d("Analyze", "payload: " + payloadObject.toString());
             Vector<Vector<String>> logvector = new Vector<>();
-            for(int i = 0; i < hookedTarget.length(); i++){
-                JSONObject jo = hookedTarget.getJSONObject(i);
-                String keyword = jo.getString("Keyword");
-                String type = jo.getString("Type");
+            for(int i = 0; i < hookTarget.length(); i++){
+                JSONObject targetObject = hookTarget.getJSONObject(i);
+                String keyword = targetObject.getString("Keyword");
+                String type = targetObject.getString("Type");
                 String s = "";
                 Vector<String> v = new Vector<>();
-                Log.d("AnalyzeFragment", "target : " + keyword);
+                Log.d("Analyze", "keyword : " + keyword + "type : " + type);
                 try {
                     String value = payloadObject.getString(keyword);
                     s += type + ": " + value + "\n";
@@ -90,12 +95,10 @@ public class Analyzer {
                     if(type.compareTo(SensitiveInfoTypes.TYPE_LOCATION_LNG) == 0){
                         lngFound = value;
                     }
-                    //log(appName, "127.0.0.1", type, value);
-                    mListener.onLogGenerated();
                     ret += s;
                 }
                 catch(JSONException e){
-                    Log.d("AnalyzeFragment", "No such keyword:" + keyword);
+                    Log.d("Analyze", "No such keyword:" + keyword);
                     continue;
                 }
             }
@@ -109,11 +112,13 @@ public class Analyzer {
                     continue;
                 }
                 log(packageName, host, type, value);
+                mListener.onLogGenerated();
             }
 
             //when lat lng both found
             if(latFound != null && lngFound !=null){
                 log(packageName, latlngHost, SensitiveInfoTypes.TYPE_LOCATION_LATLNG, latFound +";" + lngFound);
+                mListener.onLogGenerated();
             }
 
             if(ret.compareTo("") == 0)
@@ -158,8 +163,8 @@ public class Analyzer {
         public String contentType = "";
         public HttpResponse(String str){
             try{
-                responseBody = str.split("\\\\r\\\\n\\\\r\\\\n", 2)[1].trim();
-                contentType = str.split("Content-Type: ", 2)[1].split("\\\\r\\\\n")[0].trim();
+                responseBody = str.split("\\r?\\n\\r?\\n", 2)[1].trim();
+                contentType = str.split("Content-Type: ", 2)[1].split("\\r?\\n")[0].trim();
             }
             catch(Exception e){
                 e.printStackTrace();
