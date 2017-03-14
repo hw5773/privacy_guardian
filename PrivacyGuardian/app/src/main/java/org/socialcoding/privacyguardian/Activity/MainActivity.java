@@ -49,8 +49,10 @@ import org.socialcoding.privacyguardian.Fragment.SettingsFragment;
 import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.*;
 import org.socialcoding.privacyguardian.Inteface.OnCacheMakerInteractionListener;
 import org.socialcoding.privacyguardian.R;
-import org.socialcoding.privacyguardian.ResultItem;
+
+import org.socialcoding.privacyguardian.Structs.ResultItem;
 import org.socialcoding.privacyguardian.VPN.Vpn;
+
 
 import java.util.Calendar;
 import java.util.List;
@@ -79,7 +81,7 @@ public class MainActivity extends AppCompatActivity
     DatabaseHelper mDatabase;
     AppInfoCache mAppInfoCache;
 
-    public static String APPS_LIST = "AppsList";
+    public static final String APPS_LIST = "AppsList";
     static final int START_ANALYZE_REQUEST_CODE = 1;
     static final int VPN_ACTIVITY_REQUEST_CODE = 2;
 
@@ -349,8 +351,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onAnalyzePressed() {
-        if (cm != null && analyzer != null)
+        if (cm != null && analyzer != null){
             startAnalyze(cm.getAppsList());
+        }
     }
 
     @Override

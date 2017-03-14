@@ -11,22 +11,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.socialcoding.privacyguardian.Activity.DataSelectActivity;
+import org.socialcoding.privacyguardian.AppsItemRecyclerViewAdapter;
+import org.socialcoding.privacyguardian.Inteface.DataSelectActivityInterFaces;
 import org.socialcoding.privacyguardian.R;
-import org.socialcoding.privacyguardian.Fragment.dummy.DataSelectAppContent;
+import org.socialcoding.privacyguardian.Fragment.AppsItem.DataSelectAppContent;
+import org.socialcoding.privacyguardian.Inteface.DataSelectActivityInterFaces.OnAppSelectionInteractionListener;
 
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnAppSelectionChangedListener}
+ * Activities containing this fragment MUST implement the {@link OnAppSelectionInteractionListener}
  * interface.
  */
 public class DataSelectAppFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
-    private OnAppSelectionChangedListener mListener;
+    private OnAppSelectionInteractionListener mListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -47,7 +48,7 @@ public class DataSelectAppFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DataSelectAppContent.init(DataSelectActivity.appsList);
+        DataSelectAppContent.init(DataSelectActivity.appsList, mListener.onAppCacheDemanded());
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
@@ -66,7 +67,7 @@ public class DataSelectAppFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(DataSelectAppContent.ITEMS, mListener));
+            recyclerView.setAdapter(new AppsItemRecyclerViewAdapter(DataSelectAppContent.ITEMS, mListener));
         }
         return view;
     }
@@ -75,11 +76,11 @@ public class DataSelectAppFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnAppSelectionChangedListener) {
-            mListener = (OnAppSelectionChangedListener) context;
+        if (context instanceof DataSelectActivityInterFaces.OnAppSelectionInteractionListener) {
+            mListener = (DataSelectActivityInterFaces.OnAppSelectionInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnAppSelectionChangedListener");
+                + " must implement OnAppSelectionInteractionListener");
         }
     }
 
@@ -89,17 +90,4 @@ public class DataSelectAppFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnAppSelectionChangedListener {
-        void onAppSelectionChanged(DataSelectAppContent.AppsItem item);
-    }
 }

@@ -7,12 +7,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CalendarView;
 import android.widget.DatePicker;
 
 import org.socialcoding.privacyguardian.R;
 
 import java.util.Calendar;
+
+import org.socialcoding.privacyguardian.Inteface.DataSelectActivityInterFaces.OnDateSelectionChangedListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,14 +24,15 @@ import java.util.Calendar;
  * create an instance of this fragment.
  */
 public class DataSelectDateFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final String START_DATE = "param1";
+    private static final String END_DATE = "param2";
+    private static final int YEAR = Calendar.YEAR;
+    private static final int MONTH = Calendar.MONTH;
+    private static final int DATE = Calendar.DATE;
+
+    private Calendar startCal;
+    private Calendar endCal;
 
     private OnDateSelectionChangedListener mListener;
 
@@ -39,19 +41,16 @@ public class DataSelectDateFragment extends Fragment {
     }
 
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param startDate Parameter 1.
+     * @param EndDate Parameter 2.
      * @return A new instance of fragment DataSelectDateFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static DataSelectDateFragment newInstance(String param1, String param2) {
+    public static DataSelectDateFragment newInstance(Long startDate, Long EndDate) {
         DataSelectDateFragment fragment = new DataSelectDateFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putLong(START_DATE, startDate);
+        args.putLong(END_DATE, EndDate);
         fragment.setArguments(args);
         return fragment;
     }
@@ -60,8 +59,10 @@ public class DataSelectDateFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            startCal = Calendar.getInstance();
+            startCal.setTimeInMillis(getArguments().getLong(START_DATE));
+            endCal = Calendar.getInstance();
+            endCal.setTimeInMillis(getArguments().getLong(END_DATE));
         }
     }
 
@@ -70,14 +71,6 @@ public class DataSelectDateFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_data_select_date, container, false);
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed() {
-        //TODO: DO SOMETHING!!!
-        if (mListener != null) {
-            //mListener.onStartDateSelectionChanged(new Date(), new Date());
-        }
     }
 
     @Override
@@ -100,7 +93,7 @@ public class DataSelectDateFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         DatePicker datePicker1 = (DatePicker) view.findViewById(R.id.ds_start_dp);
-        datePicker1.init(1992, 11, 22, new DatePicker.OnDateChangedListener() {
+        datePicker1.init(startCal.get(YEAR), startCal.get(MONTH), startCal.get(DATE), new DatePicker.OnDateChangedListener() {
             @Override
             public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 Calendar calendar = Calendar.getInstance();
@@ -109,7 +102,7 @@ public class DataSelectDateFragment extends Fragment {
             }
         });
         DatePicker datePicker2 = (DatePicker) view.findViewById(R.id.ds_end_dp);
-        datePicker2.init(2016, 11, 22, new DatePicker.OnDateChangedListener() {
+        datePicker2.init(endCal.get(YEAR), endCal.get(MONTH), endCal.get(DATE), new DatePicker.OnDateChangedListener() {
             @Override
             public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 Calendar calendar = Calendar.getInstance();
@@ -119,18 +112,4 @@ public class DataSelectDateFragment extends Fragment {
         });
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnDateSelectionChangedListener {
-        void onStartDateSelectionChanged(Calendar start);
-        void onEndDateSelectionChanged(Calendar end);
-    }
 }

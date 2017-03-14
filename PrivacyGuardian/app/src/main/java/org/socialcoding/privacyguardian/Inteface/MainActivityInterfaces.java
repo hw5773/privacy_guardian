@@ -1,6 +1,6 @@
 package org.socialcoding.privacyguardian.Inteface;
 
-import org.socialcoding.privacyguardian.ResultItem;
+import org.socialcoding.privacyguardian.Structs.ResultItem;
 
 /**
  * Created by disxc on 2017-02-22.
