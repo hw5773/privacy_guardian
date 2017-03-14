@@ -15,7 +15,6 @@ public interface MainActivityInterfaces {
 
         void onMapsPressed();
 
-        void onBackPressed();
     }
 
     interface OnFirstpageInteractionListener {
@@ -24,5 +23,9 @@ public interface MainActivityInterfaces {
 
     interface OnSettingsInteractionListener {
         void onSettingsInteraction();
+    }
+
+    interface OnGoogleMapsInteractionListener{
+        void onBackPressed();
     }
 }

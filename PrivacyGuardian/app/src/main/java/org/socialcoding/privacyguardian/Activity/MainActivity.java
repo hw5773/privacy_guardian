@@ -47,7 +47,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements OnFirstpageInteractionListener, OnAnalyzeInteractionListener,
-        OnSettingsInteractionListener, OnCacheMakerInteractionListener {
+        OnSettingsInteractionListener, OnCacheMakerInteractionListener, OnGoogleMapsInteractionListener{
 
     /**
      * The {@link PagerAdapter} that will provide
@@ -266,6 +266,7 @@ public class MainActivity extends AppCompatActivity
     public void onMapsPressed() {
         Fragment fragment = new GoogleMapsFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        //fragmentTransaction.add(R.id.fragment_analyze,)
         fragmentTransaction.replace(R.id.fragment_analyze, fragment);
         fragmentTransaction.commit();
     }
