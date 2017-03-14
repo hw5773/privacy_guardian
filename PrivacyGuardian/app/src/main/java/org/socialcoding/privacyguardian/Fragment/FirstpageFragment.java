@@ -92,13 +92,7 @@ public class FirstpageFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Button startVPNTestButton = (Button) view.findViewById(R.id.firstpage_button1);
-        startVPNTestButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                onVPNButtonPressed();
-            }
-        });
+
     }
 
     @Override
