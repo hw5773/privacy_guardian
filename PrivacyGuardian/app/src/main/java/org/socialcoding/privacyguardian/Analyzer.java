@@ -24,7 +24,7 @@ public class Analyzer {
     private CacheMaker cache;
     private Context ctx;
     private DatabaseHelper mDatabase;
-    private onLogGeneratedListener mListener;
+    private OnAnalyzerInteractionListener mListener;
     private List<String> availables;
 
     public Analyzer(CacheMaker cm, Context context){
@@ -112,13 +112,13 @@ public class Analyzer {
                     continue;
                 }
                 log(packageName, host, type, value);
-                mListener.onLogGenerated();
+                mListener.onLogGenerated(packageName);
             }
 
             //when lat lng both found
             if(latFound != null && lngFound !=null){
                 log(packageName, latlngHost, SensitiveInfoTypes.TYPE_LOCATION_LATLNG, latFound +";" + lngFound);
-                mListener.onLogGenerated();
+                mListener.onLogGenerated(packageName);
             }
 
             if(ret.compareTo("") == 0)
@@ -172,11 +172,11 @@ public class Analyzer {
         }
     }
 
-    public interface onLogGeneratedListener{
-        void onLogGenerated();
+    public interface OnAnalyzerInteractionListener {
+        void onLogGenerated(String packageName);
     }
 
-    public void setOnLogGenerated(onLogGeneratedListener listener){
+    public void setOnLogGenerated(OnAnalyzerInteractionListener listener){
         mListener = listener;
     }
 }

@@ -26,4 +26,5 @@
     <string name="ds_date_e">종료 날짜</string>
     <string name="maps">지도</string>
     <string name="back">뒤로 가기</string>
+    <string name="notification_title">PrivacyGuradian</string>
 </resources>
