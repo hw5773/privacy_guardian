@@ -55,6 +55,7 @@ import org.socialcoding.privacyguardian.VPN.Vpn;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 import static org.socialcoding.privacyguardian.Structs.SensitiveInfoTypes.TYPE_LOCATION_LATLNG;
 
@@ -394,15 +395,15 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = new GoogleMapsFragment();
         //loading arguments
         Bundle bundle = new Bundle();
-        String[] strings = new String[arrayList.size()];
+        ArrayList<String> stringArrayList = new ArrayList<>();
+
         for(int i = 0; i < arrayList.size(); i++){
             ResultItem item = arrayList.get(i);
-            if(item.dataType == TYPE_LOCATION_LATLNG){
-                strings[i] = item.dataValue;
+            if(item.dataType.equals(TYPE_LOCATION_LATLNG)){
+                stringArrayList.add(item.dataValue);
             }
-
         }
-        bundle.putStringArray(GoogleMapsFragment.ARG_LAT_LANG, strings);
+        bundle.putStringArrayList(GoogleMapsFragment.ARG_LAT_LANG, stringArrayList);
         fragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         //fragmentTransaction.add(R.id.fragment_analyze,fragment);
