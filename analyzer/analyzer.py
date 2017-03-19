@@ -22,7 +22,14 @@ def represent_int(s):
 def parse_left(left, cname):
     left_lst = left.strip().split(" ")
     ret = {}
-    ret["var"] = cname + "." + left_lst[-1]
+    var = left_lst[-1]
+
+    # Remove "this."
+    if "this." in var:
+        idx_this = var.index("this.")
+        var = var[idx_this+5:]
+
+    ret["var"] = cname + "." + var
     ret["r2c"] = {}            # reference to class
 
     if len(left_lst) >= 2:
@@ -40,6 +47,7 @@ def parse_right(var, right, cname, r2c, i2c):
     #s1.add(var)
     ret = {}
     ret["i2c"] = dict(i2c)    # instance to class
+    print ("right: ", right)
 
     if "new" in right:
         idx = right.index("new")
@@ -115,15 +123,17 @@ def parse_right(var, right, cname, r2c, i2c):
                 args = args + right[idx1 + i]
                 i = i + 1
 
-            args = args[1:-1]
-            ret = parse_args(args, cname, r2c, i2c)
+            args = args[:-1]
+            print ("args: ", args)
+            lst = parse_args(args, cname, r2c, i2c)
+            print ("parse_args ret: ", ret)
 
             print ("  added var: ", var)
             s1.add(var)
             print ("  added val: ", val)
             s1.add(val)
 
-            for e in ret:
+            for e in lst:
                 print ("  added arg: ", e)
                 s1.add(e)
 
@@ -154,19 +164,22 @@ def parse_right(var, right, cname, r2c, i2c):
 # parsing the arguments in the righthand
 def parse_args(arg, cname, r2c, i2c):
     ret = [] # arguments only have values. No need to revise r2c or i2c, since there is no declaration
+    if len(arg.strip()) == 0:
+        return ret
+
     arg_lst = arg.split(",")
 
     for e in arg_lst:
         if "." in e:
             idx = e.index(".")
-            obj = cname + "." + e[0:idx]
+            obj = cname + "." + e[0:idx].strip()
             e = e.replace(e[0:idx], obj)
             if obj in i2c.keys():
                 e = e.replace(obj, i2c[obj])
             elif obj in r2c.keys():
                 e = e.replace(obj, r2c[obj])
         else:
-            e = cname + "." + e
+            e = cname + "." + e.strip()
 
         if ("(" in e) and (")" in e):
             args = ""
@@ -215,7 +228,14 @@ def parse_line(line, cname, fname, r2c, i2c):
                 ret["r2c"][k] = left_ret["r2c"][k]
 
         right = line[idx+1:].strip()
+
+        # Remove "this."
+        if "this." in right:
+            idx_this = right.index("this.")
+            right = right[idx_this+5:]
+
         right_ret = parse_right(left_ret["var"], right, cname, ret["r2c"], ret["i2c"])
+        print ("right_ret: ", right_ret)
 
         if len(right_ret["i2c"]) > 0:
             for k in right_ret["i2c"].keys():
@@ -353,8 +373,8 @@ def parsing(blk, cname, fname, ref_to_class, inst_to_class):
                 for k in ret["i2c"].keys():
                     inst_to_class[k] = ret["i2c"][k]
 
-                print ("ref_to_class: ", ref_to_class)
-                print ("inst_to_class: ", inst_to_class)
+                #print ("ref_to_class: ", ref_to_class)
+                #print ("inst_to_class: ", inst_to_class)
     
                 l = ""
                 continue
@@ -398,10 +418,10 @@ def parsing(blk, cname, fname, ref_to_class, inst_to_class):
                     parsing(b, cname, fname, ref_to_class, inst_to_class)
                 elif "catch" in l:                # when it says "catch"
                     ret = parse_catch(cname, l)
-                    r2c = dict(ref_to_class)
-                    for k in ret["r2c"].keys():
-                        r2c[k] = ret["r2c"][k]
-                    parsing(b, cname, fname, r2c, inst_to_class)
+                    i2c = dict(ref_to_class)
+                    for k in ret["i2c"].keys():
+                        i2c[k] = ret["i2c"][k]
+                    parsing(b, cname, fname, ref_to_class, i2c)
                 elif "switch" in l:                # when it says "switch"
                     parse_none(l) # TODO: Need to implement the parser related to the "switch"
                 elif "=" in l:                    # to process the array
@@ -413,11 +433,11 @@ def parsing(blk, cname, fname, ref_to_class, inst_to_class):
                         inst_to_class[k] = ret["i2c"][k]
                 else:
                     ret = parse_func(cname, l)
-                    r2c = dict(ref_to_class)
-                    for k in ret["r2c"].keys():
-                        r2c[k] = ret["r2c"][k]
+                    i2c = dict(ref_to_class)
+                    for k in ret["i2c"].keys():
+                        i2c[k] = ret["i2c"][k]
                         
-                    parsing(b, cname, ret["func_name"], r2c, inst_to_class)
+                    parsing(b, cname, ret["func_name"], ref_to_class, i2c)
 
                 l = ""
                 continue
@@ -434,7 +454,7 @@ def parse_catch(cname, prefix):
     idx2 = prefix.index(")")
     params = prefix[idx1+1:idx2]
     if len(params) >= 1:
-        ret["r2c"] = parse_params(cname, params)
+        ret["i2c"] = parse_params(cname, params)
 
     return ret
 
@@ -449,7 +469,7 @@ def parse_func(cname, prefix):
     idx = 1
     ret = {}
     ret["func_name"] = ""
-    ret["r2c"] = {}
+    ret["i2c"] = {}
     
     while idx > 0:
         try:
@@ -473,20 +493,23 @@ def parse_func(cname, prefix):
     params = prefix[idx1+1:idx2]
 
     if len(params) >= 1:
-        ret["r2c"] = parse_params(cname, params)
+        ret["i2c"] = parse_params(cname, params)
 
     return ret
 
 def parse_params(cname, params):            # parsing the parameters - "String a, int b, ..."
     lst = params.split(",")
-    r2c = {}
+    i2c = {}
+
     for p in lst:
         idx = p.strip().index(" ")
         c = p[0:idx].strip()
+        if c in primitives:
+            continue
         r = p[idx+1:].strip()
-        r2c[cname + "." + r] = c
+        i2c[cname + "." + r] = c
 
-    return r2c
+    return i2c
 
 def find_location_lst():
     ret = []
@@ -530,12 +553,14 @@ def main():
         print ("java_files: ", java_files)
 
     for f in java_files:
-        fi = open(f, "r")
-        b = fi.read()
+        if "CurrentAddress" in f:
+            fi = open(f, "r")
+            print ("fi: ", fi)
+            b = fi.read()
 
-        print (fi)
-        parsing(b, "", "", {}, {})
-        print ("\n")
+            print (fi)
+            parsing(b, "", "", {}, {})
+            print ("\n")
     
     print ("rel_set: ", rel_set)
     loc_lst = find_location_lst()
