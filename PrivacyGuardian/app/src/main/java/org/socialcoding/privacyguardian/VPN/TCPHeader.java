@@ -65,7 +65,7 @@ public class TCPHeader extends TransportHeader {
     boolean getFin() {
         boolean ret = false;
 
-        if (((header[13] & 0x1) >> 1) == 1)
+        if ((header[13] & 0x1) == 1)
             ret = true;
         return ret;
     }
