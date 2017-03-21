@@ -195,15 +195,6 @@ public class MainActivity extends AppCompatActivity
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         mDatabase = new DatabaseHelper(this);
         mAppInfoCache = new AppInfoCache(this);
         // ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -279,7 +270,7 @@ public class MainActivity extends AppCompatActivity
     //button when update button pressed
     public void onUpdateButtonClicked(View v) {
         try {
-            Snackbar.make(findViewById(R.id.fab), "업데이트를 시작합니다.", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(v, "업데이트를 시작합니다.", Snackbar.LENGTH_SHORT).show();
             new CacheMaker(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         } catch (Exception e) {
             e.printStackTrace();
@@ -386,7 +377,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onCacheMakerCreated(CacheMaker cm, String pm) {
         this.cm = cm;
-        Snackbar.make(findViewById(R.id.fab), pm, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(findViewById(R.id.container), pm, Snackbar.LENGTH_SHORT).show();
         analyzer = new Analyzer(cm, getApplicationContext());
         analyzer.setOnLogGenerated(new Analyzer.OnAnalyzerInteractionListener() {
             @Override
@@ -404,6 +395,7 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    //creates app notifications for a package
     private void createNotification(String packageName) {
         Integer pNum = detectionHashMap.get(packageName);
         if(pNum == null){
