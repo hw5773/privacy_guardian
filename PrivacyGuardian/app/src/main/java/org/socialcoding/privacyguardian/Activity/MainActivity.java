@@ -197,6 +197,16 @@ public class MainActivity extends AppCompatActivity
 
         mDatabase = new DatabaseHelper(this);
         mAppInfoCache = new AppInfoCache(this);
+
+        //initiate update
+        try {
+            Snackbar.make(findViewById(R.id.container), "업데이트를 시작합니다.", Snackbar.LENGTH_SHORT).show();
+            new CacheMaker(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("init.update", "something Wrong...");
+        }
+
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
     }
@@ -267,16 +277,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    //button when update button pressed
-    public void onUpdateButtonClicked(View v) {
-        try {
-            Snackbar.make(v, "업데이트를 시작합니다.", Snackbar.LENGTH_SHORT).show();
-            new CacheMaker(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("button", "something Wrong...");
-        }
-    }
 
     //returns array of resultItem that matches with query
     public ResultItem[] getQueryList() {

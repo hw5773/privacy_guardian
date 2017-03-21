@@ -9,19 +9,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <Button
-            android:text="@string/analyze_update"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/update_button"
-            android:onClick="onUpdateButtonClicked"
-            tools:text="update" />
 
         <Button
             android:text="@string/start_analyze"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/update_button"
             android:id="@+id/start_analyze" />
 
         <Button
