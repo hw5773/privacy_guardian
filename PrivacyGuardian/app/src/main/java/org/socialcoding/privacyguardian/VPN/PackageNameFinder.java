@@ -52,16 +52,13 @@ public class PackageNameFinder {
 
         while((line = br.readLine()) != null){
             String[] values = line.trim().split(" ");
-            //System.out.println("Values[LocalAddr]: " + values[localAddrIdx]);
-            //System.out.println("Port: " + port);
             if(values[localAddrIdx].contains(port)) {
-                //System.out.println("Line: " + line);
-                //System.out.println("Uid: " + values[uidIdx]);
+
                 if(values[uidIdx].equals(""))
                     uid = 0;
                 else
                     uid = Integer.parseInt(values[uidIdx]);
-                //System.out.println("UID of the Package: " + uid);
+
                 break;
             }
             continue;
@@ -69,8 +66,9 @@ public class PackageNameFinder {
         String Packagename = "";
         PackageManager pm = mContext.getPackageManager();
         String[] names = pm.getPackagesForUid(uid);
+
         if(names == null){
-            //System.out.println("UID NOT FOUND : " + uid);
+            System.out.println("UID NOT FOUND : " + uid);
             return "";
         }
         //System.out.println("name = " + names[0]);

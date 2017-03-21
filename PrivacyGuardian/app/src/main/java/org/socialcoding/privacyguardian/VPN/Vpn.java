@@ -33,7 +33,7 @@ public class Vpn extends VpnService {
     Builder builder = new Builder();
     private Context mContext = null;
     private static int TIMING = 5;
-    private int MAX_BYTES = 2048;
+    private int MAX_BYTES = 1460;
     private int UDP_OFFSET = 8;
 
     private boolean mIsRunning;
@@ -91,6 +91,7 @@ public class Vpn extends VpnService {
                          .addRoute("0.0.0.0", 0).establish();
                     FileInputStream in = new FileInputStream(mInterface.getFileDescriptor());
                     FileOutputStream out = new FileOutputStream(mInterface.getFileDescriptor());
+                    System.out.println("Start the SocketManager.");
                     SocketManager socketManager = new SocketManager();
 
                     int length;                                                        //length of packet.
@@ -187,6 +188,7 @@ public class Vpn extends VpnService {
                 e.printStackTrace();
             }
         } else if (tcpHeader.getFin()) {
+            System.out.println("Get FIN packet");
             processTCPHandshake(in, out, ipHeader, tcpHeader);
             // Delete the TCP Socket in the SocketManager
             sm.delSocket(true, ipHeader.getSourceIP(), tcpHeader.getSourcePort());
@@ -197,7 +199,8 @@ public class Vpn extends VpnService {
             }
 
             System.out.println("Flags from " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort() + ": " + tcpHeader.getFlag());
-            System.out.println("ACK- TCP handshake complete to " + ipHeader.getDestIP() + ":" + tcpHeader.getDestPort() + " from " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort());
+            System.out.println("ACK- TCP handshake complete");
+            System.out.println("ACK) DestIP: " + ipHeader.getDestIP() + ", DestPort: " + tcpHeader.getDestPort() + ", SrcIP: " + ipHeader.getSourceIP() + ", SrcPort: " + tcpHeader.getSourcePort() + ", SEQ: " + tcpHeader.getSequenceNumber() + ", ACK: " + tcpHeader.getAckNumber() + ", Flags: " + tcpHeader.getFlag());
         } else {
             // Send the Message
             System.out.println("Send the TCP message from " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort() + " to " + ipHeader.getDestIP() + ":" + tcpHeader.getDestPort());
@@ -217,6 +220,7 @@ public class Vpn extends VpnService {
     }
 
     private void analyzePacket(String packageName, byte[] payload) {
+        System.out.println("In Analyze Packet) Package Name: " + packageName + ", Payload Size: " + payload.length);
         String strPayload = new String(payload);
         try{
             Message msg = Message.obtain(null, SENDPAYLOAD);
@@ -259,9 +263,11 @@ public class Vpn extends VpnService {
 
         if (tcpHeader.getSyn()) {
             System.out.println("SYN packet found to " + destIP + ":" + dPort);
+            System.out.println("SYN) DestIP: " + destIP + ", DestPort: " + dPort + ", SrcIP: " + sourceIP + ", SrcPort: " + sPort + ", SEQ: " + tcpHeader.getSequenceNumber() + ", ACK: " + tcpHeader.getAckNumber() + ", Flags: " + tcpHeader.getFlag());
             outPacket = changeDestSrc(tcpHeader, ipHeader, null, sourceIP, destIP, sPort, dPort, seqNum, ackNum, "syn");
         } else if (tcpHeader.getFin()) {
             System.out.println("FIN packet found to " + destIP + ":" + dPort);
+            System.out.println("FIN) DestIP: " + destIP + ", DestPort: " + dPort + ", SrcIP: " + sourceIP + ", SrcPort: " + sPort + ", SEQ: " + tcpHeader.getSequenceNumber() + ", ACK: " + tcpHeader.getAckNumber() + ", Flags: " + tcpHeader.getFlag());
             outPacket = changeDestSrc(tcpHeader, ipHeader, null, sourceIP, destIP, sPort, dPort, seqNum, ackNum, "fin");
         }
 
@@ -310,7 +316,7 @@ public class Vpn extends VpnService {
                 answer = answer+(int)(((tmp&0xff) << 8)|(tmp2&0xff));
             }
         }
-        answer=((answer&0xffff)+ (answer>>16));
+        answer=((answer & 0xffff)+ (answer >> 16));
         return ~answer;
     }
 
@@ -326,6 +332,7 @@ public class Vpn extends VpnService {
         switch(state) {
             case "syn":
                 System.out.println("SYN/ACK- Seq from Server: " + tHeader.getSequenceNumber() + " " + ipHeader.getDestIP() + ":" + tHeader.getDestPort()) ;
+                System.out.println("SYN/ACK) DestIP: " + destIP + ", DestPort: " + dPort + ", SrcIP: " + sourceIP + ", SrcPort: " + sPort + ", SEQ: " + tHeader.getSequenceNumber() + ", ACK: " + tHeader.getAckNumber() + ", Flags: " + tHeader.getFlag());
                 System.out.println("SYN/ACK- Ack from Server: " + tHeader.getAckNumber() + " " + ipHeader.getDestIP() + ":" + tHeader.getDestPort());
                 break;
             case "fin":
@@ -343,7 +350,7 @@ public class Vpn extends VpnService {
         if(state.compareTo("syn")==0)
             tHeaderReader[13] = (byte) 0x12;                                                 //make to syn ack
         else if(state.compareTo("fin")==0)
-            tHeaderReader[13] = (byte) 0x11;
+            tHeaderReader[13] = (byte) 0x10;
         else if(tHeader.getDestPort() == 443) // Temporal RST
             tHeaderReader[13] = (byte) 0x4;
 
