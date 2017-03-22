@@ -193,6 +193,12 @@ public class Vpn extends VpnService {
             // Delete the TCP Socket in the SocketManager
             sm.delSocket(true, ipHeader.getSourceIP(), tcpHeader.getSourcePort());
         } else if (tcpHeader.getAck() && tcpHeader.getPayloadLength() == 0) {
+            if (tcpHeader.getDestPort() == 443) {
+                System.out.println("This is TLS. Now RST.");
+                byte[] outPacket = changeDestSrc(tcpHeader, ipHeader, tcpHeader.getPayload(), ipHeader.getSourceIP(), ipHeader.getDestIP(), tcpHeader.getSourcePort(), tcpHeader.getDestPort(), tcpHeader.getSequenceNumber(), tcpHeader.getAckNumber(), "");
+            }
+
+            System.out.println("Flags from " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort() + ": " + tcpHeader.getFlag());
             System.out.println("ACK- TCP handshake complete");
             System.out.println("ACK) DestIP: " + ipHeader.getDestIP() + ", DestPort: " + tcpHeader.getDestPort() + ", SrcIP: " + ipHeader.getSourceIP() + ", SrcPort: " + tcpHeader.getSourcePort() + ", SEQ: " + tcpHeader.getSequenceNumber() + ", ACK: " + tcpHeader.getAckNumber() + ", Flags: " + tcpHeader.getFlag());
         } else {
@@ -209,10 +215,6 @@ public class Vpn extends VpnService {
             }
 
             analyzePacket(packageName, tcpHeader.getPayload());
-            ///// Analyzer Interface Needed /////
-            ///// Package Name: packageName / Payload: tcpHeader.getPayload
-            /////////////////////////////////////
-
             sm.sendMessage(true, ipHeader.getSourceIP(), tcpHeader.getSourcePort(), tcpHeader.getPayload());
         }
     }
@@ -349,6 +351,8 @@ public class Vpn extends VpnService {
             tHeaderReader[13] = (byte) 0x12;                                                 //make to syn ack
         else if(state.compareTo("fin")==0)
             tHeaderReader[13] = (byte) 0x10;
+        else if(tHeader.getDestPort() == 443) // Temporal RST
+            tHeaderReader[13] = (byte) 0x4;
 
         int payload_l = 0;
         if(payload != null){
