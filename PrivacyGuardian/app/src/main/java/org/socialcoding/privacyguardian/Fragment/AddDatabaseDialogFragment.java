@@ -44,7 +44,7 @@ public class AddDatabaseDialogFragment extends DialogFragment {
         mTime.setText(Long.valueOf(Calendar.getInstance().getTime().getTime()).toString());
         mIp.setText("127.0.0.1");
         mType.setText(SensitiveInfoTypes.TYPE_LOCATION_LATLNG);
-        mValue.setText("37.45;126.95");
+        mValue.setText("37.459;126.953");
 
         builder.setView(view)
                 .setPositiveButton(R.string.add_sample_db, new DialogInterface.OnClickListener() {

@@ -419,6 +419,7 @@ public class MainActivity extends AppCompatActivity
         if(analyzer != null){
             analyzer.log(packageName, time, ip, type, value);
         }
+        refreshResultList();
     }
 
 
