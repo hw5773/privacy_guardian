@@ -56,14 +56,18 @@ import org.socialcoding.privacyguardian.R;
 import org.socialcoding.privacyguardian.Structs.ResultItem;
 import org.socialcoding.privacyguardian.VPN.Vpn;
 
-
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+
+import static org.socialcoding.privacyguardian.Structs.SensitiveInfoTypes.TYPE_LOCATION_LATLNG;
 
 public class MainActivity extends AppCompatActivity
         implements OnFirstpageInteractionListener, OnAnalyzeInteractionListener,
-        OnSettingsInteractionListener, OnCacheMakerInteractionListener, DatabaseDialogListener {
+        OnSettingsInteractionListener, OnCacheMakerInteractionListener, DatabaseDialogListener, OnGoogleMapsInteractionListener {
+
 
     private static final int NOTIFICATION_ON_DETECTED = 123;
 
@@ -78,6 +82,8 @@ public class MainActivity extends AppCompatActivity
     public static final String APPS_LIST = "AppsList";
     static final int START_ANALYZE_REQUEST_CODE = 1;
     static final int VPN_ACTIVITY_REQUEST_CODE = 2;
+
+    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
     //Notification Alarming
     private Boolean notificationEnabled = true;
@@ -357,10 +363,33 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMapsPressed() {
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    public void onbackButtonPressed(){
+        getSupportFragmentManager().popBackStack();
+        Log.d("back", "i'm back");
+    }
+
+    @Override
+    public void onMapsPressed(ArrayList<ResultItem> arrayList) {
         Fragment fragment = new GoogleMapsFragment();
+        //loading arguments
+        Bundle bundle = new Bundle();
+        ArrayList<String> stringArrayList = new ArrayList<>();
+
+        for(int i = 0; i < arrayList.size(); i++){
+            ResultItem item = arrayList.get(i);
+            if(item.dataType.equals(TYPE_LOCATION_LATLNG)){
+                stringArrayList.add(item.dataValue);
+            }
+        }
+        bundle.putStringArrayList(GoogleMapsFragment.ARG_LAT_LANG, stringArrayList);
+        fragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_analyze, fragment);
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
@@ -390,6 +419,7 @@ public class MainActivity extends AppCompatActivity
         if(analyzer != null){
             analyzer.log(packageName, time, ip, type, value);
         }
+        refreshResultList();
     }
 
 

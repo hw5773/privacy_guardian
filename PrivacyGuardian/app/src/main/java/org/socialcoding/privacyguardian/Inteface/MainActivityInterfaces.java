@@ -4,6 +4,8 @@ import android.support.v4.app.DialogFragment;
 
 import org.socialcoding.privacyguardian.Structs.ResultItem;
 
+import java.util.ArrayList;
+
 /**
  * Created by disxc on 2017-02-22.
  */
@@ -13,8 +15,7 @@ public interface MainActivityInterfaces {
         void onAnalyzePressed();
         void onClearDBPressed();
         ResultItem[] onListRequired();
-        void onMapsPressed();
-        void onBackPressed();
+        void onMapsPressed(ArrayList<ResultItem> arrayList);
     }
 
     interface OnFirstpageInteractionListener {
@@ -25,6 +26,10 @@ public interface MainActivityInterfaces {
         void onSettingsInteraction();
     }
 
+    interface OnGoogleMapsInteractionListener{
+        void onbackButtonPressed();
+    }
+  
     interface DatabaseDialogListener {
         void onDialogPositiveClick(String packageName, Long time, String ip, String type, String value);
     }

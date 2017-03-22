@@ -90,7 +90,7 @@ public class AnalyzeFragment extends Fragment {
         buttonGoogleMaps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    onMapsButtonPressed();
+                    onMapsButtonPressed(LIST_MENU);
                 }
         });
 
@@ -121,9 +121,9 @@ public class AnalyzeFragment extends Fragment {
             refreshList();
         }
     }
-    public void onMapsButtonPressed(){
+    public void onMapsButtonPressed(ArrayList<ResultItem> LIST_MENU){
         if(mListener !=null){
-            mListener.onMapsPressed();
+            mListener.onMapsPressed(LIST_MENU);
         }
     }
 
