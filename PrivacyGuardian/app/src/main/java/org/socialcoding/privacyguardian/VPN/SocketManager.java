@@ -93,7 +93,6 @@ public class SocketManager implements SocketManagerAPI {
                                     while (true) {
                                         recv = socket.read(buf);
                                         System.out.println("bytes: " + bytes + ", recv: " + recv);
-                                        Thread.sleep(3000);
 
                                         if (recv == -1) {
                                             System.out.println("Find EOF from the READ socket");
@@ -111,6 +110,7 @@ public class SocketManager implements SocketManagerAPI {
                                             byte[] packet = makeTCPPacket(msg, socket.socket(), 1);
                                             addMessage(packet);
                                             tcpInfo.get(socket).setSeqNum(bytes);
+                                            System.out.println("SEQ becomes " + tcpInfo.get(socket).getSeqNum());
                                             bytes = 0;
                                         }
                                     }
@@ -122,6 +122,7 @@ public class SocketManager implements SocketManagerAPI {
                                         byte[] packet = makeTCPPacket(msg, socket.socket(), 1);
                                         addMessage(packet);
                                         tcpInfo.get(socket).setSeqNum(bytes);
+                                        System.out.println("SEQ becomes " + tcpInfo.get(socket).getSeqNum());
                                     }
 
                                     // Generate FIN packet

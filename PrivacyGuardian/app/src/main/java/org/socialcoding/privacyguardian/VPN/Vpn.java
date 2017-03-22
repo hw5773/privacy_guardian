@@ -197,7 +197,7 @@ public class Vpn extends VpnService {
             System.out.println("ACK) DestIP: " + ipHeader.getDestIP() + ", DestPort: " + tcpHeader.getDestPort() + ", SrcIP: " + ipHeader.getSourceIP() + ", SrcPort: " + tcpHeader.getSourcePort() + ", SEQ: " + tcpHeader.getSequenceNumber() + ", ACK: " + tcpHeader.getAckNumber() + ", Flags: " + tcpHeader.getFlag());
         } else {
             // Send the Message
-            System.out.println("Send the TCP message from " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort() + " to " + ipHeader.getDestIP() + ":" + tcpHeader.getDestPort());
+            System.out.println("Send the TCP message from " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort() + " to " + ipHeader.getDestIP() + ":" + tcpHeader.getDestPort() + " SEQ: " + tcpHeader.getSequenceNumber() + " ACK: " + tcpHeader.getAckNumber());
             System.out.println("TCP Message Size: " + tcpHeader.getPayloadLength());
             System.out.println("Now Finding the Package Name");
             String packageName = "";
