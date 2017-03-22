@@ -368,10 +368,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void onbackButtonPressed(){
-        Fragment fragment= new AnalyzeFragment();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_analyze, fragment);
-        fragmentTransaction.commit();
+        getSupportFragmentManager().popBackStack();
         Log.d("back", "i'm back");
     }
 
@@ -391,8 +388,8 @@ public class MainActivity extends AppCompatActivity
         bundle.putStringArrayList(GoogleMapsFragment.ARG_LAT_LANG, stringArrayList);
         fragment.setArguments(bundle);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        //fragmentTransaction.add(R.id.fragment_analyze,fragment);
         fragmentTransaction.replace(R.id.fragment_analyze, fragment);
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
