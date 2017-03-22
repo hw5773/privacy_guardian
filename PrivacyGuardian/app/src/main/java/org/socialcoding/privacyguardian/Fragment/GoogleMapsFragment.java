@@ -5,8 +5,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.Uri;
+import android.net.VpnService;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,24 +32,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 import static org.socialcoding.privacyguardian.R.id.container;
 import static org.socialcoding.privacyguardian.R.id.map;
 import static org.socialcoding.privacyguardian.R.id.submenuarrow;
 
 public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
-
     private GoogleMap googleMap;
     private MapView mapView;
-    private MainActivityInterfaces.OnAnalyzeInteractionListener mListener;
+    private MainActivityInterfaces.OnGoogleMapsInteractionListener mListener;
+    private ArrayList<String> coordinates;
 
-    public static GoogleMapsFragment newInstance() {
-        
-        Bundle args = new Bundle();
-        
-        GoogleMapsFragment fragment = new GoogleMapsFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
+    public static final String ARG_LAT_LANG = "DataLatLng";
     
     @Override
     public void onMapReady(GoogleMap map){
@@ -54,18 +52,24 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
                 .position(new LatLng(0,0))
                 .title("Marker"));
     }
-    /*
+
     @Override
-    public void onCreate(Bundle savedInstanceState){
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mapView.onCreate(savedInstanceState);
-    }*/
+            if(getArguments() != null){
+                    //coordinates are saved as string "123.456;78.91234"
+                    coordinates = getArguments().getStringArrayList(ARG_LAT_LANG);
+            }
+        else Log.d("VpnService","no args");
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_google_maps, container, false);
 
-        Button button = (Button) rootView.findViewById(R.id.button_back);
+        Button button = (Button) rootView.findViewById(R.id.backbutton);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,21 +92,45 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
 
-                //For showing a move to my location button
-               // googleMap.setMyLocationEnabled(true);
+                    //For showing a move to my location button
+                    // googleMap.setMyLocationEnabled(true);
+                    int length = coordinates.size();
+                    LatLng latLng = new LatLng(0,0);
+                    for (int i=0;i< length ;i++) {
+                        //For dropping a marker at a point on the Map
+                        String[] tmpArray;
+                        Log.d("VpnService",length+coordinates.get(i)+i);
+                        tmpArray = coordinates.get(i).split(";");
+                        double lang = Double.parseDouble(tmpArray[0]);
+                       // sumlang += lang;
+                        double lng = Double.parseDouble(tmpArray[1]);
+                        //sumlng += lng;
+                        latLng = new LatLng(lang,lng);
+                        googleMap.addMarker(new MarkerOptions().position(latLng).title("Marker Title").snippet("Marker Description"));
+                    }
+                    if(length==0){System.out.print("??"); return;}
+                    //LatLng cameraCenter= new LatLng(sumlang/length,sumlng/length);
+                    //For zooming automatically to the location of the marker
+                    CameraPosition cameraPosition = new CameraPosition.Builder().target(latLng).zoom(17).build();
+                    googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                //For dropping a marker at a point on the Map
-                LatLng sydney = new LatLng(-34,151);
-                googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
-
-                //For zooming automatically to the location of the marker
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(12).build();
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
         });
 
         return rootView;
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof MainActivityInterfaces.OnGoogleMapsInteractionListener) {
+            mListener = (MainActivityInterfaces.OnGoogleMapsInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement MainActivityInterfaces.OnGoogleMapsInteractionListener");
+        }
+    }
+
     @Override
     public void onResume(){
         super.onResume();
@@ -126,7 +154,7 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
 
     public void onBackButtonPressed(){
         if(mListener !=null){
-            mListener.onBackPressed();
+            mListener.onbackButtonPressed();
         }
     }
 }
