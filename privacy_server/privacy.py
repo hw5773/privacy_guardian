@@ -13,7 +13,7 @@ def api_lastupdate():
 @app.route('/sensitiveinfo', methods = ['GET'])
 def api_sensitiveinfo():
 	if request.method == 'GET':
-		return jsonify({"List": [{"AppId":"org.locationprivacy.locationprivacy", "Format":"json", "HookTarget":[{"Keyword":"latitude", "Type":"latitude"}, {"Keyword":"longitude", "Type":"longitude"}], "Timestamp":"1474960000"}, {"AppId":"testapp2", "Format":"json", "HookTarget":[{"Keyword":"lat", "Type":"GPSInfo"}, {"Keyword":"lon", "Type":"GPSInfo"}], "Timestamp":"1470889243"}]})
+		return jsonify({"List": [{"AppId":"org.locationprivacy.locationprivacy", "Format":"json", "HookTarget":[{"Keyword":"latitude", "Type":"Location.latitude"}, {"Keyword":"longitude", "Type":"Location.longitude"}], "Timestamp":"1474960000"}, {"AppId":"testapp2", "Format":"json", "HookTarget":[{"Keyword":"lat", "Type":"GPSInfo"}, {"Keyword":"lon", "Type":"GPSInfo"}], "Timestamp":"1470889243"}]})
 
 if __name__ == '__main__':
-	app.run(host="147.46.215.152", port=2507)
+	app.run(host="147.46.216.207", port=2507)

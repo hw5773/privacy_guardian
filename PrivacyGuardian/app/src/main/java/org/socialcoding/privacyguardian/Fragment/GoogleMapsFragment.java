@@ -69,6 +69,7 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
         View rootView = inflater.inflate(R.layout.fragment_google_maps, container, false);
 
         Button button = (Button) rootView.findViewById(R.id.backbutton);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

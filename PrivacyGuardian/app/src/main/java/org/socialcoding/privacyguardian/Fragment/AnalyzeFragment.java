@@ -1,10 +1,12 @@
 package org.socialcoding.privacyguardian.Fragment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +17,9 @@ import android.widget.ListView;
 
 import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.OnAnalyzeInteractionListener;
 import org.socialcoding.privacyguardian.R;
-import org.socialcoding.privacyguardian.ResultItem;
+import org.socialcoding.privacyguardian.Structs.ResultItem;
 import org.socialcoding.privacyguardian.ResultAdapter;
+import org.socialcoding.privacyguardian.Structs.SensitiveInfoTypes;
 
 import java.util.ArrayList;
 
@@ -58,22 +61,11 @@ public class AnalyzeFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-
-        /* sample1 */
-        Button button2 = (Button) view.findViewById(R.id.button2);
-        button2.setOnClickListener(new View.OnClickListener() {
+        Button addDBButton = (Button) view.findViewById(R.id.button_add_to_db);
+        addDBButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onSamplePayloadPressed(0);
-            }
-        });
-
-        /* sample2 */
-        Button button3 = (Button) view.findViewById(R.id.button3);
-        button3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onSamplePayloadPressed(1);
+                showDBDialog();
             }
         });
 
@@ -109,6 +101,11 @@ public class AnalyzeFragment extends Fragment {
         refreshList();
     }
 
+    private void showDBDialog() {
+        AddDatabaseDialogFragment dialog = new AddDatabaseDialogFragment();
+        dialog.show(getFragmentManager(), "mytag");
+    }
+
     /* interaction with main activity */
 
     private void onClearDBButtonPressed() {
@@ -127,12 +124,6 @@ public class AnalyzeFragment extends Fragment {
     public void onMapsButtonPressed(ArrayList<ResultItem> LIST_MENU){
         if(mListener !=null){
             mListener.onMapsPressed(LIST_MENU);
-        }
-    }
-    public void onSamplePayloadPressed(int i){
-        if (mListener!= null){
-            mListener.onSamplePayloadPressed(i);
-            refreshList();
         }
     }
 

@@ -16,25 +16,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import org.socialcoding.privacyguardian.AppInfoCache;
 import org.socialcoding.privacyguardian.Fragment.DataSelectAppFragment;
 import org.socialcoding.privacyguardian.Fragment.DataSelectDateFragment;
 import org.socialcoding.privacyguardian.Fragment.DataSelectTypeFragment;
-import org.socialcoding.privacyguardian.Fragment.dummy.DataSelectAppContent;
+import org.socialcoding.privacyguardian.Fragment.AppsItem.DataSelectAppContent;
 import org.socialcoding.privacyguardian.R;
 
 import java.util.Calendar;
+import org.socialcoding.privacyguardian.Inteface.DataSelectActivityInterFaces.*;
 
 public class DataSelectActivity extends AppCompatActivity
-    implements DataSelectAppFragment.OnAppSelectionChangedListener,
-    DataSelectDateFragment.OnDateSelectionChangedListener,
-        DataSelectTypeFragment.OnTypeSelectionChangedListener {
+    implements OnAppSelectionInteractionListener, OnDateSelectionChangedListener,
+        OnTypeSelectionChangedListener {
     private static final int APP_SELECT_COLUMN = 3;
-    public static String[] appsList;
+    private AppInfoCache mAppInfo;
 
-    private String selectedApp = "";
-    private Calendar selectedStartDate = null;
-    private Calendar selectedEndDate = null;
-    private String selectedType = "";
+    private String selectedApp = "*";
+    private Calendar selectedStartDate = Calendar.getInstance();
+    private Calendar selectedEndDate = Calendar.getInstance();
+    private String selectedType = "*";
+
+    public static String[] appsList;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -54,6 +57,10 @@ public class DataSelectActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //create appInfoCache
+        mAppInfo = new AppInfoCache(getApplicationContext());
+
         setContentView(R.layout.activity_dataselect);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -72,23 +79,10 @@ public class DataSelectActivity extends AppCompatActivity
 
         Intent intent = getIntent();
         appsList = intent.getStringArrayExtra(MainActivity.APPS_LIST);
-
+        selectedStartDate.setTimeInMillis(selectedStartDate.getTime().getTime() - 1000 * 60 * 60 * 24 * 7);
     }
 
     public void setFilter(View view){
-        //TODO: send work argument to main activity and return to main activity
-        if(selectedApp.compareTo("") == 0){
-            Toast.makeText(getApplicationContext(), "앱을 선택해 주세요", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if(selectedStartDate == null || selectedEndDate == null){
-            Toast.makeText(getApplicationContext(), "날짜를 선택해 주세요", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if(selectedType.compareTo("") == 0){
-            Toast.makeText(getApplicationContext(), "타입을 선택해 주세요", Toast.LENGTH_SHORT).show();
-            return;
-        }
         Intent data = new Intent();
         data.putExtra("app", selectedApp);
         data.putExtra("date_start", selectedStartDate.getTimeInMillis());
@@ -125,6 +119,11 @@ public class DataSelectActivity extends AppCompatActivity
     public void onAppSelectionChanged(DataSelectAppContent.AppsItem item) {
         Log.d("onAppSelectionChanged", "App selected");
         selectedApp = item.content;
+    }
+
+    @Override
+    public AppInfoCache onAppCacheDemanded() {
+        return mAppInfo;
     }
 
     @Override
@@ -165,7 +164,7 @@ public class DataSelectActivity extends AppCompatActivity
                 case 2:
                     return DataSelectTypeFragment.newInstance("", "");
                 default:
-                    return DataSelectDateFragment.newInstance("", "");
+                    return DataSelectDateFragment.newInstance(selectedStartDate.getTimeInMillis(), selectedEndDate.getTimeInMillis());
             }
         }
 

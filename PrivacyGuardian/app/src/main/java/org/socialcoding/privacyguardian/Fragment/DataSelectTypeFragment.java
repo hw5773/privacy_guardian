@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import org.socialcoding.privacyguardian.R;
+import org.socialcoding.privacyguardian.Inteface.DataSelectActivityInterFaces.OnTypeSelectionChangedListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -69,7 +70,6 @@ public class DataSelectTypeFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_data_select_type, container, false);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onContactButtonPressed() {
         if (mListener != null) {
             mListener.onTypeSelectionChanged("contact");
@@ -101,7 +101,6 @@ public class DataSelectTypeFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        //super.onViewCreated(view, savedInstanceState);
         ImageView buttonContact = (ImageView) view.findViewById(R.id.image_view_type_contact);
         buttonContact.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -119,17 +118,4 @@ public class DataSelectTypeFragment extends Fragment {
         });
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnTypeSelectionChangedListener {
-        void onTypeSelectionChanged(String type);
-    }
 }

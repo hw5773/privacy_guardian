@@ -4,17 +4,25 @@ xmlns:tools="http://schemas.android.com/tools"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
 tools:context="org.socialcoding.privacyguardian.Fragment.DataSelectAppFragment">
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/ds_select_app"/>
+        android:layout_height="wrap_content">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/ds_applist"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        tools:listitem="@layout/fragment_item" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ds_select_app"
+            android:id="@+id/ds_text" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/ds_applist"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_below="@+id/ds_text"
+            tools:listitem="@layout/fragment_item" />
+    </RelativeLayout>
+
 
 </FrameLayout>

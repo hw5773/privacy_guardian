@@ -13,15 +13,21 @@ import java.util.HashMap;
  * Created by disxc on 2017-02-28.
  */
 public class AppInfoCache {
-    Context ctx;
-    PackageManager pm;
-    HashMap<String, String> nameCache;
-    HashMap<String, Drawable> iconCache;
+    private Context ctx;
+    private PackageManager pm;
+    private HashMap<String, String> nameCache;
+    private HashMap<String, Drawable> iconCache;
+    private Drawable defaultIcon;
+
     public AppInfoCache(Context context){
         ctx = context;
         pm = context.getPackageManager();
         nameCache = new HashMap<>();
         iconCache = new HashMap<>();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            defaultIcon = ctx.getDrawable(android.R.drawable.sym_def_app_icon);
+        else
+            defaultIcon = ctx.getResources().getDrawable(android.R.drawable.sym_def_app_icon);
     }
 
     public String getAppName(String packageName){
@@ -48,10 +54,7 @@ public class AppInfoCache {
                 icon = pm.getApplicationIcon(packageName);
             } catch (PackageManager.NameNotFoundException e) {
                 Log.d("AppInfoCache", "No icon for such package: " + packageName);
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    icon = ctx.getDrawable(android.R.drawable.sym_def_app_icon);
-                else
-                    icon = ctx.getResources().getDrawable(android.R.drawable.sym_def_app_icon);
+                icon = defaultIcon;
             }
             iconCache.put(packageName, icon);
         }

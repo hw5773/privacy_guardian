@@ -1,6 +1,8 @@
 package org.socialcoding.privacyguardian.Inteface;
 
-import org.socialcoding.privacyguardian.ResultItem;
+import android.support.v4.app.DialogFragment;
+
+import org.socialcoding.privacyguardian.Structs.ResultItem;
 
 import java.util.ArrayList;
 
@@ -11,11 +13,9 @@ import java.util.ArrayList;
 public interface MainActivityInterfaces {
     interface OnAnalyzeInteractionListener {
         void onAnalyzePressed();
-        void onSamplePayloadPressed(int index);
         void onClearDBPressed();
         ResultItem[] onListRequired();
         void onMapsPressed(ArrayList<ResultItem> arrayList);
-
     }
 
     interface OnFirstpageInteractionListener {
@@ -28,5 +28,9 @@ public interface MainActivityInterfaces {
 
     interface OnGoogleMapsInteractionListener{
         void onbackButtonPressed();
+    }
+  
+    interface DatabaseDialogListener {
+        void onDialogPositiveClick(String packageName, Long time, String ip, String type, String value);
     }
 }

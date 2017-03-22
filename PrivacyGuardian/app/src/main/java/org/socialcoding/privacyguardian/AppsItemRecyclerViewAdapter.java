@@ -1,30 +1,31 @@
-package org.socialcoding.privacyguardian.Fragment;
+package org.socialcoding.privacyguardian;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.socialcoding.privacyguardian.Fragment.DataSelectAppFragment.OnAppSelectionChangedListener;
-import org.socialcoding.privacyguardian.Fragment.dummy.DataSelectAppContent.AppsItem;
-import org.socialcoding.privacyguardian.R;
-
 import java.util.List;
+
+import org.socialcoding.privacyguardian.Fragment.AppsItem.DataSelectAppContent.AppsItem;
+import org.socialcoding.privacyguardian.Inteface.DataSelectActivityInterFaces.OnAppSelectionInteractionListener;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link AppsItem} and makes a call to the
- * specified {@link OnAppSelectionChangedListener}.
+ * specified {@link OnAppSelectionInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
+public class AppsItemRecyclerViewAdapter extends RecyclerView.Adapter<AppsItemRecyclerViewAdapter.ViewHolder> {
 
     private final List<AppsItem> mValues;
-    private final OnAppSelectionChangedListener mListener;
+    private final OnAppSelectionInteractionListener mListener;
 
-    public MyItemRecyclerViewAdapter(List<AppsItem> items, OnAppSelectionChangedListener listener) {
+    public AppsItemRecyclerViewAdapter(List<AppsItem> items, OnAppSelectionInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -39,17 +40,20 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        //holder.mIdView.setText(mValues.get(position).id);
-        holder.mImageView.setImageResource(R.drawable.poro);
+        holder.mImageView.setImageDrawable(mValues.get(position).image);
         holder.mContentView.setText(mValues.get(position).content);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(v.getContext(), holder.mItem.content, Toast.LENGTH_SHORT);
+                //TODO: DO app list changed action.
+                if(!holder.mCheckBox.isChecked()){
+                    holder.mCheckBox.setChecked(true);
+                }
+                else{
+                    holder.mCheckBox.setChecked(false);
+                }
                 if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
                     mListener.onAppSelectionChanged(holder.mItem);
                 }
             }
@@ -66,14 +70,17 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
         //public final TextView mIdView;
         public final TextView mContentView;
         public final ImageView mImageView;
+        public final CheckBox mCheckBox;
         public AppsItem mItem;
+        public boolean isChecked;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             mImageView = (ImageView) view.findViewById(R.id.image);
-            //mIdView = (TextView) view.findViewById(R.id.id);
             mContentView = (TextView) view.findViewById(R.id.content);
+            mCheckBox = (CheckBox) view.findViewById(R.id.app_checkbox);
+            isChecked = false;
         }
 
         @Override
@@ -81,4 +88,5 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
             return super.toString() + " '" + mContentView.getText() + "'";
         }
     }
+
 }
