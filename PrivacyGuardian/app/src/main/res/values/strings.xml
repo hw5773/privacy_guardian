@@ -27,4 +27,12 @@
     <string name="maps">지도</string>
     <string name="back">뒤로 가기</string>
     <string name="notification_title">PrivacyGuradian</string>
+    <string name="add_sample_db">DB추가</string>
+    <string name="add_value">value</string>
+    <string name="add_type">sensitive info type</string>
+    <string name="add_ip">ip</string>
+    <string name="add_time">time as long</string>
+    <string name="add_packagename">packagename</string>
+    <string name="addtodb">DB에 추가</string>
+    <string name="cancel">취소</string>
 </resources>

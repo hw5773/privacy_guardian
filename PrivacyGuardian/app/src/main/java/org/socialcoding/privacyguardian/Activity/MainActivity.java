@@ -11,6 +11,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.Cursor;
@@ -62,7 +63,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements OnFirstpageInteractionListener, OnAnalyzeInteractionListener,
-        OnSettingsInteractionListener, OnCacheMakerInteractionListener {
+        OnSettingsInteractionListener, OnCacheMakerInteractionListener, DatabaseDialogListener {
 
     private static final int NOTIFICATION_ON_DETECTED = 123;
 
@@ -78,14 +79,12 @@ public class MainActivity extends AppCompatActivity
     static final int START_ANALYZE_REQUEST_CODE = 1;
     static final int VPN_ACTIVITY_REQUEST_CODE = 2;
 
+    //Notification Alarming
     private Boolean notificationEnabled = true;
 
-    //VPN MESSEAGING SECTIONS
 
     Messenger mService = null;
     boolean mIsBound;
-
-    //Notification Alarming
 
     private HashMap<String, Integer> detectionHashMap = new HashMap<>();
 
@@ -140,6 +139,8 @@ public class MainActivity extends AppCompatActivity
         mIsBound = false;
         Log.d("service", "unbinding");
     }
+
+    /***** messenger part end *****/
 
 
     @Override
@@ -331,17 +332,13 @@ public class MainActivity extends AppCompatActivity
         return resultItems;
     }
 
+    /***** analyzer fragment interaction *****/
+
     @Override
     public void onAnalyzePressed() {
         if (cm != null && analyzer != null) {
             startAnalyze(cm.getAppsList());
         }
-    }
-
-    @Override
-    public void onSamplePayloadPressed(int index) {
-        if (analyzer != null)
-            analyzer.runSamplePayload(index);
     }
 
     @Override
@@ -374,6 +371,9 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.commit();
     }
 
+
+    /***** CacheMaker interaction *****/
+
     @Override
     public void onCacheMakerCreated(CacheMaker cm, String pm) {
         this.cm = cm;
@@ -385,14 +385,27 @@ public class MainActivity extends AppCompatActivity
                 if (notificationEnabled) {
                     createNotification(packageName);
                 }
-                if (mSectionsPagerAdapter.getCurrentFragment() instanceof AnalyzeFragment) {
-                    Log.d("onLogGenerated", "find success...");
-                } else {
-                    Log.d("onLogGenerated", "failed...");
-                }
-                ((AnalyzeFragment) mSectionsPagerAdapter.getCurrentFragment()).refreshList();
+                refreshResultList();
             }
         });
+    }
+
+    /***** Dialog interaction *****/
+
+    @Override
+    public void onDialogPositiveClick(String packageName, Long time, String ip, String type, String value) {
+        if(analyzer != null){
+            analyzer.log(packageName, time, ip, type, value);
+        }
+    }
+
+
+    private void refreshResultList(){
+        if (mSectionsPagerAdapter.getCurrentFragment() instanceof AnalyzeFragment) {
+            ((AnalyzeFragment) mSectionsPagerAdapter.getCurrentFragment()).refreshList();
+        } else {
+            Log.d("onLogGenerated", "not in fragment_analyze");
+        }
     }
 
     //creates app notifications for a package

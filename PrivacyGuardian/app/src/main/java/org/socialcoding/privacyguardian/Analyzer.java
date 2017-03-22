@@ -142,14 +142,18 @@ public class Analyzer {
         }
     }
 
+    //default log function for logging current time.
     public void log(String packageName, String ip, String type, String value){
-        Calendar c = Calendar.getInstance();
+        log(packageName, Calendar.getInstance().getTime().getTime(), ip, type, value);
+    }
 
+    //default log function for custom time.
+    public void log(String packageName, Long time, String ip, String type, String value){
         SQLiteDatabase db = mDatabase.getWritableDatabase();
         ContentValues values = new ContentValues();
 
         //saves time in milliseconds
-        values.put(DatabaseHelper.LogEntry.COLUMN_DATETIME, c.getTime().getTime());
+        values.put(DatabaseHelper.LogEntry.COLUMN_DATETIME, time);
         values.put(DatabaseHelper.LogEntry.COLUMN_PACKAGE_NAME, packageName);
         values.put(DatabaseHelper.LogEntry.COLUMN_HOST_ADDRESS, ip);
         values.put(DatabaseHelper.LogEntry.COLUMN_DATA_TYPE, type);
