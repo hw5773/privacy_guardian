@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity
     //Notification Alarming
     private Boolean notificationEnabled = true;
 
+    /***** Messenger part start *****/
 
     Messenger mService = null;
     boolean mIsBound;
@@ -356,14 +357,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onBackPressed() {
-        Fragment fragment = new AnalyzeFragment();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_analyze, fragment);
-        fragmentTransaction.commit();
-    }
-
-    @Override
     public void onMapsPressed() {
         Fragment fragment = new GoogleMapsFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -404,8 +397,9 @@ public class MainActivity extends AppCompatActivity
         if (mSectionsPagerAdapter.getCurrentFragment() instanceof AnalyzeFragment) {
             ((AnalyzeFragment) mSectionsPagerAdapter.getCurrentFragment()).refreshList();
         } else {
-            Log.d("onLogGenerated", "not in fragment_analyze");
+            Log.d("refreshResultList", "not in fragment_analyze");
         }
+        Log.d("refreshResultList", "refreshed");
     }
 
     //creates app notifications for a package
