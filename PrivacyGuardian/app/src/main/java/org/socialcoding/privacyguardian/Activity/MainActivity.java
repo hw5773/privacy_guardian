@@ -1,5 +1,7 @@
 package org.socialcoding.privacyguardian.Activity;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ServiceConnection;
@@ -9,6 +11,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,8 +20,8 @@ import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -55,25 +58,16 @@ import org.socialcoding.privacyguardian.VPN.Vpn;
 
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements OnFirstpageInteractionListener, OnAnalyzeInteractionListener,
-        OnSettingsInteractionListener, OnCacheMakerInteractionListener {
+        OnSettingsInteractionListener, OnCacheMakerInteractionListener, DatabaseDialogListener {
 
-    /**
-     * The {@link PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link FragmentStatePagerAdapter}.
-     */
+    private static final int NOTIFICATION_ON_DETECTED = 123;
+
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
     private ViewPager mViewPager;
 
     CacheMaker cm = null;
@@ -85,18 +79,23 @@ public class MainActivity extends AppCompatActivity
     static final int START_ANALYZE_REQUEST_CODE = 1;
     static final int VPN_ACTIVITY_REQUEST_CODE = 2;
 
-    //VPN MESSEAGING SECTIONS
+    //Notification Alarming
+    private Boolean notificationEnabled = true;
+
+    /***** Messenger part start *****/
 
     Messenger mService = null;
     boolean mIsBound;
 
-    class IncomingHandler extends Handler{
+    private HashMap<String, Integer> detectionHashMap = new HashMap<>();
+
+    class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            switch(msg.what){
+            switch (msg.what) {
                 case Vpn.SENDPAYLOAD:
                     Log.d("incoming", "i got packet");
-                    if(analyzer != null){
+                    if (analyzer != null) {
                         Bundle bundle = msg.getData();
                         analyzer.analyze(bundle.getString("packageName"), bundle.getString("payload"));
                     }
@@ -114,7 +113,7 @@ public class MainActivity extends AppCompatActivity
         public void onServiceConnected(ComponentName name, IBinder service) {
             mService = new Messenger(service);
             Log.d("service", "connected");
-            try{
+            try {
                 Message msg = Message.obtain(null, Vpn.REGISTER);
                 msg.replyTo = mMessenger;
                 mService.send(msg);
@@ -130,17 +129,19 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    void doBindService(){
+    void doBindService() {
         bindService(new Intent(this, Vpn.class),
                 mConnection, Context.BIND_AUTO_CREATE);
         mIsBound = true;
         Log.d("service", "binding");
     }
 
-    void doUnbindService(){
+    void doUnbindService() {
         mIsBound = false;
         Log.d("service", "unbinding");
     }
+
+    /***** messenger part end *****/
 
 
     @Override
@@ -164,8 +165,8 @@ public class MainActivity extends AppCompatActivity
         vpnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    if(analyzer == null){
+                if (isChecked) {
+                    if (analyzer == null) {
                         Toast.makeText(getApplicationContext(), "업데이트를 수행해 주세요", Toast.LENGTH_LONG).show();
                         buttonView.setChecked(false);
                         return;
@@ -178,11 +179,10 @@ public class MainActivity extends AppCompatActivity
                         onActivityResult(VPN_ACTIVITY_REQUEST_CODE, RESULT_OK, null);
                     }
 
-                }
-                else{
+                } else {
                     //end VPN Connection
-                    if(mIsBound){
-                        try{
+                    if (mIsBound) {
+                        try {
                             Message msg = Message.obtain(null, Vpn.ENDVPN);
                             mService.send(msg);
                         } catch (RemoteException e) {
@@ -197,17 +197,18 @@ public class MainActivity extends AppCompatActivity
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         mDatabase = new DatabaseHelper(this);
         mAppInfoCache = new AppInfoCache(this);
+
+        //initiate update
+        try {
+            Snackbar.make(findViewById(R.id.container), "업데이트를 시작합니다.", Snackbar.LENGTH_SHORT).show();
+            new CacheMaker(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("init.update", "something Wrong...");
+        }
+
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
     }
@@ -260,7 +261,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         //VPN Service
-        if (requestCode == VPN_ACTIVITY_REQUEST_CODE){
+        if (requestCode == VPN_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Intent intent = new Intent(this, Vpn.class);
                 startService(intent);
@@ -278,16 +279,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    //button when update button pressed
-    public void onUpdateButtonClicked(View v) {
-        try {
-            Snackbar.make(findViewById(R.id.fab), "업데이트를 시작합니다.", Snackbar.LENGTH_SHORT).show();
-            new CacheMaker(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("button", "something Wrong...");
-        }
-    }
 
     //returns array of resultItem that matches with query
     public ResultItem[] getQueryList() {
@@ -342,17 +333,13 @@ public class MainActivity extends AppCompatActivity
         return resultItems;
     }
 
-    @Override
-    public void onAnalyzePressed() {
-        if (cm != null && analyzer != null){
-            startAnalyze(cm.getAppsList());
-        }
-    }
+    /***** analyzer fragment interaction *****/
 
     @Override
-    public void onSamplePayloadPressed(int index) {
-        if (analyzer != null)
-            analyzer.runSamplePayload(index);
+    public void onAnalyzePressed() {
+        if (cm != null && analyzer != null) {
+            startAnalyze(cm.getAppsList());
+        }
     }
 
     @Override
@@ -368,13 +355,7 @@ public class MainActivity extends AppCompatActivity
         }
         return null;
     }
-    @Override
-    public void onBackPressed(){
-        Fragment fragment= new AnalyzeFragment();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_analyze, fragment);
-        fragmentTransaction.commit();
-    }
+
     @Override
     public void onMapsPressed() {
         Fragment fragment = new GoogleMapsFragment();
@@ -383,22 +364,87 @@ public class MainActivity extends AppCompatActivity
         fragmentTransaction.commit();
     }
 
+
+    /***** CacheMaker interaction *****/
+
     @Override
     public void onCacheMakerCreated(CacheMaker cm, String pm) {
         this.cm = cm;
-        Snackbar.make(findViewById(R.id.fab), pm, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(findViewById(R.id.container), pm, Snackbar.LENGTH_SHORT).show();
         analyzer = new Analyzer(cm, getApplicationContext());
-        analyzer.setOnLogGenerated(new Analyzer.onLogGeneratedListener(){
+        analyzer.setOnLogGenerated(new Analyzer.OnAnalyzerInteractionListener() {
             @Override
-            public void onLogGenerated() {
-                if (mSectionsPagerAdapter.getCurrentFragment() instanceof AnalyzeFragment) {
-                    Log.d("onLogGenerated", "find success...");
-                } else {
-                    Log.d("onLogGenerated", "failed...");
+            public void onLogGenerated(String packageName) {
+                if (notificationEnabled) {
+                    createNotification(packageName);
                 }
-                ((AnalyzeFragment) mSectionsPagerAdapter.getCurrentFragment()).refreshList();
+                refreshResultList();
             }
         });
+    }
+
+    /***** Dialog interaction *****/
+
+    @Override
+    public void onDialogPositiveClick(String packageName, Long time, String ip, String type, String value) {
+        if(analyzer != null){
+            analyzer.log(packageName, time, ip, type, value);
+        }
+    }
+
+
+    private void refreshResultList(){
+        if (mSectionsPagerAdapter.getCurrentFragment() instanceof AnalyzeFragment) {
+            ((AnalyzeFragment) mSectionsPagerAdapter.getCurrentFragment()).refreshList();
+        } else {
+            Log.d("refreshResultList", "not in fragment_analyze");
+        }
+        Log.d("refreshResultList", "refreshed");
+    }
+
+    //creates app notifications for a package
+    private void createNotification(String packageName) {
+        Integer pNum = detectionHashMap.get(packageName);
+        if(pNum == null){
+            detectionHashMap.put(packageName, 1);
+            pNum = 1;
+        }
+        else{
+            pNum += 1;
+            detectionHashMap.put(packageName, pNum);
+        }
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.location_icon)
+                        .setContentTitle(getString(R.string.notification_title))
+                        .setContentText("다음 앱에서 " + pNum + "개의 위치정보 전송을 감지\n" + packageName)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setAutoCancel(true);
+
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(this, MainActivity.class);
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(MainActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // mId allows you to update the notification later on.
+        int mId = NOTIFICATION_ON_DETECTED;
+        mNotificationManager.notify(mId, mBuilder.build());
     }
 
 

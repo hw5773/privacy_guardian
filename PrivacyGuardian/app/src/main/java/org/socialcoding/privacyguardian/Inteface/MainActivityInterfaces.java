@@ -1,5 +1,7 @@
 package org.socialcoding.privacyguardian.Inteface;
 
+import android.support.v4.app.DialogFragment;
+
 import org.socialcoding.privacyguardian.Structs.ResultItem;
 
 /**
@@ -9,12 +11,9 @@ import org.socialcoding.privacyguardian.Structs.ResultItem;
 public interface MainActivityInterfaces {
     interface OnAnalyzeInteractionListener {
         void onAnalyzePressed();
-        void onSamplePayloadPressed(int index);
         void onClearDBPressed();
         ResultItem[] onListRequired();
-
         void onMapsPressed();
-
         void onBackPressed();
     }
 
@@ -24,5 +23,9 @@ public interface MainActivityInterfaces {
 
     interface OnSettingsInteractionListener {
         void onSettingsInteraction();
+    }
+
+    interface DatabaseDialogListener {
+        void onDialogPositiveClick(String packageName, Long time, String ip, String type, String value);
     }
 }
