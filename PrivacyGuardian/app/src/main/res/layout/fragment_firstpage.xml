@@ -7,19 +7,43 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp">
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/hello_firstpage" />
-
-        <ImageView
+            android:id="@+id/leftquote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="It's Poro!"
-            android:id="@+id/firstpage_imageView1"
-            app:srcCompat="@drawable/poro" />
+            android:text="“"
+            style="@style/Quotes"/>
+        <TextView
+            android:layout_toRightOf="@+id/leftquote"
+            android:layout_toLeftOf="@+id/rightquote"
+            android:id="@+id/tv_quote"
+            style="@style/Quotes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:text="@string/firstpage_quote" />
+
+        <TextView
+            android:id="@+id/tv_quote2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_quote"
+            android:layout_alignParentRight="true"
+            android:text="@string/firstpage_quote2" />
+
+        <TextView
+            android:id="@+id/rightquote"
+            android:layout_alignParentRight="true"
+            android:layout_above="@id/tv_quote2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="”"
+            style="@style/Quotes"/>
 
     </RelativeLayout>
+
 
 </FrameLayout>
