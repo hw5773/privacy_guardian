@@ -472,8 +472,8 @@ public class MainActivity extends AppCompatActivity
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.location_icon)
-                        .setContentTitle(getString(R.string.notification_title))
-                        .setContentText(pNum + "개의 위치정보 전송을 감지:" + mAppInfoCache.getAppName(packageName))
+                        .setContentTitle(pNum + "개의 위치정보 전송을 감지")
+                        .setContentText(mAppInfoCache.getAppName(packageName))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setAutoCancel(true);
 
