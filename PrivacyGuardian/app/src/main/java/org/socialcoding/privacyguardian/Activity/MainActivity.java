@@ -448,7 +448,7 @@ public class MainActivity extends AppCompatActivity
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.location_icon)
                         .setContentTitle(getString(R.string.notification_title))
-                        .setContentText("다음 앱에서 " + pNum + "개의 위치정보 전송을 감지\n" + packageName)
+                        .setContentText(pNum + "개의 위치정보 전송을 감지:" + packageName)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setAutoCancel(true);
 

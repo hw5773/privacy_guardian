@@ -28,14 +28,13 @@
             android:text="@string/add_sample_db"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/start_analyze"
+            android:layout_toRightOf="@id/maps"
             android:id="@+id/button_add_to_db"/>
 
         <Button
             android:text="@string/analyze_clearDB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/start_analyze"
             android:layout_toRightOf="@+id/button_add_to_db"
             android:id="@+id/button4"
             android:layout_weight="1" />
