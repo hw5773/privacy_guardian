@@ -128,6 +128,9 @@ public class AnalyzeFragment extends Fragment {
     }
 
     public void refreshList() {
+        if(mListener == null){
+            return;
+        }
         ResultItem[] items = mListener.onListRequired();
         LIST_MENU.clear();
         if(items == null){

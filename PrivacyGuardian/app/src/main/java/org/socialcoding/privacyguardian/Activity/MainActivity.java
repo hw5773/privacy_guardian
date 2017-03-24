@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity
     DatabaseHelper mDatabase;
     AppInfoCache mAppInfoCache;
     SwitchCompat mVpnSwitch;
+    private boolean mIsRunning = false;
 
     public static final String APPS_LIST = "AppsList";
     static final int START_ANALYZE_REQUEST_CODE = 1;
@@ -177,13 +178,28 @@ public class MainActivity extends AppCompatActivity
             Log.d("init.update", "something Wrong...");
         }
 
-        //set toggle button event
         mVpnSwitch = (SwitchCompat) findViewById(R.id.vpn_toggle);
+
+        //if vpn is running, set switch to true
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
+            if (Vpn.class.getName().equals(service.service.getClassName())){
+                Log.d("onCreate", "service found");
+                mIsRunning = true;
+                doBindService();
+                mVpnSwitch.setChecked(true);
+            }
+        }
+
+        //set toggle button event
         mVpnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 Log.d("check", "changed to state:" + isChecked);
                 if (isChecked) {
+                    if (mIsRunning){
+                        return;
+                    }
                     if (analyzer == null) {
                         Toast.makeText(getApplicationContext(), "업데이트를 수행해 주세요", Toast.LENGTH_LONG).show();
                         buttonView.setChecked(false);
@@ -206,6 +222,7 @@ public class MainActivity extends AppCompatActivity
                         } catch (RemoteException e) {
                             e.printStackTrace();
                         }
+                        mIsRunning = false;
                         doUnbindService();
                     }
                 }
@@ -425,16 +442,6 @@ public class MainActivity extends AppCompatActivity
                 refreshResultList();
             }
         });
-
-        //if vpn is running, set switch to true
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
-            if (Vpn.class.getName().equals(service.service.getClassName())){
-                Log.d("onCreate", "service found");
-                doBindService();
-                mVpnSwitch.setChecked(true);
-            }
-        }
     }
 
     /***** Dialog interaction *****/
