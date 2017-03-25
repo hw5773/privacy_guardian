@@ -190,6 +190,7 @@ public class MainActivity extends AppCompatActivity
                 mVpnSwitch.setChecked(true);
             }
         }
+        Log.d("onCreate", "service running:" + mIsRunning);
 
         //set toggle button event
         mVpnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -224,6 +225,7 @@ public class MainActivity extends AppCompatActivity
                         }
                         mIsRunning = false;
                         doUnbindService();
+                        stopService(new Intent(getApplicationContext(), Vpn.class));
                     }
                 }
             }
@@ -304,6 +306,7 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = new Intent(this, Vpn.class);
                 startService(intent);
                 doBindService();
+                Log.d("onActivityResult", "service running start");
             }
         }
     }

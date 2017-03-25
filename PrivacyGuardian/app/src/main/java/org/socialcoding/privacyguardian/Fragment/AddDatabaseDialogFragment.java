@@ -40,7 +40,7 @@ public class AddDatabaseDialogFragment extends DialogFragment {
         mValue = (EditText) view.findViewById(R.id.add_value);
 
 
-        mPackage.setText("com.example.app");
+        mPackage.setText("org.locationprivacy.locationprivacy");
         mTime.setText(Long.valueOf(Calendar.getInstance().getTime().getTime()).toString());
         mIp.setText("127.0.0.1");
         mType.setText(SensitiveInfoTypes.TYPE_LOCATION_LATLNG);
