@@ -44,7 +44,7 @@ import org.socialcoding.privacyguardian.AppInfoCache;
 import org.socialcoding.privacyguardian.CacheMaker;
 import org.socialcoding.privacyguardian.DatabaseHelper;
 import org.socialcoding.privacyguardian.Fragment.AnalyzeFragment;
-import org.socialcoding.privacyguardian.Fragment.FirstpageFragment;
+import org.socialcoding.privacyguardian.Fragment.FeedbackFragment;
 import org.socialcoding.privacyguardian.Fragment.GoogleMapsFragment;
 import org.socialcoding.privacyguardian.Fragment.SettingsFragment;
 import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.*;
@@ -544,7 +544,7 @@ public class MainActivity extends AppCompatActivity
             //return PlaceholderFragment.newInstance(position + 1);
             switch (position) {
                 case 0:
-                    return FirstpageFragment.newInstance("1", "2");
+                    return FeedbackFragment.newInstance("1", "2");
                 case 1:
                     return AnalyzeFragment.newInstance();
                 default:
@@ -566,7 +566,7 @@ public class MainActivity extends AppCompatActivity
                 case 1:
                     return "분석";
                 case 2:
-                    return "설정";
+                    return "피드백";
             }
             return null;
         }
