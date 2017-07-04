@@ -17,4 +17,13 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="Quotes" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">18sp</item>
+
+    </style>
+
+    <style name="Firstpage_hello">
+        <item name="android:textSize">36sp</item>
+    </style>
+
 </resources>

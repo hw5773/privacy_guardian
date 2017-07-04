@@ -56,11 +56,12 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-            if(getArguments() != null){
-                    //coordinates are saved as string "123.456;78.91234"
-                    coordinates = getArguments().getStringArrayList(ARG_LAT_LANG);
-            }
-        else Log.d("VpnService","no args");
+        if(getArguments() != null){
+                //coordinates are saved as string "123.456;78.91234"
+                coordinates = getArguments().getStringArrayList(ARG_LAT_LANG);
+        }
+        else
+            Log.d("VpnService","no args");
 
     }
 
@@ -96,6 +97,7 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
                     // googleMap.setMyLocationEnabled(true);
                     int length = coordinates.size();
                     LatLng latLng = new LatLng(0,0);
+                    LatLng first = null;
                     for (int i=0;i< length ;i++) {
                         //For dropping a marker at a point on the Map
                         String[] tmpArray;
@@ -106,12 +108,14 @@ public class GoogleMapsFragment extends Fragment implements OnMapReadyCallback{
                         double lng = Double.parseDouble(tmpArray[1]);
                         //sumlng += lng;
                         latLng = new LatLng(lang,lng);
+                        if(first == null)
+                            first = latLng;
                         googleMap.addMarker(new MarkerOptions().position(latLng).title("Marker Title").snippet("Marker Description"));
                     }
                     if(length==0){System.out.print("??"); return;}
                     //LatLng cameraCenter= new LatLng(sumlang/length,sumlng/length);
                     //For zooming automatically to the location of the marker
-                    CameraPosition cameraPosition = new CameraPosition.Builder().target(latLng).zoom(17).build();
+                    CameraPosition cameraPosition = new CameraPosition.Builder().target(first).zoom(17).build();
                     googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
             }

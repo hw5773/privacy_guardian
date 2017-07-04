@@ -1,5 +1,6 @@
 package org.socialcoding.privacyguardian.Activity;
 
+import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -11,14 +12,12 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -35,7 +34,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Toast;
@@ -60,7 +58,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 import static org.socialcoding.privacyguardian.Structs.SensitiveInfoTypes.TYPE_LOCATION_LATLNG;
 
@@ -70,6 +67,7 @@ public class MainActivity extends AppCompatActivity
 
 
     private static final int NOTIFICATION_ON_DETECTED = 123;
+    private static final String GET_TO_ANALYZE_FRAGMENT = "FRAGGOGO";
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
@@ -78,6 +76,8 @@ public class MainActivity extends AppCompatActivity
     Analyzer analyzer = null;
     DatabaseHelper mDatabase;
     AppInfoCache mAppInfoCache;
+    SwitchCompat mVpnSwitch;
+    private boolean mIsRunning = false;
 
     public static final String APPS_LIST = "AppsList";
     static final int START_ANALYZE_REQUEST_CODE = 1;
@@ -143,7 +143,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     void doUnbindService() {
-        mIsBound = false;
+        if(mIsBound) {
+            unbindService(mConnection);
+            mIsBound = false;
+        }
         Log.d("service", "unbinding");
     }
 
@@ -166,12 +169,38 @@ public class MainActivity extends AppCompatActivity
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        //initiate update
+        try {
+            Snackbar.make(findViewById(R.id.container), "업데이트를 시작합니다.", Snackbar.LENGTH_SHORT).show();
+            new CacheMaker(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("init.update", "something Wrong...");
+        }
+
+        mVpnSwitch = (SwitchCompat) findViewById(R.id.vpn_toggle);
+
+        //if vpn is running, set switch to true
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
+            if (Vpn.class.getName().equals(service.service.getClassName())){
+                Log.d("onCreate", "service found");
+                mIsRunning = true;
+                doBindService();
+                mVpnSwitch.setChecked(true);
+            }
+        }
+        Log.d("onCreate", "service running:" + mIsRunning);
+
         //set toggle button event
-        SwitchCompat vpnSwitch = (SwitchCompat) findViewById(R.id.vpn_toggle);
-        vpnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mVpnSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.d("check", "changed to state:" + isChecked);
                 if (isChecked) {
+                    if (mIsRunning){
+                        return;
+                    }
                     if (analyzer == null) {
                         Toast.makeText(getApplicationContext(), "업데이트를 수행해 주세요", Toast.LENGTH_LONG).show();
                         buttonView.setChecked(false);
@@ -194,7 +223,9 @@ public class MainActivity extends AppCompatActivity
                         } catch (RemoteException e) {
                             e.printStackTrace();
                         }
+                        mIsRunning = false;
                         doUnbindService();
+                        stopService(new Intent(getApplicationContext(), Vpn.class));
                     }
                 }
             }
@@ -206,19 +237,22 @@ public class MainActivity extends AppCompatActivity
         mDatabase = new DatabaseHelper(this);
         mAppInfoCache = new AppInfoCache(this);
 
-        //initiate update
-        try {
-            Snackbar.make(findViewById(R.id.container), "업데이트를 시작합니다.", Snackbar.LENGTH_SHORT).show();
-            new CacheMaker(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("init.update", "something Wrong...");
+        //goto analyzer if notification called
+        Boolean menu = getIntent().getBooleanExtra(GET_TO_ANALYZE_FRAGMENT, false);
+        if(menu){
+            mViewPager.setCurrentItem(1);
         }
+
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
     }
 
+    @Override
+    protected void onDestroy() {
+        doUnbindService();
+        super.onDestroy();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -272,6 +306,7 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = new Intent(this, Vpn.class);
                 startService(intent);
                 doBindService();
+                Log.d("onActivityResult", "service running start");
             }
         }
     }
@@ -447,14 +482,14 @@ public class MainActivity extends AppCompatActivity
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.location_icon)
-                        .setContentTitle(getString(R.string.notification_title))
-                        .setContentText("다음 앱에서 " + pNum + "개의 위치정보 전송을 감지\n" + packageName)
+                        .setContentTitle(pNum + "개의 위치정보 전송을 감지")
+                        .setContentText(mAppInfoCache.getAppName(packageName))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setAutoCancel(true);
 
         // Creates an explicit intent for an Activity in your app
         Intent resultIntent = new Intent(this, MainActivity.class);
-
+        resultIntent.putExtra(GET_TO_ANALYZE_FRAGMENT, true);
         // The stack builder object will contain an artificial back stack for the
         // started Activity.
         // This ensures that navigating backward from the Activity leads out of
@@ -475,6 +510,7 @@ public class MainActivity extends AppCompatActivity
         // mId allows you to update the notification later on.
         int mId = NOTIFICATION_ON_DETECTED;
         mNotificationManager.notify(mId, mBuilder.build());
+
     }
 
 
