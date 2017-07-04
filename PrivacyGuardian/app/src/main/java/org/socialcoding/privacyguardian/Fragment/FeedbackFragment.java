@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.OnFirstpageInteractionListener;
 import org.socialcoding.privacyguardian.R;
@@ -17,10 +16,10 @@ import org.socialcoding.privacyguardian.R;
  * Activities that contain this fragment must implement the
  * {@link OnFirstpageInteractionListener} interface
  * to handle interaction events.
- * Use the {@link FirstpageFragment#newInstance} factory method to
+ * Use the {@link FeedbackFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FirstpageFragment extends Fragment {
+public class FeedbackFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -32,7 +31,7 @@ public class FirstpageFragment extends Fragment {
 
     private OnFirstpageInteractionListener mListener;
 
-    public FirstpageFragment() {
+    public FeedbackFragment() {
         // Required empty public constructor
     }
 
@@ -42,11 +41,11 @@ public class FirstpageFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment FirstpageFragment.
+     * @return A new instance of fragment FeedbackFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static FirstpageFragment newInstance(String param1, String param2) {
-        FirstpageFragment fragment = new FirstpageFragment();
+    public static FeedbackFragment newInstance(String param1, String param2) {
+        FeedbackFragment fragment = new FeedbackFragment();
         /*
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
