@@ -39,8 +39,7 @@ public class SocketManager implements SocketManagerAPI {
     private int IP_HEADER_LENGTH = 20;
     private int TCP_HEADER_LENGTH = 20;
     private int UDP_HEADER_LENGTH = 8;
-    private int IP_HEADER_LENGTH_MAX_SIZE = 65536;
-    private int MAX_BYTES = 2048;
+    private int MAX_BYTES = 1460;
     private int TIMING = 5;
 
     public SocketManager() {
@@ -93,23 +92,41 @@ public class SocketManager implements SocketManagerAPI {
                                     System.out.println("Let's read the Response");
                                     while (true) {
                                         recv = socket.read(buf);
-                                        if (bytes > 0 && recv == -1)
-                                            break;
-                                        else if (recv != -1)
-                                            bytes += recv;
-                                    }
-                                    System.out.println("Received " + bytes + " TCP bytes.");
-                                    byte[] msg = new byte[bytes];
-                                    System.arraycopy(buf.array(), 0, msg, 0, bytes);
+                                        System.out.println("bytes: " + bytes + ", recv: " + recv);
+                                        Thread.sleep(3000);
 
-                                    // TODO: Need to implement the fragmentation.
-                                    byte[] packet = makeTCPPacket(msg, socket.socket(), 1);
-                                    addMessage(packet);
-                                    tcpInfo.get(socket).setSeqNum(bytes);
+                                        if (recv == -1) {
+                                            System.out.println("Find EOF from the READ socket");
+                                            break;
+                                        } else if (bytes == 0 && recv == 0)
+                                            break;
+                                        else
+                                            bytes += recv;
+
+                                        if (bytes > 0) {
+                                            System.out.println("Received " + bytes + " TCP bytes.");
+                                            byte[] msg = new byte[bytes];
+                                            System.arraycopy(buf.array(), 0, msg, 0, bytes);
+                                            buf.clear();
+                                            byte[] packet = makeTCPPacket(msg, socket.socket(), 1);
+                                            addMessage(packet);
+                                            tcpInfo.get(socket).setSeqNum(bytes);
+                                            bytes = 0;
+                                        }
+                                    }
+
+                                    if (bytes > 0) {
+                                        System.out.println("Received " + bytes + " TCP bytes.");
+                                        byte[] msg = new byte[bytes];
+                                        System.arraycopy(buf.array(), 0, msg, 0, bytes);
+                                        byte[] packet = makeTCPPacket(msg, socket.socket(), 1);
+                                        addMessage(packet);
+                                        tcpInfo.get(socket).setSeqNum(bytes);
+                                    }
 
                                     // Generate FIN packet
                                     byte[] fin = makeTCPPacket(null, socket.socket(), 2);
-                                    addMessage(packet);
+                                    addMessage(fin);
                                 }
                             }
                         } catch (IOException e) {
