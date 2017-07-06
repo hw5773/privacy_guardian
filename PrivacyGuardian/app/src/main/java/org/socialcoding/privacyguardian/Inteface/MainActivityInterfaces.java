@@ -22,8 +22,8 @@ public interface MainActivityInterfaces {
         void onFirstpageInteraction();
     }
 
-    interface OnSettingsInteractionListener {
-        void onSettingsInteraction();
+    interface OnFeedbackInteractionListener {
+        void onFeedbackInteraction();
     }
 
     interface OnGoogleMapsInteractionListener{
