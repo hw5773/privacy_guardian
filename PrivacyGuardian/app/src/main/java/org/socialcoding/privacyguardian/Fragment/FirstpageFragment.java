@@ -1,42 +1,37 @@
 package org.socialcoding.privacyguardian.Fragment;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.OnSettingsInteractionListener;
+import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.OnFirstpageInteractionListener;
 import org.socialcoding.privacyguardian.R;
-import com.google.android.gms.plus.PlusOneButton;
 
 /**
- * A fragment with a Google +1 button.
+ * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link OnSettingsInteractionListener} interface
+ * {@link OnFirstpageInteractionListener} interface
  * to handle interaction events.
- * Use the {@link SettingsFragment#newInstance} factory method to
+ * Use the {@link FirstpageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SettingsFragment extends Fragment {
+public class FirstpageFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    // The request code must be 0 or greater.
-    private static final int PLUS_ONE_REQUEST_CODE = 0;
-    // The URL to +1.  Must be a valid URL.
-    private final String PLUS_ONE_URL = "http://developer.android.com";
+
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private PlusOneButton mPlusOneButton;
 
-    private OnSettingsInteractionListener mListener;
+    private OnFirstpageInteractionListener mListener;
 
-    public SettingsFragment() {
+    public FirstpageFragment() {
         // Required empty public constructor
     }
 
@@ -44,11 +39,13 @@ public class SettingsFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment SettingsFragment.
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment FirstpageFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static SettingsFragment newInstance() {
-        SettingsFragment fragment = new SettingsFragment();
+    public static FirstpageFragment newInstance(String param1, String param2) {
+        FirstpageFragment fragment = new FirstpageFragment();
         /*
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -70,38 +67,31 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_settings, container, false);
-
-        //Find the +1 button
-        //mPlusOneButton = (PlusOneButton) view.findViewById(R.id.plus_one_button);
-
-        return view;
+        return inflater.inflate(R.layout.fragment_firstpage, container, false);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
 
-        // Refresh the state of the +1 button each time the activity receives focus.
-        //mPlusOneButton.initialize(PLUS_ONE_URL, PLUS_ONE_REQUEST_CODE);
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
+    public void onVPNButtonPressed() {
         if (mListener != null) {
-            mListener.onSettingsInteraction();
+            mListener.onFirstpageInteraction();
         }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnSettingsInteractionListener) {
-            mListener = (OnSettingsInteractionListener) context;
+        if (context instanceof OnFirstpageInteractionListener) {
+            mListener = (OnFirstpageInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnSettingsInteractionListener");
+                    + " must implement OnFirstpageInteractionListener");
         }
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
     }
 
     @Override
@@ -109,4 +99,5 @@ public class SettingsFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
 }

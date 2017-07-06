@@ -44,9 +44,9 @@ import org.socialcoding.privacyguardian.AppInfoCache;
 import org.socialcoding.privacyguardian.CacheMaker;
 import org.socialcoding.privacyguardian.DatabaseHelper;
 import org.socialcoding.privacyguardian.Fragment.AnalyzeFragment;
-import org.socialcoding.privacyguardian.Fragment.FeedbackFragment;
+import org.socialcoding.privacyguardian.Fragment.FirstpageFragment;
 import org.socialcoding.privacyguardian.Fragment.GoogleMapsFragment;
-import org.socialcoding.privacyguardian.Fragment.SettingsFragment;
+import org.socialcoding.privacyguardian.Fragment.FeedbackFragment;
 import org.socialcoding.privacyguardian.Inteface.MainActivityInterfaces.*;
 import org.socialcoding.privacyguardian.Inteface.OnCacheMakerInteractionListener;
 import org.socialcoding.privacyguardian.R;
@@ -63,7 +63,7 @@ import static org.socialcoding.privacyguardian.Structs.SensitiveInfoTypes.TYPE_L
 
 public class MainActivity extends AppCompatActivity
         implements OnFirstpageInteractionListener, OnAnalyzeInteractionListener,
-        OnSettingsInteractionListener, OnCacheMakerInteractionListener, DatabaseDialogListener, OnGoogleMapsInteractionListener {
+        OnFeedbackInteractionListener, OnCacheMakerInteractionListener, DatabaseDialogListener, OnGoogleMapsInteractionListener {
 
 
     private static final int NOTIFICATION_ON_DETECTED = 123;
@@ -316,7 +316,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public void onSettingsInteraction() {
+    public void onFeedbackInteraction() {
 
     }
 
@@ -544,11 +544,11 @@ public class MainActivity extends AppCompatActivity
             //return PlaceholderFragment.newInstance(position + 1);
             switch (position) {
                 case 0:
-                    return FeedbackFragment.newInstance("1", "2");
+                    return FirstpageFragment.newInstance("1", "2");
                 case 1:
                     return AnalyzeFragment.newInstance();
                 default:
-                    return SettingsFragment.newInstance();
+                    return FeedbackFragment.newInstance();
             }
         }
 
@@ -564,7 +564,7 @@ public class MainActivity extends AppCompatActivity
                 case 0:
                     return "첫 페이지";
                 case 1:
-                    return "분석";
+                    return "기록";
                 case 2:
                     return "피드백";
             }
