@@ -182,7 +182,12 @@ public class Vpn extends VpnService {
                 protect(channel.socket());
                 System.out.println("SYN- Seq from Client: " + tcpHeader.getSequenceNumber() + " " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort());
                 tcpHeader.setAckNumber(makingSeqnum());
-                sm.addTCPSocket(channel, ipHeader, tcpHeader);
+
+                if (tcpHeader.getDestPort() == 443) {
+                    sm.addTLSSocket(channel, ipHeader, tcpHeader);
+                } else {
+                    sm.addTCPSocket(channel, ipHeader, tcpHeader);
+                }
                 processTCPHandshake(in, out, ipHeader, tcpHeader);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -194,9 +199,11 @@ public class Vpn extends VpnService {
             sm.delSocket(true, ipHeader.getSourceIP(), tcpHeader.getSourcePort());
         } else if (tcpHeader.getAck() && tcpHeader.getPayloadLength() == 0) {
             if (tcpHeader.getDestPort() == 443) {
-                System.out.println("This is TLS. Now RST.");
-                byte[] outPacket = changeDestSrc(tcpHeader, ipHeader, tcpHeader.getPayload(), ipHeader.getSourceIP(), ipHeader.getDestIP(), tcpHeader.getSourcePort(), tcpHeader.getDestPort(), tcpHeader.getSequenceNumber(), tcpHeader.getAckNumber(), "");
+                System.out.println("This is TLS. Now Start TLS Handshake.");
+                processTLSHandshake(in, out, ipHeader, tcpHeader);
+                //byte[] outPacket = changeDestSrc(tcpHeader, ipHeader, tcpHeader.getPayload(), ipHeader.getSourceIP(), ipHeader.getDestIP(), tcpHeader.getSourcePort(), tcpHeader.getDestPort(), tcpHeader.getSequenceNumber(), tcpHeader.getAckNumber(), "");
             }
+
 
             System.out.println("Flags from " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort() + ": " + tcpHeader.getFlag());
             System.out.println("ACK- TCP handshake complete");
@@ -255,7 +262,6 @@ public class Vpn extends VpnService {
         String destIP = ipHeader.getDestIP();
         int sPort = tcpHeader.getSourcePort();
         int dPort = tcpHeader.getDestPort();
-        int headerLength = tcpHeader.getHeaderLength();
         long seqNum = tcpHeader.getSequenceNumber();
         long ackNum = tcpHeader.getAckNumber();
 
@@ -276,6 +282,10 @@ public class Vpn extends VpnService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void processTLSHandshake(FileInputStream in, FileOutputStream out, IPHeader ipHeader, TCPHeader tcpHeader) {
+
     }
 
     private void processFINHandshake(FileInputStream in, FileOutputStream out, IPHeader ipHeader, TCPHeader tcpHeader) {
