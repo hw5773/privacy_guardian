@@ -126,8 +126,12 @@ public class SocketManager implements SocketManagerAPI {
                                     }
 
                                     // Generate FIN packet
-                                    byte[] fin = makeTCPPacket(null, socket.socket(), 2);
-                                    addMessage(fin);
+                                    if (!socket.isOpen()) {
+                                        System.out.println("Send the FIN packet to " + socket.socket().getInetAddress() + ":" + socket.socket().getPort());
+                                        byte[] fin = makeTCPPacket(null, socket.socket(), 2);
+                                        addMessage(fin);
+                                        Thread.sleep(10000);
+                                    }
                                 }
                             }
                         } catch (IOException e) {

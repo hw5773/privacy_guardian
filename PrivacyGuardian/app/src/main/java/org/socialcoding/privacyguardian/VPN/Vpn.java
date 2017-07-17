@@ -184,7 +184,7 @@ public class Vpn extends VpnService {
                 tcpHeader.setAckNumber(makingSeqnum());
 
                 if (tcpHeader.getDestPort() == 443) {
-                    sm.addTLSSocket(channel, ipHeader, tcpHeader);
+                    // TODO: sm.addTLSSocket(channel, ipHeader, tcpHeader);
                 } else {
                     sm.addTCPSocket(channel, ipHeader, tcpHeader);
                 }
@@ -200,10 +200,11 @@ public class Vpn extends VpnService {
         } else if (tcpHeader.getAck() && tcpHeader.getPayloadLength() == 0) {
             if (tcpHeader.getDestPort() == 443) {
                 System.out.println("This is TLS. Now Start TLS Handshake.");
-                processTLSHandshake(in, out, ipHeader, tcpHeader);
+                // TODO: SecurityParameter sp;
+                // TODO: sp = processTLSHandshake(in, out, ipHeader, tcpHeader);
+                // TODO: updateTLSSocket(channel, sp);
                 //byte[] outPacket = changeDestSrc(tcpHeader, ipHeader, tcpHeader.getPayload(), ipHeader.getSourceIP(), ipHeader.getDestIP(), tcpHeader.getSourcePort(), tcpHeader.getDestPort(), tcpHeader.getSequenceNumber(), tcpHeader.getAckNumber(), "");
             }
-
 
             System.out.println("Flags from " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort() + ": " + tcpHeader.getFlag());
             System.out.println("ACK- TCP handshake complete");
