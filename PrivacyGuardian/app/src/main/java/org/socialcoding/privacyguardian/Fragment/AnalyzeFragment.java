@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -61,6 +62,8 @@ public class AnalyzeFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        /* TODO: move this to configuration */
+        /*
         Button addDBButton = (Button) view.findViewById(R.id.button_add_to_db);
         addDBButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,9 +78,9 @@ public class AnalyzeFragment extends Fragment {
             public void onClick(View v) {
                 onClearDBButtonPressed();
             }
-        });
+        }); */
 
-        Button buttonStartAnalyze = (Button) view.findViewById(R.id.start_analyze);
+        FloatingActionButton buttonStartAnalyze = (FloatingActionButton) view.findViewById(R.id.fab_filter);
         buttonStartAnalyze.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,7 +89,7 @@ public class AnalyzeFragment extends Fragment {
         });
 
 
-        Button buttonGoogleMaps = (Button) view.findViewById(R.id.maps);
+        FloatingActionButton buttonGoogleMaps = (FloatingActionButton) view.findViewById(R.id.fab_map);
         buttonGoogleMaps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
