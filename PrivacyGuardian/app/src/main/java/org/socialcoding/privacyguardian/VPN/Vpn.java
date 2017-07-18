@@ -164,14 +164,8 @@ public class Vpn extends VpnService {
         return START_STICKY;
     }
 
-
-
     private int getIhl(byte[] packet) {
         return (packet[0] & 0xf) * 4;
-    }
-
-    private void processICMPPacket(FileOutputStream out, IPHeader ipHeader, ICMPHeader icmpHeader) {
-
     }
 
     private void processTCPPacket(FileInputStream in, FileOutputStream out, SocketManager sm, IPHeader ipHeader, TCPHeader tcpHeader) {
@@ -286,7 +280,7 @@ public class Vpn extends VpnService {
     }
 
     private void processTLSHandshake(FileInputStream in, FileOutputStream out, IPHeader ipHeader, TCPHeader tcpHeader) {
-
+        Log.d("PG", "in processTLSHandshake");
     }
 
     private void processFINHandshake(FileInputStream in, FileOutputStream out, IPHeader ipHeader, TCPHeader tcpHeader) {
