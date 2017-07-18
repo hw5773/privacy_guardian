@@ -481,7 +481,7 @@ public class MainActivity extends AppCompatActivity
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.location_icon)
+                        .setSmallIcon(R.drawable.icon_location)
                         .setContentTitle(pNum + "개의 위치정보 전송을 감지")
                         .setContentText(mAppInfoCache.getAppName(packageName))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)

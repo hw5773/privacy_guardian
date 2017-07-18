@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="type:location"
             android:id="@+id/image_view_type_location"
-            app:srcCompat="@drawable/location_icon"
+            app:srcCompat="@drawable/icon_location"
             android:padding="14dp"/>
 
         <ImageView
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="type:contact"
             android:id="@+id/image_view_type_contact"
-            app:srcCompat="@drawable/contact_icon"
+            app:srcCompat="@drawable/icon_contact"
             android:padding="14dp"/>
     </LinearLayout>
 

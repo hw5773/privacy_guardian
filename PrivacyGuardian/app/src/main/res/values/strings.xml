@@ -37,4 +37,5 @@
     <string name="cancel">취소</string>
     <string name="firstpage_quote">자신에 관한 정보가 언제 누구에게  어느 범위까지 알려지고 또 이용되도록 할 것인지를  그 정보주체가 스스로 결정할 수 있는 권리</string>
     <string name="firstpage_quote2">\'개인정보 자기결정권\'의 정의, 헌법재판소(2005)</string>
+    <string name="empty_result">결과가 없습니다.</string>
 </resources>

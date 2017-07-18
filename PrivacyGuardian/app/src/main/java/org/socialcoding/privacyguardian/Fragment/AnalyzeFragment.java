@@ -2,11 +2,15 @@ package org.socialcoding.privacyguardian.Fragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -88,7 +92,6 @@ public class AnalyzeFragment extends Fragment {
             }
         });
 
-
         FloatingActionButton buttonGoogleMaps = (FloatingActionButton) view.findViewById(R.id.fab_map);
         buttonGoogleMaps.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,6 +104,7 @@ public class AnalyzeFragment extends Fragment {
         arrayAdapter = new ResultAdapter(getContext(), R.layout.result_list_item, LIST_MENU);
         listView = (ListView) view.findViewById(R.id.listview1);
         listView.setAdapter(arrayAdapter);
+        listView.setEmptyView(view.findViewById(R.id.text_empty));
         refreshList();
     }
 
