@@ -54,7 +54,7 @@ public class AppsItemRecyclerViewAdapter extends RecyclerView.Adapter<AppsItemRe
                     holder.mCheckBox.setChecked(false);
                 }
                 if (null != mListener) {
-                    mListener.onAppSelectionChanged(holder.mItem);
+                    mListener.onAppSelectionChanged(holder.mItem, holder.mCheckBox.isChecked());
                 }
             }
         });

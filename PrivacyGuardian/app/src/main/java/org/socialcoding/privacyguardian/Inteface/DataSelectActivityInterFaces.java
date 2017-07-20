@@ -11,7 +11,7 @@ import java.util.Calendar;
 
 public interface DataSelectActivityInterFaces {
     interface OnAppSelectionInteractionListener {
-        void onAppSelectionChanged(DataSelectAppContent.AppsItem item);
+        void onAppSelectionChanged(DataSelectAppContent.AppsItem item, boolean checked);
         AppInfoCache onAppCacheDemanded();
     }
 

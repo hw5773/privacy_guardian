@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import org.socialcoding.privacyguardian.AppInfoCache;
 import org.socialcoding.privacyguardian.Fragment.DataSelectAppFragment;
@@ -32,7 +31,8 @@ public class DataSelectActivity extends AppCompatActivity
     private static final int APP_SELECT_COLUMN = 3;
     private AppInfoCache mAppInfo;
 
-    private String selectedApp = "*";
+    //private String selectedApp = "*";
+    private HashSet selectedApps = new java.util.HashSet<>()
     private Calendar selectedStartDate = Calendar.getInstance();
     private Calendar selectedEndDate = Calendar.getInstance();
     private String selectedType = "*";
@@ -116,8 +116,12 @@ public class DataSelectActivity extends AppCompatActivity
     }
 
     @Override
-    public void onAppSelectionChanged(DataSelectAppContent.AppsItem item) {
-        Log.d("onAppSelectionChanged", "App selected");
+    public void onAppSelectionChanged(DataSelectAppContent.AppsItem item, boolean checked) {
+        Log.d("onAppSelectionChanged", "App selected : " + item.content + "is " + checked);
+        if(checked){
+
+        }
+
         selectedApp = item.content;
     }
 

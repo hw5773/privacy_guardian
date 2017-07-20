@@ -72,6 +72,12 @@ public class MainActivity extends AppCompatActivity
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
 
+    /* params for analyze filter */
+    Calendar analyzeStart;
+    Calendar analyzeEnd;
+    String[] appNames;
+    String analyzeTypes;
+
     CacheMaker cm = null;
     Analyzer analyzer = null;
     DatabaseHelper mDatabase;
@@ -291,12 +297,13 @@ public class MainActivity extends AppCompatActivity
         //FILTER ACTIVITY
         if (requestCode == START_ANALYZE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                Calendar date = Calendar.getInstance();
                 String app, type;
-                date.setTimeInMillis(data.getLongExtra("date_start", 0L));
+                analyzeStart.setTimeInMillis(data.getLongExtra("date_start", 0L));
+                analyzeEnd.setTimeInMillis(data.getLongExtra("date_end", 0L));
                 app = data.getStringExtra("app");
                 type = data.getStringExtra("type");
-                Log.d("onActivityResult", date.toString() + "/" + app + "/" + type);
+                Log.d("onActivityResult", analyzeStart.getTime().toString() + "/" + app + "/" + type);
+                Log.d("onActivityResult", analyzeEnd.getTime().toString());
             }
         }
 
