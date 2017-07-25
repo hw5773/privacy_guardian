@@ -157,7 +157,9 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //setting
+        //    getFragmentManager().beginTransaction().replace(android.R.id.content,new SettingsFragment()).commit();
+        //
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -270,12 +272,14 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Log.d("VPNService","settings");
+            Intent intent = new Intent(this,SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-
     //분석 필터 액티비티 시작
     public void startAnalyze(List<String> appsList) {
         Log.d("startAnalyze", appsList.toArray().toString());
@@ -548,7 +552,7 @@ public class MainActivity extends AppCompatActivity
                 case 1:
                     return AnalyzeFragment.newInstance();
                 default:
-                    return SettingsFragment.newInstance();
+                    return FeedbackFragment.newInstance("1","2");
             }
         }
 
