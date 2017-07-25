@@ -73,8 +73,8 @@ public class MainActivity extends AppCompatActivity
     private ViewPager mViewPager;
 
     /* params for analyze filter */
-    Calendar analyzeStart;
-    Calendar analyzeEnd;
+    Calendar analyzeStart = Calendar.getInstance();
+    Calendar analyzeEnd = Calendar.getInstance();
     String[] appNames;
     String analyzeTypes;
 
@@ -297,12 +297,16 @@ public class MainActivity extends AppCompatActivity
         //FILTER ACTIVITY
         if (requestCode == START_ANALYZE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                String app, type;
+                String type;
+                String[] apps;
                 analyzeStart.setTimeInMillis(data.getLongExtra("date_start", 0L));
                 analyzeEnd.setTimeInMillis(data.getLongExtra("date_end", 0L));
-                app = data.getStringExtra("app");
+                apps = data.getStringArrayExtra("app");
                 type = data.getStringExtra("type");
-                Log.d("onActivityResult", analyzeStart.getTime().toString() + "/" + app + "/" + type);
+                Log.d("onActivityResult", analyzeStart.getTime().toString() + "/" + type);
+                for(String s : apps){
+                    Log.d("onActivityResult", "apps:" + s);
+                }
                 Log.d("onActivityResult", analyzeEnd.getTime().toString());
             }
         }

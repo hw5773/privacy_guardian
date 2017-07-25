@@ -23,6 +23,8 @@ import org.socialcoding.privacyguardian.Fragment.AppsItem.DataSelectAppContent;
 import org.socialcoding.privacyguardian.R;
 
 import java.util.Calendar;
+import java.util.Set;
+
 import org.socialcoding.privacyguardian.Inteface.DataSelectActivityInterFaces.*;
 
 public class DataSelectActivity extends AppCompatActivity
@@ -32,7 +34,7 @@ public class DataSelectActivity extends AppCompatActivity
     private AppInfoCache mAppInfo;
 
     //private String selectedApp = "*";
-    private HashSet selectedApps = new java.util.HashSet<>()
+    private Set<String> selectedApps = new java.util.HashSet<>();
     private Calendar selectedStartDate = Calendar.getInstance();
     private Calendar selectedEndDate = Calendar.getInstance();
     private String selectedType = "*";
@@ -84,7 +86,7 @@ public class DataSelectActivity extends AppCompatActivity
 
     public void setFilter(View view){
         Intent data = new Intent();
-        data.putExtra("app", selectedApp);
+        data.putExtra("app", selectedApps.toArray(new String[selectedApps.size()]));
         data.putExtra("date_start", selectedStartDate.getTimeInMillis());
         data.putExtra("date_end", selectedStartDate.getTimeInMillis());
         data.putExtra("type", selectedType);
@@ -117,12 +119,13 @@ public class DataSelectActivity extends AppCompatActivity
 
     @Override
     public void onAppSelectionChanged(DataSelectAppContent.AppsItem item, boolean checked) {
-        Log.d("onAppSelectionChanged", "App selected : " + item.content + "is " + checked);
-        if(checked){
-
+        if(checked) {
+            Log.d("onAppSelectionChanged", "App selected : " + item.content + "is inserted");
+            selectedApps.add(item.content);
+        } else {
+            Log.d("onAppSelectionChanged", "App selected : " + item.content + "is removed");
+            selectedApps.remove(item.content);
         }
-
-        selectedApp = item.content;
     }
 
     @Override

@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.disxc.anonymous", appContext.getPackageName());
+        assertEquals("org.socialcoding.privacyguardian", appContext.getPackageName());
     }
 }
