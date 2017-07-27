@@ -7,9 +7,9 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 
 public class ClientTest {
 	public static void main(String[] args) throws IOException {
-		String httpsURL = "https://mmlab.snu.ac.kr";
+//		String httpsURL = "https://mmlab.snu.ac.kr";
 //		String httpsURL = "https://147.46.114.188";
-//		String httpsURL = "https://127.0.0.1:9999";
+		String httpsURL = "https://147.46.114.22:5555";
 		URL url;
 
 		try {
