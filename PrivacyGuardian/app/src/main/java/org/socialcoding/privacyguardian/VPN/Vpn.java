@@ -184,7 +184,8 @@ public class Vpn extends VpnService {
                 tcpHeader.setAckNumber(makingSeqnum());
 
                 if (tcpHeader.getDestPort() == 443) {
-                    sm.addTLSSocket(channel, ipHeader, tcpHeader);
+                    // TODO: remove comment after implemation is done.
+                    //sm.addTLSSocket(channel, ipHeader, tcpHeader);
                 } else {
                     sm.addTCPSocket(channel, ipHeader, tcpHeader);
                 }

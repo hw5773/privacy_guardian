@@ -1,10 +1,12 @@
 package org.socialcoding.privacyguardian.Activity;
 
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.ServiceConnection;
 import android.net.VpnService;
 import android.os.Handler;
@@ -38,6 +40,8 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import org.socialcoding.privacyguardian.Credential.CredentialManager;
+import org.spongycastle.jce.provider.BouncyCastleProvider;
 
 import org.socialcoding.privacyguardian.Analyzer;
 import org.socialcoding.privacyguardian.AppInfoCache;
@@ -54,6 +58,7 @@ import org.socialcoding.privacyguardian.R;
 import org.socialcoding.privacyguardian.Structs.ResultItem;
 import org.socialcoding.privacyguardian.VPN.Vpn;
 
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -77,6 +82,7 @@ public class MainActivity extends AppCompatActivity
     DatabaseHelper mDatabase;
     AppInfoCache mAppInfoCache;
     SwitchCompat mVpnSwitch;
+    CredentialManager mCredential;
     private boolean mIsRunning = false;
 
     public static final String APPS_LIST = "AppsList";
@@ -84,6 +90,10 @@ public class MainActivity extends AppCompatActivity
     static final int VPN_ACTIVITY_REQUEST_CODE = 2;
 
     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
+    static {
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
     //Notification Alarming
     private Boolean notificationEnabled = true;
@@ -168,6 +178,33 @@ public class MainActivity extends AppCompatActivity
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        // invoke credential manager
+        mCredential = new CredentialManager(getApplicationContext());
+        if(!mCredential.isRootInstalled()) {
+            final boolean[] installed = {false};
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setMessage(R.string.CredentialNotInstalledAlertText);
+            alert.setNegativeButton(R.string.Deny, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Log.d("checkCA", "user declined install");
+                    dialogInterface.dismiss();
+                }
+            });
+            alert.setPositiveButton(R.string.Allow, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    installed[0] = mCredential.installRootCA();
+                }
+            });
+            alert.show();
+            if(installed[0]) {
+                // do something
+            }
+        } else {
+            // get root CA's information
+        }
 
         //initiate update
         try {
