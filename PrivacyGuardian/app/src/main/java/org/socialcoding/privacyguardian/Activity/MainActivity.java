@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.net.VpnService;
 import android.os.Handler;
 import android.os.IBinder;
@@ -63,6 +62,8 @@ import org.socialcoding.privacyguardian.VPN.Vpn;
 
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity
     private static final String PREFERENCE_NAME = "privacyguardian_preference";
 
     /* preference string variable for root installed */
-    private static final String ROOT_INSTALLED = "ROOT_INSTALLED";
+    private static final String ROOT_INSTALL_DENIED = "ROOT_INSTALL_DENIED";
 
     private static final String ROOT_CA_ALIAS = "Privacy Guardian SSL";
 
@@ -98,7 +99,8 @@ public class MainActivity extends AppCompatActivity
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private SharedPreferences mPreferences;
 
-    private boolean mIsRunning = false;
+    private static boolean mIsRunning = false;
+    private static boolean mDeniedInstall =false;
 
     /* activity result codes */
     private static final int CODE_START_ANALYZE_REQUEST = 1;
@@ -200,31 +202,7 @@ public class MainActivity extends AppCompatActivity
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        // invoke credential manager
-        if(!mPreferences.getBoolean(ROOT_INSTALLED, false)) {
-            final boolean[] installed = {false};
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
-            alert.setMessage(R.string.CredentialNotInstalledAlertText);
-            alert.setNegativeButton(R.string.Deny, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    Log.d("checkCA", "user declined install");
-                    dialogInterface.dismiss();
-                }
-            });
-            alert.setPositiveButton(R.string.Allow, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    installed[0] = installRootCA();
-                }
-            });
-            alert.show();
-            if(installed[0]) {
-                // do something
-            }
-        } else {
-            // get root CA's information
-        }
+        checkRootCA();
 
         //initiate update
         try {
@@ -305,11 +283,51 @@ public class MainActivity extends AppCompatActivity
         // See https://g.co/AppIndexing/AndroidStudio for more information.
     }
 
+    private void checkRootCA() {
+        if(mDeniedInstall) {
+            return;
+        }
+        X509Certificate[] rootCA = null;
+        try {
+            rootCA = KeyChain.getCertificateChain(this, ROOT_CA_ALIAS);
+            if(rootCA != null)
+                rootCA[0].checkValidity();
+        } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+            Log.d("checkRootCA", "expired root ca");
+            rootCA = null;
+        } catch (Exception e) {
+            Log.d("checkRootCA", "error while get root cert");
+            e.printStackTrace();
+        }
+        if(rootCA == null) {
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setMessage(R.string.CredentialNotInstalledAlertText);
+            alert.setNegativeButton(R.string.Deny, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Log.d("checkCA", "user declined install");
+                    Toast.makeText(
+                            getApplicationContext(),
+                            getString(R.string.root_install_needed),
+                            Toast.LENGTH_LONG).show();
+                    mDeniedInstall = true;
+                    dialogInterface.dismiss();
+                }
+            }).setPositiveButton(R.string.Allow, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    installRootCA();
+                }
+            });
+            alert.show();
+        }
+    }
+
     // creates root CA cert intent return true on success, false on failure.
-    private boolean installRootCA() {
+    private void installRootCA() {
          X509Certificate cert = CredentialManager.getRootCert();
          if(cert == null)
-            return false;
+             return;
 
         byte[] keychain;
         try {
@@ -317,20 +335,19 @@ public class MainActivity extends AppCompatActivity
         } catch (CertificateEncodingException e) {
             Log.d("installRootCA", "failed to get encoded keychain");
             e.printStackTrace();
-            return false;
+            return;
         }
 
         Intent installIntent = KeyChain.createInstallIntent();
         installIntent.putExtra(KeyChain.EXTRA_CERTIFICATE, keychain);
         installIntent.putExtra(KeyChain.EXTRA_NAME, ROOT_CA_ALIAS);
         startActivityForResult(installIntent, CODE_INSTALL_ROOT);
-        // create intent
-        return true;
     }
 
     @Override
     protected void onDestroy() {
         doUnbindService();
+
         super.onDestroy();
     }
 
@@ -392,11 +409,18 @@ public class MainActivity extends AppCompatActivity
 
         if (requestCode == CODE_INSTALL_ROOT) {
             if (resultCode == RESULT_OK) {
+                Toast.makeText(
+                        this,
+                        getString(R.string.root_install_succeed),
+                        Toast.LENGTH_LONG).show();
                 Log.d(TAG, "successfully installed");
-                SharedPreferences.Editor editor = mPreferences.edit();
-                editor.putBoolean(ROOT_INSTALLED, true);
-                editor.apply();
+
             } else {
+                Toast.makeText(
+                        this,
+                        getString(R.string.root_install_needed),
+                        Toast.LENGTH_LONG).show();
+                Log.d(TAG, "root ca not installed");
                 super.onActivityResult(requestCode, resultCode, data);
             }
         }
