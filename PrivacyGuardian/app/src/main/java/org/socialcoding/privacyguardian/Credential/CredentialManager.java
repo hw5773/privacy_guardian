@@ -1,13 +1,10 @@
 package org.socialcoding.privacyguardian.Credential;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.spongycastle.asn1.ASN1ObjectIdentifier;
 import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x509.BasicConstraints;
-import org.spongycastle.asn1.x509.Certificate;
 import org.spongycastle.cert.CertIOException;
 import org.spongycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.spongycastle.cert.jcajce.JcaX509v3CertificateBuilder;
@@ -32,44 +29,27 @@ import java.util.Date;
 
 public class CredentialManager {
     //TODO: CREATE appropriate interface for Credential manager.
-    final Context context;
-    final String LOGNAME = this.getClass().getSimpleName();
-    final String prefix;
-    final String rootCARegisterd;
-    final SharedPreferences preferences;
+    private static final String TAG = "CredentialManager";
 
-    final String CERT_PATH = "cert.p12";
-
-    public CredentialManager(Context _context) {
-        this.context = _context;
-        this.prefix = context.getPackageName();
-        this.rootCARegisterd = prefix + "rootCARegistered";
-        this.preferences = context.getSharedPreferences(
-                rootCARegisterd, Context.MODE_PRIVATE);
-    }
-
-    public boolean isRootInstalled() {
-        return preferences.getBoolean(rootCARegisterd, false);
-    }
-
-    public boolean installRootCA() {
+    static public X509Certificate getRootCert() {
+        X509Certificate selfCa;
         try {
-            X509Certificate selfCa = generateSelfSigendCertificate();
+            selfCa = generateSelfSigendCertificate();
         } catch (Exception e) {
-            Log.d(LOGNAME, "error while creating selfsigned certificate");
+            Log.d(TAG, "error while creating selfsigned certificate");
             e.printStackTrace();
-            return false;
+            return null;
         }
-        Log.d(LOGNAME, "successfully created certificate!");
-        return true;
+        Log.d(TAG, "successfully created certificate!");
+        return selfCa;
     }
 
-    public boolean removeRootCA() {
+    static public boolean removeRootCA() {
         return false;
     }
 
     // generates self-signed cert
-    private X509Certificate generateSelfSigendCertificate()
+    static private X509Certificate generateSelfSigendCertificate()
             throws NoSuchProviderException, NoSuchAlgorithmException,
             OperatorCreationException, CertIOException, CertificateException {
         final String subjectDN = "CN=PrivacyGuardian, C=KR";

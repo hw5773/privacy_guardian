@@ -8,12 +8,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.VpnService;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.security.KeyChain;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.Cursor;
@@ -59,7 +62,10 @@ import org.socialcoding.privacyguardian.Structs.ResultItem;
 import org.socialcoding.privacyguardian.VPN.Vpn;
 
 import java.security.Security;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -70,24 +76,35 @@ public class MainActivity extends AppCompatActivity
         implements OnFirstpageInteractionListener, OnAnalyzeInteractionListener,
         OnSettingsInteractionListener, OnCacheMakerInteractionListener, DatabaseDialogListener, OnGoogleMapsInteractionListener {
 
-
-    private static final int NOTIFICATION_ON_DETECTED = 123;
+    public static final String APPS_LIST = "AppsList";
     private static final String GET_TO_ANALYZE_FRAGMENT = "FRAGGOGO";
 
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-    private ViewPager mViewPager;
+    /* name for shared preference */
+    private static final String PREFERENCE_NAME = "privacyguardian_preference";
 
-    CacheMaker cm = null;
-    Analyzer analyzer = null;
-    DatabaseHelper mDatabase;
-    AppInfoCache mAppInfoCache;
-    SwitchCompat mVpnSwitch;
-    CredentialManager mCredential;
+    /* preference string variable for root installed */
+    private static final String ROOT_INSTALLED = "ROOT_INSTALLED";
+
+    private static final String ROOT_CA_ALIAS = "Privacy Guardian SSL";
+
+
+    /* manager classes */
+    private ViewPager mViewPager;
+    private CacheMaker cm = null;
+    private Analyzer analyzer = null;
+    private DatabaseHelper mDatabase;
+    private AppInfoCache mAppInfoCache;
+    private SwitchCompat mVpnSwitch;
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private SharedPreferences mPreferences;
+
     private boolean mIsRunning = false;
 
-    public static final String APPS_LIST = "AppsList";
-    static final int START_ANALYZE_REQUEST_CODE = 1;
-    static final int VPN_ACTIVITY_REQUEST_CODE = 2;
+    /* activity result codes */
+    private static final int CODE_START_ANALYZE_REQUEST = 1;
+    private static final int CODE_VPN_ACTIVITY_REQUEST = 2;
+    private static final int CODE_INSTALL_ROOT = 124;
+    private static final int CODE_NOTIFICATION_ON_DETECTED = 123;
 
     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
@@ -171,6 +188,10 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // Get Share preferences
+        mPreferences = getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -180,8 +201,7 @@ public class MainActivity extends AppCompatActivity
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         // invoke credential manager
-        mCredential = new CredentialManager(getApplicationContext());
-        if(!mCredential.isRootInstalled()) {
+        if(!mPreferences.getBoolean(ROOT_INSTALLED, false)) {
             final boolean[] installed = {false};
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
             alert.setMessage(R.string.CredentialNotInstalledAlertText);
@@ -195,7 +215,7 @@ public class MainActivity extends AppCompatActivity
             alert.setPositiveButton(R.string.Allow, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    installed[0] = mCredential.installRootCA();
+                    installed[0] = installRootCA();
                 }
             });
             alert.show();
@@ -246,9 +266,9 @@ public class MainActivity extends AppCompatActivity
                     //Start VPN connection establishing
                     Intent intent = VpnService.prepare(getApplicationContext());
                     if (intent != null) {
-                        startActivityForResult(intent, VPN_ACTIVITY_REQUEST_CODE);
+                        startActivityForResult(intent, CODE_VPN_ACTIVITY_REQUEST);
                     } else {
-                        onActivityResult(VPN_ACTIVITY_REQUEST_CODE, RESULT_OK, null);
+                        onActivityResult(CODE_VPN_ACTIVITY_REQUEST, RESULT_OK, null);
                     }
 
                 } else {
@@ -285,6 +305,29 @@ public class MainActivity extends AppCompatActivity
         // See https://g.co/AppIndexing/AndroidStudio for more information.
     }
 
+    // creates root CA cert intent return true on success, false on failure.
+    private boolean installRootCA() {
+         X509Certificate cert = CredentialManager.getRootCert();
+         if(cert == null)
+            return false;
+
+        byte[] keychain;
+        try {
+            keychain = cert.getEncoded();
+        } catch (CertificateEncodingException e) {
+            Log.d("installRootCA", "failed to get encoded keychain");
+            e.printStackTrace();
+            return false;
+        }
+
+        Intent installIntent = KeyChain.createInstallIntent();
+        installIntent.putExtra(KeyChain.EXTRA_CERTIFICATE, keychain);
+        installIntent.putExtra(KeyChain.EXTRA_NAME, ROOT_CA_ALIAS);
+        startActivityForResult(installIntent, CODE_INSTALL_ROOT);
+        // create intent
+        return true;
+    }
+
     @Override
     protected void onDestroy() {
         doUnbindService();
@@ -315,35 +358,46 @@ public class MainActivity extends AppCompatActivity
 
     //분석 필터 액티비티 시작
     public void startAnalyze(List<String> appsList) {
-        Log.d("startAnalyze", appsList.toArray().toString());
+        Log.d("startAnalyze", Arrays.toString(appsList.toArray()));
         Intent intent = new Intent(this, DataSelectActivity.class);
         intent.putExtra(APPS_LIST, (appsList.toArray(new String[0])));
-        startActivityForResult(intent, START_ANALYZE_REQUEST_CODE);
+        startActivityForResult(intent, CODE_START_ANALYZE_REQUEST);
     }
 
     //분석 필터 액티비티 결과 수신
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
+        final String TAG = "onActivityResult";
         //FILTER ACTIVITY
-        if (requestCode == START_ANALYZE_REQUEST_CODE) {
+        if (requestCode == CODE_START_ANALYZE_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Calendar date = Calendar.getInstance();
                 String app, type;
                 date.setTimeInMillis(data.getLongExtra("date_start", 0L));
                 app = data.getStringExtra("app");
                 type = data.getStringExtra("type");
-                Log.d("onActivityResult", date.toString() + "/" + app + "/" + type);
+                Log.d(TAG, date.toString() + "/" + app + "/" + type);
             }
         }
 
         //VPN Service
-        if (requestCode == VPN_ACTIVITY_REQUEST_CODE) {
+        if (requestCode == CODE_VPN_ACTIVITY_REQUEST) {
             if (resultCode == RESULT_OK) {
                 Intent intent = new Intent(this, Vpn.class);
                 startService(intent);
                 doBindService();
-                Log.d("onActivityResult", "service running start");
+                Log.d(TAG, "service running start");
+            }
+        }
+
+        if (requestCode == CODE_INSTALL_ROOT) {
+            if (resultCode == RESULT_OK) {
+                Log.d(TAG, "successfully installed");
+                SharedPreferences.Editor editor = mPreferences.edit();
+                editor.putBoolean(ROOT_INSTALLED, true);
+                editor.apply();
+            } else {
+                super.onActivityResult(requestCode, resultCode, data);
             }
         }
     }
@@ -406,6 +460,7 @@ public class MainActivity extends AppCompatActivity
                 resultItems[i++] = ri;
             } while (c.moveToNext());
         }
+        c.close();
         if (i == 0)
             return null;
         return resultItems;
@@ -545,7 +600,7 @@ public class MainActivity extends AppCompatActivity
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         // mId allows you to update the notification later on.
-        int mId = NOTIFICATION_ON_DETECTED;
+        int mId = CODE_NOTIFICATION_ON_DETECTED;
         mNotificationManager.notify(mId, mBuilder.build());
 
     }
