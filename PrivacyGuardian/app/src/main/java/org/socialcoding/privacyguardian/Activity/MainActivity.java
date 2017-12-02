@@ -10,12 +10,18 @@ import android.content.DialogInterface;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.VpnService;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.security.KeyChain;
+import android.security.KeyChainException;
+import android.security.KeyPairGeneratorSpec;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.Cursor;
@@ -60,6 +66,13 @@ import org.socialcoding.privacyguardian.R;
 import org.socialcoding.privacyguardian.Structs.ResultItem;
 import org.socialcoding.privacyguardian.VPN.Vpn;
 
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateExpiredException;
@@ -70,6 +83,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.security.auth.x500.X500Principal;
 
 import static org.socialcoding.privacyguardian.Structs.SensitiveInfoTypes.TYPE_LOCATION_LATLNG;
 
@@ -87,6 +102,7 @@ public class MainActivity extends AppCompatActivity
     private static final String ROOT_INSTALL_DENIED = "ROOT_INSTALL_DENIED";
 
     private static final String ROOT_CA_ALIAS = "Privacy Guardian SSL";
+    private static final String ROOT_CA_PK_ALIAS = "PrivacyGuardianPK"  ;
 
 
     /* manager classes */
@@ -100,13 +116,16 @@ public class MainActivity extends AppCompatActivity
     private SharedPreferences mPreferences;
 
     private static boolean mIsRunning = false;
-    private static boolean mDeniedInstall =false;
+    private static boolean mDeniedInstall = false;
 
     /* activity result codes */
     private static final int CODE_START_ANALYZE_REQUEST = 1;
     private static final int CODE_VPN_ACTIVITY_REQUEST = 2;
     private static final int CODE_INSTALL_ROOT = 124;
     private static final int CODE_NOTIFICATION_ON_DETECTED = 123;
+
+    /* root ca cert */
+    private static KeyPair rootKeyPair;
 
     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
@@ -202,6 +221,7 @@ public class MainActivity extends AppCompatActivity
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        // check root ca is installed
         checkRootCA();
 
         //initiate update
@@ -290,6 +310,8 @@ public class MainActivity extends AppCompatActivity
         X509Certificate[] rootCA = null;
         try {
             rootCA = KeyChain.getCertificateChain(this, ROOT_CA_ALIAS);
+            KeyChain.getPrivateKey(this, ROOT_CA_PK_ALIAS);
+
             if(rootCA != null)
                 rootCA[0].checkValidity();
         } catch (CertificateExpiredException | CertificateNotYetValidException e) {
@@ -320,14 +342,55 @@ public class MainActivity extends AppCompatActivity
                 }
             });
             alert.show();
+        } else {
+            //todo: do something
         }
     }
 
-    // creates root CA cert intent return true on success, false on failure.
+    // creates root CA cert intent
     private void installRootCA() {
-         X509Certificate cert = CredentialManager.getRootCert();
-         if(cert == null)
-             return;
+        try {
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+            KeyPairGenerator kpg = KeyPairGenerator.getInstance(
+                    "RSA", "AndroidKeyStore");
+            /*
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                kpg.initialize(new KeyGenParameterSpec.Builder(
+                        ROOT_CA_PK_ALIAS,
+                        KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
+                        .setDigests(KeyProperties.DIGEST_SHA256,
+                                KeyProperties.DIGEST_SHA512)
+                        .build());
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                // Generate the RSA key pairs
+                Calendar start = Calendar.getInstance();
+                Calendar end = Calendar.getInstance();
+                end.add(Calendar.YEAR, 30);
+
+                KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(this)
+                        .setAlias(ROOT_CA_PK_ALIAS)
+                        .setSubject(new X500Principal("CN=" + ROOT_CA_PK_ALIAS))
+                        .setSerialNumber(BigInteger.TEN)
+                        .setStartDate(start.getTime())
+                        .setEndDate(end.getTime())
+                        .build();
+                kpg.initialize(spec);
+            } else {
+                // if version is too low, use bouncy castle
+                kpg = KeyPairGenerator.getInstance("RSA", "BC");
+            }*/
+
+            kpg = KeyPairGenerator.getInstance("RSA", "BC");
+            rootKeyPair = kpg.generateKeyPair();
+        } catch (Exception e) {
+            Log.d("installRootCA", "error on generating keypair");
+            e.printStackTrace();
+            return;
+        }
+        X509Certificate cert = CredentialManager.getRootCert(rootKeyPair);
+        if(cert == null)
+            return;
 
         byte[] keychain;
         try {

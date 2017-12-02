@@ -15,9 +15,9 @@ import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
@@ -31,16 +31,17 @@ public class CredentialManager {
     //TODO: CREATE appropriate interface for Credential manager.
     private static final String TAG = "CredentialManager";
 
-    static public X509Certificate getRootCert() {
+    static public X509Certificate getRootCert(KeyPair keyPair) {
         X509Certificate selfCa;
         try {
-            selfCa = generateSelfSigendCertificate();
+            selfCa = generateSelfSigendCertificate(keyPair);
         } catch (Exception e) {
             Log.d(TAG, "error while creating selfsigned certificate");
             e.printStackTrace();
             return null;
         }
         Log.d(TAG, "successfully created certificate!");
+
         return selfCa;
     }
 
@@ -48,15 +49,29 @@ public class CredentialManager {
         return false;
     }
 
+    static public X509Certificate generateClonedCertificate(X509Certificate original, PrivateKey privateKey) {
+        int version = original.getVersion();
+
+        X500Name dnName = (X500Name) original.getSubjectDN();
+        BigInteger serial = original.getSerialNumber();
+        Date validAfter = original.getNotAfter();
+        Date validUntil = original.getNotBefore();
+        try {
+            ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA").build(privateKey);
+        } catch (OperatorCreationException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     // generates self-signed cert
-    static private X509Certificate generateSelfSigendCertificate()
+    static private X509Certificate generateSelfSigendCertificate(KeyPair keyPair)
             throws NoSuchProviderException, NoSuchAlgorithmException,
             OperatorCreationException, CertIOException, CertificateException {
         final String subjectDN = "CN=PrivacyGuardian, C=KR";
         long now = System.currentTimeMillis();
         Date startDate = new Date(now);
-        KeyPair keyPair = KeyPairGenerator.getInstance("RSA", "BC").generateKeyPair();
-
         X500Name dnName = new X500Name(subjectDN);
         BigInteger certSerialNumber = new BigInteger(Long.toString(now)); // <-- Using the current timestamp as the certificate serial number
 
