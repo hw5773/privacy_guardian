@@ -10,18 +10,12 @@ import android.content.DialogInterface;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.VpnService;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.security.KeyChain;
-import android.security.KeyChainException;
-import android.security.KeyPairGeneratorSpec;
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyProperties;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.Cursor;
@@ -66,25 +60,26 @@ import org.socialcoding.privacyguardian.R;
 import org.socialcoding.privacyguardian.Structs.ResultItem;
 import org.socialcoding.privacyguardian.VPN.Vpn;
 
-import java.math.BigInteger;
+import java.io.IOException;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.KeyStore.ProtectionParameter;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.Security;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.security.auth.x500.X500Principal;
+import java.util.UUID;
 
 import static org.socialcoding.privacyguardian.Structs.SensitiveInfoTypes.TYPE_LOCATION_LATLNG;
 
@@ -97,12 +92,13 @@ public class MainActivity extends AppCompatActivity
 
     /* name for shared preference */
     private static final String PREFERENCE_NAME = "privacyguardian_preference";
+    private static final String PREFERENCE_KSPASS = "keystore_pass";
 
     /* preference string variable for root installed */
     private static final String ROOT_INSTALL_DENIED = "ROOT_INSTALL_DENIED";
-
+    private static final String ROOT_KEY_ENTRY_ALIAS = CredentialManager.ROOT_KEY_ENTRY_ALIAS;
     private static final String ROOT_CA_ALIAS = "Privacy Guardian SSL";
-    private static final String ROOT_CA_PK_ALIAS = "PrivacyGuardianPK"  ;
+    private static final String CERT_FILE = "root.ks";
 
 
     /* manager classes */
@@ -125,7 +121,8 @@ public class MainActivity extends AppCompatActivity
     private static final int CODE_NOTIFICATION_ON_DETECTED = 123;
 
     /* root ca cert */
-    private static KeyPair rootKeyPair;
+    private String keyEntryPass;
+    private KeyStore.Entry rootEntry;
 
     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
@@ -304,23 +301,53 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void checkRootCA() {
+        final String TAG = "CheckRootCA";
         if(mDeniedInstall) {
             return;
         }
-        X509Certificate[] rootCA = null;
-        try {
-            rootCA = KeyChain.getCertificateChain(this, ROOT_CA_ALIAS);
-            KeyChain.getPrivateKey(this, ROOT_CA_PK_ALIAS);
+        X509Certificate rootCA = null;
 
+        try {
+            String pass = mPreferences.getString(PREFERENCE_KSPASS, null);
+            if (pass == null)
+                throw new RuntimeException("preference not found");
+
+            KeyStore ks = CredentialManager.readKeystoreFromFile(CERT_FILE, )
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        /*
+        try {
+
+            KeyStore ks = KeyStore.getInstance("AndroidCAStore");
+            if (ks == null) {
+                Log.d(TAG, "error while getting AndroidCAStore");
+                return;
+            }
+
+            // check existence of root cert and read from file.
+            ks.load(null, null);
+            Enumeration aliases = ks.aliases();
+            while (aliases.hasMoreElements())
+            {
+                String alias = (String) aliases.nextElement();
+                java.security.cert.X509Certificate cert = (java.security.cert.X509Certificate) ks.getCertificate(alias);
+
+                if (cert.getIssuerDN().getName().contains("PrivacyGuardian"))
+                {
+                    rootCA =
+                    break;
+                }
+            }
             if(rootCA != null)
-                rootCA[0].checkValidity();
+                rootCA.checkValidity();
         } catch (CertificateExpiredException | CertificateNotYetValidException e) {
             Log.d("checkRootCA", "expired root ca");
             rootCA = null;
         } catch (Exception e) {
             Log.d("checkRootCA", "error while get root cert");
             e.printStackTrace();
-        }
+        }*/
         if(rootCA == null) {
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
             alert.setMessage(R.string.CredentialNotInstalledAlertText);
@@ -348,13 +375,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     // creates root CA cert intent
-    private void installRootCA() {
+    private void installRootCA() { /*
         try {
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
             KeyPairGenerator kpg = KeyPairGenerator.getInstance(
                     "RSA", "AndroidKeyStore");
-            /*
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 kpg.initialize(new KeyGenParameterSpec.Builder(
                         ROOT_CA_PK_ALIAS,
@@ -379,7 +406,7 @@ public class MainActivity extends AppCompatActivity
             } else {
                 // if version is too low, use bouncy castle
                 kpg = KeyPairGenerator.getInstance("RSA", "BC");
-            }*/
+            }
 
             kpg = KeyPairGenerator.getInstance("RSA", "BC");
             rootKeyPair = kpg.generateKeyPair();
@@ -387,8 +414,35 @@ public class MainActivity extends AppCompatActivity
             Log.d("installRootCA", "error on generating keypair");
             e.printStackTrace();
             return;
+        }*/
+        //X509Certificate cert = CredentialManager.generateRootCert(rootKeyPair);
+        X509Certificate cert = null;
+
+        // creates new random string for key store
+        keyEntryPass = UUID.randomUUID().toString();
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putString(PREFERENCE_KSPASS, keyEntryPass);
+        editor.apply();
+
+        try {
+            ProtectionParameter protParam =
+                    new KeyStore.PasswordProtection(keyEntryPass.toCharArray());
+            byte[] keyStoreBytes = CredentialManager.generateRootCertKeystore(keyEntryPass);
+            KeyStore ks = CredentialManager.loadKeystore(keyStoreBytes, keyEntryPass);
+            rootEntry = ks.getEntry(ROOT_KEY_ENTRY_ALIAS, protParam);
+            cert = (X509Certificate) ks.getCertificate(ROOT_KEY_ENTRY_ALIAS);
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableEntryException e) {
+            e.printStackTrace();
         }
-        X509Certificate cert = CredentialManager.getRootCert(rootKeyPair);
+
         if(cert == null)
             return;
 
@@ -400,6 +454,9 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             return;
         }
+
+        // wrtite root cert into file
+        //CredentialManager.writeRootCertFile(CERT_FILE);
 
         Intent installIntent = KeyChain.createInstallIntent();
         installIntent.putExtra(KeyChain.EXTRA_CERTIFICATE, keychain);
