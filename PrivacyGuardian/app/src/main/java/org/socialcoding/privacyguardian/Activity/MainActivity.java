@@ -60,18 +60,11 @@ import org.socialcoding.privacyguardian.R;
 import org.socialcoding.privacyguardian.Structs.ResultItem;
 import org.socialcoding.privacyguardian.VPN.Vpn;
 
-import java.io.IOException;
-import java.security.KeyPair;
+import java.io.FileOutputStream;
 import java.security.KeyStore;
-import java.security.KeyStore.ProtectionParameter;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.Security;
-import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,7 +78,8 @@ import static org.socialcoding.privacyguardian.Structs.SensitiveInfoTypes.TYPE_L
 
 public class MainActivity extends AppCompatActivity
         implements OnFirstpageInteractionListener, OnAnalyzeInteractionListener,
-        OnSettingsInteractionListener, OnCacheMakerInteractionListener, DatabaseDialogListener, OnGoogleMapsInteractionListener {
+        OnSettingsInteractionListener, OnCacheMakerInteractionListener, DatabaseDialogListener,
+        OnGoogleMapsInteractionListener {
 
     public static final String APPS_LIST = "AppsList";
     private static final String GET_TO_ANALYZE_FRAGMENT = "FRAGGOGO";
@@ -97,7 +91,7 @@ public class MainActivity extends AppCompatActivity
     /* preference string variable for root installed */
     private static final String ROOT_INSTALL_DENIED = "ROOT_INSTALL_DENIED";
     private static final String ROOT_KEY_ENTRY_ALIAS = CredentialManager.ROOT_KEY_ENTRY_ALIAS;
-    private static final String ROOT_CA_ALIAS = "Privacy Guardian SSL";
+    public static final String ROOT_CA_NAME = "Privacy Guardian SSL";
     private static final String CERT_FILE = "root.ks";
 
 
@@ -122,7 +116,9 @@ public class MainActivity extends AppCompatActivity
 
     /* root ca cert */
     private String keyEntryPass;
-    private KeyStore.Entry rootEntry;
+    private boolean isRootInstalled = false;
+    private X509Certificate rootCert = null;
+    private PrivateKey rootPrivate = null;
 
     FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
@@ -300,61 +296,58 @@ public class MainActivity extends AppCompatActivity
         // See https://g.co/AppIndexing/AndroidStudio for more information.
     }
 
+    // checks installation of root ca and if not installed, call InstallRootCA();
     private void checkRootCA() {
         final String TAG = "CheckRootCA";
+        Log.d(TAG, "initiated");
         if(mDeniedInstall) {
             return;
         }
-        X509Certificate rootCA = null;
 
+        boolean foundRoot = false;
         try {
+            //  first read from file.
             String pass = mPreferences.getString(PREFERENCE_KSPASS, null);
-            if (pass == null)
-                throw new RuntimeException("preference not found");
-
-            KeyStore ks = CredentialManager.readKeystoreFromFile(CERT_FILE, )
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        /*
-        try {
-
-            KeyStore ks = KeyStore.getInstance("AndroidCAStore");
-            if (ks == null) {
-                Log.d(TAG, "error while getting AndroidCAStore");
-                return;
+            if (pass == null) {
+                Log.d(TAG, "could not found password string");
+                throw new RuntimeException("could not found password string");
             }
 
-            // check existence of root cert and read from file.
+            KeyStore ks = CredentialManager.readKeystoreFromFile(openFileInput(CERT_FILE), pass);
+            rootCert = (X509Certificate) ks.getCertificate(ROOT_KEY_ENTRY_ALIAS);
+            rootPrivate = (PrivateKey) ks.getKey(ROOT_KEY_ENTRY_ALIAS, pass.toCharArray());
+
+            // second check in the android
+            ks = KeyStore.getInstance("AndroidCAStore");
+            if (ks == null) {
+                throw new RuntimeException("could not load AndroidCA Store");
+            }
             ks.load(null, null);
             Enumeration aliases = ks.aliases();
-            while (aliases.hasMoreElements())
-            {
+            while (aliases.hasMoreElements()) {
                 String alias = (String) aliases.nextElement();
-                java.security.cert.X509Certificate cert = (java.security.cert.X509Certificate) ks.getCertificate(alias);
+                X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
 
-                if (cert.getIssuerDN().getName().contains("PrivacyGuardian"))
-                {
-                    rootCA =
+                if (cert.getIssuerDN().getName().contains("PrivacyGuardian")) {
+                    cert.checkValidity();
+                    foundRoot = true;
+                    Log.d(TAG, "found a matching cert with DN");
                     break;
                 }
             }
-            if(rootCA != null)
-                rootCA.checkValidity();
-        } catch (CertificateExpiredException | CertificateNotYetValidException e) {
-            Log.d("checkRootCA", "expired root ca");
-            rootCA = null;
         } catch (Exception e) {
-            Log.d("checkRootCA", "error while get root cert");
+            Log.d(TAG, "couldn't get certificate successfully");
             e.printStackTrace();
-        }*/
-        if(rootCA == null) {
+        }
+
+        if(!foundRoot || rootCert == null) {
+            Log.d(TAG, "could not found cert and root");
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
             alert.setMessage(R.string.CredentialNotInstalledAlertText);
             alert.setNegativeButton(R.string.Deny, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    Log.d("checkCA", "user declined install");
+                    Log.d(TAG, "user declined install");
                     Toast.makeText(
                             getApplicationContext(),
                             getString(R.string.root_install_needed),
@@ -370,53 +363,14 @@ public class MainActivity extends AppCompatActivity
             });
             alert.show();
         } else {
-            //todo: do something
+            Log.d(TAG, "Successfully got root cert and key");
         }
     }
 
     // creates root CA cert intent
-    private void installRootCA() { /*
-        try {
-            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
-            keyStore.load(null);
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance(
-                    "RSA", "AndroidKeyStore");
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                kpg.initialize(new KeyGenParameterSpec.Builder(
-                        ROOT_CA_PK_ALIAS,
-                        KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
-                        .setDigests(KeyProperties.DIGEST_SHA256,
-                                KeyProperties.DIGEST_SHA512)
-                        .build());
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                // Generate the RSA key pairs
-                Calendar start = Calendar.getInstance();
-                Calendar end = Calendar.getInstance();
-                end.add(Calendar.YEAR, 30);
-
-                KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(this)
-                        .setAlias(ROOT_CA_PK_ALIAS)
-                        .setSubject(new X500Principal("CN=" + ROOT_CA_PK_ALIAS))
-                        .setSerialNumber(BigInteger.TEN)
-                        .setStartDate(start.getTime())
-                        .setEndDate(end.getTime())
-                        .build();
-                kpg.initialize(spec);
-            } else {
-                // if version is too low, use bouncy castle
-                kpg = KeyPairGenerator.getInstance("RSA", "BC");
-            }
-
-            kpg = KeyPairGenerator.getInstance("RSA", "BC");
-            rootKeyPair = kpg.generateKeyPair();
-        } catch (Exception e) {
-            Log.d("installRootCA", "error on generating keypair");
-            e.printStackTrace();
-            return;
-        }*/
-        //X509Certificate cert = CredentialManager.generateRootCert(rootKeyPair);
-        X509Certificate cert = null;
+    private void installRootCA() {
+        String TAG = "installRootCA";
+        Log.d(TAG, "installing initiated");
 
         // creates new random string for key store
         keyEntryPass = UUID.randomUUID().toString();
@@ -425,42 +379,39 @@ public class MainActivity extends AppCompatActivity
         editor.apply();
 
         try {
-            ProtectionParameter protParam =
-                    new KeyStore.PasswordProtection(keyEntryPass.toCharArray());
+
             byte[] keyStoreBytes = CredentialManager.generateRootCertKeystore(keyEntryPass);
             KeyStore ks = CredentialManager.loadKeystore(keyStoreBytes, keyEntryPass);
-            rootEntry = ks.getEntry(ROOT_KEY_ENTRY_ALIAS, protParam);
-            cert = (X509Certificate) ks.getCertificate(ROOT_KEY_ENTRY_ALIAS);
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (UnrecoverableEntryException e) {
+            rootCert = (X509Certificate) ks.getCertificate(ROOT_KEY_ENTRY_ALIAS);
+            rootPrivate =
+                    (PrivateKey) ks.getKey(ROOT_KEY_ENTRY_ALIAS, keyEntryPass.toCharArray());
+            FileOutputStream outputStream = openFileOutput(CERT_FILE, Context.MODE_PRIVATE);
+            CredentialManager.writeKeystoreFile(ks, outputStream, keyEntryPass);
+            outputStream.close();
+            /*
+            KeyPair keyPair = CredentialManager.generateKeyPair();
+            rootCert = CredentialManager.generateSelfSignedCertificate(keyPair);
+            rootPrivate = keyPair.getPrivate();*/
+            //KeyChain.
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        if(cert == null)
+        if(rootCert == null)
             return;
 
         byte[] keychain;
         try {
-            keychain = cert.getEncoded();
+            keychain = rootCert.getEncoded();
         } catch (CertificateEncodingException e) {
             Log.d("installRootCA", "failed to get encoded keychain");
             e.printStackTrace();
             return;
         }
 
-        // wrtite root cert into file
-        //CredentialManager.writeRootCertFile(CERT_FILE);
-
         Intent installIntent = KeyChain.createInstallIntent();
         installIntent.putExtra(KeyChain.EXTRA_CERTIFICATE, keychain);
-        installIntent.putExtra(KeyChain.EXTRA_NAME, ROOT_CA_ALIAS);
+        installIntent.putExtra(KeyChain.EXTRA_NAME, ROOT_CA_NAME);
         startActivityForResult(installIntent, CODE_INSTALL_ROOT);
     }
 
@@ -533,13 +484,16 @@ public class MainActivity extends AppCompatActivity
                         this,
                         getString(R.string.root_install_succeed),
                         Toast.LENGTH_LONG).show();
+                isRootInstalled = true;
                 Log.d(TAG, "successfully installed");
-
             } else {
                 Toast.makeText(
                         this,
                         getString(R.string.root_install_needed),
                         Toast.LENGTH_LONG).show();
+                isRootInstalled = false;
+                rootPrivate = null;
+                rootCert = null;
                 Log.d(TAG, "root ca not installed");
                 super.onActivityResult(requestCode, resultCode, data);
             }

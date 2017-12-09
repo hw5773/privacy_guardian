@@ -1,8 +1,5 @@
 package org.socialcoding.privacyguardian.Credential;
 
-import android.util.Log;
-
-import org.apache.commons.io.FileUtils;
 import org.spongycastle.asn1.ASN1ObjectIdentifier;
 import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x509.BasicConstraints;
@@ -13,21 +10,13 @@ import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.operator.ContentSigner;
 import org.spongycastle.operator.OperatorCreationException;
 import org.spongycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.spongycastle.util.io.pem.PemObject;
-import org.spongycastle.util.io.pem.PemReader;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
@@ -35,8 +24,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
-import java.security.SecureRandom;
-import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
@@ -50,20 +37,6 @@ public class CredentialManager {
     //TODO: CREATE appropriate interface for Credential manager.
     private static final String TAG = "CredentialManager";
     public static final String ROOT_KEY_ENTRY_ALIAS = "PrivacyGuardian";
-    /*
-    static public X509Certificate generateRootCert(KeyPair keyPair) {
-        X509Certificate selfCa;
-        try {
-            selfCa = generateSelfSigendCertificate(keyPair);
-        } catch (Exception e) {
-            Log.d(TAG, "error while creating selfsigned certificate");
-            e.printStackTrace();
-            return null;
-        }
-        Log.d(TAG, "successfully created certificate!");
-
-        return selfCa;
-    }*/
 
     static public boolean removeRootCA() {
         return false;
@@ -86,7 +59,7 @@ public class CredentialManager {
     }
 
     // generates self-signed cert
-    static private X509Certificate generateSelfSigendCertificate(KeyPair keyPair)
+    private static X509Certificate generateSelfSignedCertificate(KeyPair keyPair)
             throws NoSuchProviderException, NoSuchAlgorithmException,
             OperatorCreationException, CertIOException, CertificateException {
         final String subjectDN = "CN=PrivacyGuardian, C=KR";
@@ -131,7 +104,7 @@ public class CredentialManager {
             throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
         KeyStore ks;
         char[] pass = password.toCharArray();
-        ks = KeyStore.getInstance("JKS");
+        ks = KeyStore.getInstance("BouncyCastle");
         if (keystoreBytes != null) {
             ks.load(new ByteArrayInputStream(keystoreBytes), pass);
         } else {
@@ -146,7 +119,7 @@ public class CredentialManager {
         try {
             ks = loadKeystore(null, password);
             KeyPair keyPair = generateKeyPair();
-            X509Certificate certificate = generateSelfSigendCertificate(keyPair);
+            X509Certificate certificate = generateSelfSignedCertificate(keyPair);
             ks.setKeyEntry(ROOT_KEY_ENTRY_ALIAS,
                     keyPair.getPrivate(),
                     password.toCharArray(),
@@ -164,20 +137,20 @@ public class CredentialManager {
     }
 
     private static KeyPair generateKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-        SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-        keyGen.initialize(2048, random);
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA", "BC");
         return keyGen.generateKeyPair();
     }
 
-
-    public static void writeKeystoreFile(KeyStore ks, String path, String password)
+    public static void writeKeystoreFile(KeyStore ks, FileOutputStream outputStream, String password)
             throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException {
-        ks.store(new FileOutputStream(path), password.toCharArray());
+        ks.store(outputStream, password.toCharArray());
     }
 
-    static public KeyStore readKeystoreFromFile(String path, String password)
+    public static KeyStore readKeystoreFromFile(FileInputStream inputStream, String password)
             throws IOException, CertificateException, NoSuchAlgorithmException, KeyStoreException {
-        return loadKeystore(FileUtils.readFileToByteArray(new File(path)), password);
+        byte[] bytes = new byte[inputStream.available()];
+        inputStream.read(bytes);
+        inputStream.close();
+        return loadKeystore(bytes, password);
     }
 }

@@ -25,9 +25,6 @@ import java.util.concurrent.ExecutionException;
  */
 
 public class CacheMaker extends AsyncTask<Void, Void, Void>{
-    //create DB update and table creation method.
-    private final String DATE_URL = "http://147.46.216.207:2507/lastupdate";
-    private final String FETCH_URL = "http://147.46.216.207:2507/sensitiveinfo";
 
     private Context ctx;
     private String lastUpdate;
@@ -49,6 +46,10 @@ public class CacheMaker extends AsyncTask<Void, Void, Void>{
 
     @Override
     protected Void doInBackground(Void... params) {
+        // urls for fetch
+        String DATE_URL = "http://147.46.216.207:2507/lastupdate";
+        String FETCH_URL = "http://147.46.216.207:2507/sensitiveinfo";
+
         String dateString = createHTTPConnection(DATE_URL);
         //if invalid dateString as connection failed..
         Log.d("CacheMaker", "datestring is :" + dateString);
@@ -109,7 +110,7 @@ public class CacheMaker extends AsyncTask<Void, Void, Void>{
         return ret;
     }
 
-    boolean fetchFromFile(){
+    private boolean fetchFromFile(){
         try {
             String fileString = openFromFile("json");
             if(fileString.compareTo("") == 0){
@@ -126,7 +127,7 @@ public class CacheMaker extends AsyncTask<Void, Void, Void>{
         return false;
     }
 
-    public void fetchFromServer(String dateString, String patchData){
+    private void fetchFromServer(String dateString, String patchData){
         try {
             JSONObject jo = new JSONObject(patchData);
             jsonArray = new JSONArray(jo.getString("List"));
@@ -141,7 +142,7 @@ public class CacheMaker extends AsyncTask<Void, Void, Void>{
         }
     }
 
-    public String openFromFile(String filename){
+    private String openFromFile(String filename){
         try {
             InputStream inputstream = ctx.openFileInput(filename);
             if(inputstream != null){
@@ -170,10 +171,10 @@ public class CacheMaker extends AsyncTask<Void, Void, Void>{
     }
 
     //newly is server-given last update. return false if outdated, return true if updated.
-    public boolean checkUpdate(String newly){
+    private boolean checkUpdate(String newly){
         String ihave;
         ihave = openFromFile("ver");
-        newly = newly.replaceAll("(\\r|\\n)", "");
+        newly = newly.replaceAll("([\\r\\n])", "");
         Log.d("checkUpdate", "newly :" + newly + " ihave :" + ihave);
         return ihave.compareTo(newly) == 0;
     }
@@ -199,11 +200,11 @@ public class CacheMaker extends AsyncTask<Void, Void, Void>{
     private void saveCacheData(){
         OutputStream outputStream;
         try {
-            outputStream = ctx.openFileOutput("json", ctx.MODE_PRIVATE);
+            outputStream = ctx.openFileOutput("json", Context.MODE_PRIVATE);
             outputStream.write(jsonArray.toString().getBytes());
             Log.d("saveCacheData", "writed:" + jsonArray.toString());
             outputStream.close();
-            outputStream = ctx.openFileOutput("ver", ctx.MODE_PRIVATE);
+            outputStream = ctx.openFileOutput("ver", Context.MODE_PRIVATE);
             outputStream.write(lastUpdate.getBytes());
             outputStream.close();
             Log.d("saveCacheData", "writed:" + lastUpdate);
