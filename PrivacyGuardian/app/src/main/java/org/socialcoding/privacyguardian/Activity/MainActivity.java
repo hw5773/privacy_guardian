@@ -165,11 +165,14 @@ public class MainActivity extends AppCompatActivity
                 Bundle data = new Bundle();
                 if(rootPrivate != null) {
                     data.putByteArray("privatekey", rootPrivate.getEncoded());
+                    data.putByteArray("certificate", rootCert.getEncoded());
                 }
                 msg.setData(data);
                 msg.replyTo = mMessenger;
                 mService.send(msg);
             } catch (RemoteException e) {
+                e.printStackTrace();
+            } catch (CertificateEncodingException e) {
                 e.printStackTrace();
             }
         }

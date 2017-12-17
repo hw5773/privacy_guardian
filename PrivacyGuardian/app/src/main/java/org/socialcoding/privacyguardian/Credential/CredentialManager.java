@@ -4,8 +4,12 @@ import org.spongycastle.asn1.ASN1ObjectIdentifier;
 import org.spongycastle.asn1.x500.X500Name;
 import org.spongycastle.asn1.x509.BasicConstraints;
 import org.spongycastle.cert.CertIOException;
+import org.spongycastle.cert.X509CertificateHolder;
+import org.spongycastle.cert.X509v3CertificateBuilder;
+import org.spongycastle.cert.bc.BcX509v3CertificateBuilder;
 import org.spongycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.spongycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.spongycastle.crypto.params.AsymmetricKeyParameter;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.operator.ContentSigner;
 import org.spongycastle.operator.OperatorCreationException;
@@ -42,16 +46,32 @@ public class CredentialManager {
         return false;
     }
 
-    static public X509Certificate generateClonedCertificate(X509Certificate original, PrivateKey privateKey) {
+    static public X509CertificateHolder generateClonedCertificate(
+            X509Certificate original, PrivateKey privateKey, X509CertificateHolder caCert) {
         int version = original.getVersion();
 
         X500Name dnName = (X500Name) original.getSubjectDN();
         BigInteger serial = original.getSerialNumber();
         Date validAfter = original.getNotAfter();
         Date validUntil = original.getNotBefore();
+        AsymmetricKeyParameter publicKey =
+                (AsymmetricKeyParameter) original.getPublicKey();
         try {
-            ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA").build(privateKey);
+            X509v3CertificateBuilder builder = new BcX509v3CertificateBuilder(
+                    caCert,
+                    serial,
+                    validAfter,
+                    validUntil,
+                    dnName,
+                    publicKey
+            );
+            ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA")
+                    .build(privateKey);
+
+            return builder.build(signer);
         } catch (OperatorCreationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
