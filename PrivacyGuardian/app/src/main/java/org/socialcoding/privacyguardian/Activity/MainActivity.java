@@ -162,6 +162,11 @@ public class MainActivity extends AppCompatActivity
             Log.d("service", "connected");
             try {
                 Message msg = Message.obtain(null, Vpn.REGISTER);
+                Bundle data = new Bundle();
+                if(rootPrivate != null) {
+                    data.putByteArray("privatekey", rootPrivate.getEncoded());
+                }
+                msg.setData(data);
                 msg.replyTo = mMessenger;
                 mService.send(msg);
             } catch (RemoteException e) {

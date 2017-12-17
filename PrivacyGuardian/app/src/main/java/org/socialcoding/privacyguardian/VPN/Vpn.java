@@ -15,6 +15,8 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import org.socialcoding.privacyguardian.Activity.MainActivity;
+import org.socialcoding.privacyguardian.Credential.CredentialManager;
+import org.spongycastle.jcajce.provider.asymmetric.X509;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -22,6 +24,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SocketChannel;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 
 /**
  * Created by user on 2016-08-14.
@@ -37,6 +45,7 @@ public class Vpn extends VpnService {
     private int UDP_OFFSET = 8;
 
     private boolean mIsRunning;
+    private PrivateKey privateKey = null;
 
     //VPN SERVICE SECTION START
 
@@ -49,9 +58,12 @@ public class Vpn extends VpnService {
     class IncomingHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
+            String TAG = "INCOMING";
             switch(msg.what){
                 case REGISTER:
-                    Log.d("INCOMING", "GOT REGISTER");
+                    Log.d(TAG, "GOT REGISTER");
+                    Bundle data = msg.getData();
+                    setPrivateKey(data.getByteArray("privatekey"));
                     mainMessenger = msg.replyTo;
                     break;
                 case ENDVPN:
@@ -71,11 +83,39 @@ public class Vpn extends VpnService {
         }
     }
 
+    private void setPrivateKey(byte[] pkBytes) {
+        String TAG = "setPrivateKey";
+        if (pkBytes == null) {
+            Log.d(TAG, "Got no private key");
+            return;
+        }
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            privateKey = keyFactory.generatePrivate(
+                    new PKCS8EncodedKeySpec(pkBytes));
+            Log.d(TAG, "successfully installed private key");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+    }
+
     final Messenger mMessenger = new Messenger(new IncomingHandler());
 
     @Override
     public IBinder onBind(Intent intent) {
         return mMessenger.getBinder();
+    }
+
+    // returns cloned certificate for given certificate
+    private X509Certificate getClonedCert(X509Certificate certificate) {
+        String TAG = "getClonedCert";
+        if (privateKey == null) {
+            Log.d(TAG, "There is no private key for cert");
+            return null;
+        }
+        return CredentialManager.generateClonedCertificate(certificate, privateKey);
     }
 
     public int onStartCommand(final Intent intent, int flags, int startId) {
