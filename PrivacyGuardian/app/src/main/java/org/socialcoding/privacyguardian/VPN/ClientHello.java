@@ -11,8 +11,6 @@ public class ClientHello extends Handshake{
     Random random;
     SessionID sessionID;
     CipherSuite ciphersuites;
-
-
 }
 
 

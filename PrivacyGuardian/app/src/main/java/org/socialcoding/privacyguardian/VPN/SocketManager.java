@@ -11,10 +11,14 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.security.cert.Certificate;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 
 /**
  * Created by Hyunwoo Lee on 2017-02-12.
@@ -53,12 +57,16 @@ public class SocketManager implements SocketManagerAPI {
         try {
             tcpSelector = Selector.open();
             udpSelector = Selector.open();
+
             tcpInfo = new Hashtable<SocketChannel, TCPSocketInfo>();
             udpInfo = new Hashtable<DatagramChannel, UDPSocketInfo>();
+
             tcpSock = new Hashtable<String, SocketChannel>();
             udpSock = new Hashtable<String, DatagramChannel>();
+
             tcpInfoByPort = new Hashtable<Integer, TCPSocketInfo>();
             udpInfoByPort = new Hashtable<Integer, UDPSocketInfo>();
+
             msgQueue = new LinkedBlockingQueue<byte[]>();
 
             tcpThread = new Thread(new Runnable() {
@@ -250,49 +258,19 @@ public class SocketManager implements SocketManagerAPI {
             String key = makeKey(ipHdr.getSourceIP(), tcpHdr.getSourcePort());
             System.out.println("TCP is selected");
             System.out.println("key: " + key);
+            SSLSocket sslSocket = null;
             socket.configureBlocking(false); // Set the socket in non-blocking mode
             // Connect to the server
             socket.connect(new InetSocketAddress(ipHdr.getDestIP(), tcpHdr.getDestPort()));
+
             while (!socket.finishConnect()); // Wait until finishing TCP handshake
 
-            // Log message
-            System.out.println("Complete to make the socket with " + makeKey(ipHdr.getDestIP(), tcpHdr.getDestPort()));
-            System.out.println("Socket in addSocket: " + socket);
-
-            tcpSelector.wakeup();
-            socket.register(tcpSelector, SelectionKey.OP_READ, null);
-            System.out.println("Socket is registered in the Selector");
-            System.out.println("ACK Number in addTCPSocket before set: " + tcpHdr.getSequenceNumber());
-            TCPSocketInfo info = new TCPSocketInfo(socket, ipHdr.getSourceIP(), tcpHdr.getSourcePort(), tcpHdr.getSequenceNumber(), tcpHdr.getAckNumber());
-            System.out.println("ACK Number in addTCPSocket after set: " + info.getAckNum());
-            info.setSeqNum(1);
-
-            // Input the information and the socket into the appropriate table
-            tcpInfo.put(socket, info);
-            tcpInfoByPort.put(socket.socket().getLocalPort(), info);
-            tcpSock.put(key, socket);
-        }
-        catch (IOException e)
-        {
-            System.out.println("Socket is not generated well");
-            System.out.println(e.getStackTrace());
-        }
-    }
-
-    // Add the TCP Socket into the manager
-    @Override
-    public void addTLSSocket(SocketChannel socket, IPHeader ipHdr, TCPHeader tcpHdr) {
-        System.out.println("TLS packet is added to SocketManager.");
-        try {
-            // Key is the combination of the client IP address and the client port
-            // VPN will give the SYN/ACK packet. So the destination is the client
-            String key = makeKey(ipHdr.getSourceIP(), tcpHdr.getSourcePort());
-            System.out.println("TLS is selected");
-            System.out.println("key: " + key);
-            socket.configureBlocking(false); // Set the socket in non-blocking mode
-            // Connect to the server
-            socket.connect(new InetSocketAddress(ipHdr.getDestIP(), tcpHdr.getDestPort()));
-            while (!socket.finishConnect()); // Wait until finishing TCP handshake
+            if (tcpHdr.getDestPort() == 443) {
+                SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+                sslSocket = (SSLSocket) factory.createSocket(socket.socket(), null, 443, false);
+                sslSocket.startHandshake();
+                Certificate[] cert = sslSocket.getSession().getPeerCertificates();
+            }
 
             // Log message
             System.out.println("Complete to make the socket with " + makeKey(ipHdr.getDestIP(), tcpHdr.getDestPort()));
@@ -343,6 +321,13 @@ public class SocketManager implements SocketManagerAPI {
             System.out.println("Socket is not generated well");
             System.out.println(e.getStackTrace());
         }
+    }
+
+    @Override
+    public void updateTLSSocket(SocketChannel channel, SecurityParameters sp)
+    {
+        TLSSocketInfo tlsSocketInfo = (TLSSocketInfo) tcpInfo.get(channel);
+        tlsSocketInfo.setSp(sp);
     }
 
     @Override

@@ -132,12 +132,6 @@ public class Vpn extends VpnService {
                                 System.out.println("IP Header Length: " + ihl);
                                 UDPHeader udpHeader = new UDPHeader(tmpPacket, ihl);
                                 processUDPPacket(socketManager, ipHeader, udpHeader);
-                            } else if (protocol == 1) {
-                                System.out.println("This is ICMP packet.");
-                                ICMPHeader icmpHeader = new ICMPHeader(tmpPacket, ihl);
-                                System.out.println("ICMP Type: " + icmpHeader.getType());
-                                System.out.println("ICMP Code: " + icmpHeader.getCode());
-                                processICMPPacket(out, ipHeader, icmpHeader);
                             } else {
                                 System.out.println("This is another protocol: " + protocol);
                             }
@@ -169,23 +163,25 @@ public class Vpn extends VpnService {
     }
 
     private void processTCPPacket(FileInputStream in, FileOutputStream out, SocketManager sm, IPHeader ipHeader, TCPHeader tcpHeader) {
+        SocketChannel channel = null;
+
+        try {
+            channel = SocketChannel.open();
+            protect(channel.socket());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (tcpHeader.getSyn()) {
             // Add the TCP Socket in the SocketManager
-            try {
-                SocketChannel channel = SocketChannel.open();
-                protect(channel.socket());
-                System.out.println("SYN- Seq from Client: " + tcpHeader.getSequenceNumber() + " " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort());
-                tcpHeader.setAckNumber(makingSeqnum());
+            System.out.println("SYN- Seq from Client: " + tcpHeader.getSequenceNumber() + " " + ipHeader.getSourceIP() + ":" + tcpHeader.getSourcePort());
+            tcpHeader.setAckNumber(makingSeqnum());
 
-                if (tcpHeader.getDestPort() == 443) {
-                    // TODO: sm.addTLSSocket(channel, ipHeader, tcpHeader);
-                } else {
-                    sm.addTCPSocket(channel, ipHeader, tcpHeader);
-                }
-                processTCPHandshake(in, out, ipHeader, tcpHeader);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            if (tcpHeader.getDestPort() == 443)
+                sm.addTLSSocket(channel, ipHeader, tcpHeader);
+            else
+                sm.addTCPSocket(channel, ipHeader, tcpHeader);
+
+            processTCPHandshake(in, out, ipHeader, tcpHeader);
         } else if (tcpHeader.getFin()) {
             System.out.println("Get FIN packet");
             processTCPHandshake(in, out, ipHeader, tcpHeader);
@@ -194,9 +190,9 @@ public class Vpn extends VpnService {
         } else if (tcpHeader.getAck() && tcpHeader.getPayloadLength() == 0) {
             if (tcpHeader.getDestPort() == 443) {
                 System.out.println("This is TLS. Now Start TLS Handshake.");
-                // TODO: SecurityParameter sp;
-                // TODO: sp = processTLSHandshake(in, out, ipHeader, tcpHeader);
-                // TODO: updateTLSSocket(channel, sp);
+                SecurityParameters sp;
+                sp = processTLSHandshake(in, out, ipHeader, tcpHeader);
+                sm.updateTLSSocket(channel, sp);
                 //byte[] outPacket = changeDestSrc(tcpHeader, ipHeader, tcpHeader.getPayload(), ipHeader.getSourceIP(), ipHeader.getDestIP(), tcpHeader.getSourcePort(), tcpHeader.getDestPort(), tcpHeader.getSequenceNumber(), tcpHeader.getAckNumber(), "");
             }
 
@@ -279,8 +275,12 @@ public class Vpn extends VpnService {
         }
     }
 
-    private void processTLSHandshake(FileInputStream in, FileOutputStream out, IPHeader ipHeader, TCPHeader tcpHeader) {
+    private SecurityParameters processTLSHandshake(FileInputStream in, FileOutputStream out, IPHeader ipHeader, TCPHeader tcpHeader) {
         Log.d("PG", "in processTLSHandshake");
+        SecurityParameters sp = null;
+        TLSHandshake handshake = new TLSHandshake();
+        sp = handshake.execute(in, out, ipHeader, tcpHeader);
+        return sp;
     }
 
     private void processFINHandshake(FileInputStream in, FileOutputStream out, IPHeader ipHeader, TCPHeader tcpHeader) {

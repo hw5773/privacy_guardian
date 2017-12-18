@@ -6,7 +6,7 @@ import java.nio.ByteBuffer;
  * Created by HWY on 2017-07-11.
  */
 
-public class Handshake extends Record {
+public class Handshake extends org.socialcoding.privacyguardian.VPN.Record {
     private HandshakeType msgType;
     int length;
 }

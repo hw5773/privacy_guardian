@@ -15,6 +15,13 @@ public class TLSSocketInfo extends TCPSocketInfo {
         super(socket, clntIPAddr, clntPort, seqNum, ackNum);
     }
 
-    public void setSecurityParameter(SecurityParameters sp) { this.sp = sp; }
-    public SecurityParameters getSecurityParameter() { return sp; }
+    public void setSp(SecurityParameters sp)
+    {
+        this.sp = sp;
+    }
+
+    public SecurityParameters getSp()
+    {
+        return sp;
+    }
 }

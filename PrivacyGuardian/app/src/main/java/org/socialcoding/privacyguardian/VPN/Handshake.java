@@ -30,21 +30,17 @@ class SessionID {
 }
 
 class CipherSuite {
-    private byte[] ciphersuite;
+    private short ciphersuite;
 
-    public CipherSuite(short cs) {
-        ByteBuffer buffer = ByteBuffer.allocate(2);
-        buffer.putShort(cs);
-        ciphersuite = buffer.array();
+    public CipherSuite() {
+
     }
 
     public void setCiphersuite(short cs) {
-        ByteBuffer buffer = ByteBuffer.allocate(2);
-        buffer.putShort(cs);
-        ciphersuite = buffer.array();
+        ciphersuite = cs;
     }
 
-    public byte[] getCiphersuite() { return ciphersuite; }
+    public short getCiphersuite() { return ciphersuite; }
 }
 
 enum HandshakeType {
@@ -54,16 +50,6 @@ enum HandshakeType {
 
     private final int number;
     HandshakeType(int number) {
-        this.number = number;
-    }
-
-    int getMagicNumber() { return number; }
-};
-
-enum CompressionMethod {
-    no(0), yes(255);
-    private final int number;
-    CompressionMethod(int number) {
         this.number = number;
     }
 

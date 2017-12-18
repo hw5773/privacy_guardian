@@ -14,7 +14,7 @@ public interface SocketManagerAPI {
 
     // Adding the socket in the SocketManager
     void addTCPSocket(SocketChannel channel, IPHeader ipHdr, TCPHeader tHdr);
-
+    void updateTLSSocket(SocketChannel channel, SecurityParameters sp);
     void addUDPSocket(DatagramChannel channel, IPHeader ipHdr, UDPHeader tHdr);
 
     // Deleting the socket in the SocketManager

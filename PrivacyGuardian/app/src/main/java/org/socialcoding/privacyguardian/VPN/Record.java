@@ -1,6 +1,10 @@
 package org.socialcoding.privacyguardian.VPN;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 /**
  * Created by HWY on 2017-07-11.
@@ -58,11 +62,11 @@ class Random {
     private int gmtUnixTime;
     private byte[] randomBytes;
 
-    public Random() {
+    public Random() throws NoSuchAlgorithmException {
         gmtUnixTime = (int) System.currentTimeMillis() / 1000;
         randomBytes = new byte[28];
-        for (int i=0; i<28; i++)
-            randomBytes[i] = (byte) (Math.random() * 256);
+        SecureRandom csprng = SecureRandom.getInstance("SHA1PRNG");
+        csprng.nextBytes(randomBytes);
     }
 
     public void setUnixTime() {
@@ -71,19 +75,16 @@ class Random {
 
     public int getUnixTime() { return gmtUnixTime; }
     public byte[] getRandomBytes() { return randomBytes; }
-    public byte[] getRandom() {
+    public byte[] getRandom() throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(4);
         buffer.putInt(gmtUnixTime);
         byte[] ts = buffer.array();
 
-        byte[] random = new byte[32];
-        for (int i=0; i<4; i++)
-            random[i] = ts[i];
+        ByteArrayOutputStream random = new ByteArrayOutputStream();
+        random.write(ts);
+        random.write(randomBytes);
 
-        for (int i=0; i<28; i++)
-            random[i+4] = randomBytes[i];
-
-        return random;
+        return random.toByteArray();
     }
 }
 
