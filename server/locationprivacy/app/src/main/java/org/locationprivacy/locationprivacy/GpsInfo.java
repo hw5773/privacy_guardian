@@ -1,4 +1,4 @@
-package privacyguardian.socialcoding.org.locationprivacy;
+package org.locationprivacy.locationprivacy;
 
 import android.app.AlertDialog;
 import android.app.Service;
@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 

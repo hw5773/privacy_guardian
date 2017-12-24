@@ -1,4 +1,4 @@
-package privacyguardian.socialcoding.org.locationprivacy;
+package org.locationprivacy.locationprivacy;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

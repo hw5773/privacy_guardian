@@ -1,4 +1,4 @@
-package privacyguardian.socialcoding.org.locationprivacy;
+package org.locationprivacy.locationprivacy;
 
 import org.junit.Test;
 
