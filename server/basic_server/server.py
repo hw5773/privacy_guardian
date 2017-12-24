@@ -21,4 +21,4 @@ def api_location():
 		return jsonify({"message":"test_post", "latitude":lat, "longitude":lon})
 
 if __name__ == "__main__":
-	app.run(host="147.46.215.152", port=7979)
+	app.run(host="192.168.0.2", port=7979)
